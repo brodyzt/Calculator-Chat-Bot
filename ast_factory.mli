@@ -1,0 +1,1 @@
+(*converts the strings into the AST types for the parser*)

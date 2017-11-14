@@ -1,1 +1,1 @@
-(*solving systems of eq with modlar arith*)
+(*solving systems of eq with modular arith*)

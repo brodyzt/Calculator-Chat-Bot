@@ -1,7 +1,5 @@
 (*simple arithmetic compuations like adding/multiply/power/divide *)
 
-type number
-
 val add: number -> number -> number
 
 val subtract: number -> number -> number

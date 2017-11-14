@@ -1,6 +1,5 @@
 (*linear algebra compuations like dot product, cross product, etc. *)
 
-
 type matrix
 
 val dot_product : matrix -> matrix -> matrix

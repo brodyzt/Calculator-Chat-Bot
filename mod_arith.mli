@@ -15,13 +15,13 @@ val multiply: integer -> integer -> integer -> integer
 (*[divide a b n] is the unique 0 <= r < n such that (a*b' - r) divides n, where
   if [multiply b b' n] is 1, or None if no such b' exists
   Precondition: n > 0*)
-val divide: integer -> integer -> integer -> Some integer
+val divide: integer -> integer -> integer -> integer option
 
 (*[power a b n] is the unique 0 <= r < n such that (a^b -r) divides n if b >=0,
   instead the unique 0 <= r < n such that (a'^-b -r) divides n, where
   [multiply a' a n] is 1, or none if no such a' exists.
   Precondition: n > 0*)
-val power: integer -> integer -> integer -> Some integer
+val power: integer -> integer -> integer -> integer option
 
 (*[gcd a b] is the greatest natural number d such
   that d divides a and d divides b*)

@@ -17,6 +17,7 @@ val multiply: integer -> integer -> integer -> integer
   Precondition: n > 0*)
 val divide: integer -> integer -> integer -> integer
 
+
 (*[power a b n] is the unique 0 <= r < n such that (a^b -r) divides n if b >=0,
   instead the unique 0 <= r < n such that (a'^-b -r) divides n, where
   [multiply a' a n] is 1, or -1 if no such a' exists.

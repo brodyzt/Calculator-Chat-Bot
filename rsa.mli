@@ -1,6 +1,7 @@
 (*all the rsa computation, using the congruence module,
   in addition to prime generation*)
 open Eval
+
 (*A public_key of (n,e) is an RSA public key
   where gcd(e,n) = 1 and n = pq for some
   primes p and q*)
@@ -12,7 +13,8 @@ type public_key = integer * integer
   is the Euler phi function*)
 type private_key = integer * integer * integer
 
-(*[gen_private_key] is a randomly generated private_key*)
+(*[gen_private_key] is a randomly generated private_key with very high
+  probability *)
  val gen_private_key: unit -> private_key
 
 (*[get_public_key k] is the RSA public key associated with

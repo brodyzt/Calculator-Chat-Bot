@@ -11,8 +11,10 @@ type function
 type exn
 
 (*the values of the language will be either strings, numbers or matricies*)
-type value = S of string | N of number | M of Linear_alg.matrix | E of exn;
-
+type value = S of string | N of number | M of Linear_alg.matrix | E of exn
+             PubKey of Rsa.public_key | PrivKey of Rsa.private_key
+             F of Mod_arith.factors | P of pair;
+and pair = value * value
 (*this is the enviment with all of the function bindings*)
 type env
 

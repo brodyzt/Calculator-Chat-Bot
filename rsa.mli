@@ -12,7 +12,8 @@ type public_key = integer * integer
   is the Euler phi function*)
 type private_key = integer * integer * integer
 
-(*[gen_private_key] is a randomly generated private_key*)
+(*[gen_private_key] is a randomly generated private_key with very high
+  probability *)
  val gen_private_key: unit -> private_key
 
 (*[get_public_key k] is the RSA public key associated with

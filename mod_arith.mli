@@ -13,15 +13,15 @@ Precondition: n > 0*)
 val multiply: integer -> integer -> integer -> integer
 
 (*[divide a b n] is the unique 0 <= r < n such that (a*b' - r) divides n, where
-  if [multiply b b' n] is 1, or None if no such b' exists
+  if [multiply b b' n] is 1, or -1 if no such b' exists
   Precondition: n > 0*)
-val divide: integer -> integer -> integer -> Some integer
+val divide: integer -> integer -> integer -> integer
 
 (*[power a b n] is the unique 0 <= r < n such that (a^b -r) divides n if b >=0,
   instead the unique 0 <= r < n such that (a'^-b -r) divides n, where
-  [multiply a' a n] is 1, or none if no such a' exists.
+  [multiply a' a n] is 1, or -1 if no such a' exists.
   Precondition: n > 0*)
-val power: integer -> integer -> integer -> Some integer
+val power: integer -> integer -> integer -> integer
 
 (*[gcd a b] is the greatest natural number d such
   that d divides a and d divides b*)
@@ -37,19 +37,18 @@ val gen_prime: unit -> integer*float
 
 (*[factor n] is a list of n's prime factors, ordered from least to greatest if
   n is positive, and -n's prime factors ordered from least to greatest if n is
-  negative. It is the list with the single element 0, if n=0. If it none if
-  the factoring process takes too long*)
-val factor: integer -> integer list option
+  negative. It is the list with the single element 0, if n=0.*)
+val factor: integer -> integer list
 
-(*[is_prime n] is Some true if n is a prime, Some false if n is not a prime,
-  and None if the computation takes too long*)
-val is_prime: integer -> boolean option
+(*[is_prime n] is true if n is a prime, false if n is not a prime
+  Can take an excedingly long time for large numbers*)
+val is_prime: integer -> boolean
 
 (*[is_prime_prob n] is a float p, where the probability that n is prime is not
-  less than p, or is -1 if n is certainly composite*)
+  less than p, or is -1 if n is certainly composite. This is a faster version
+  of is_prime, but without certainty of result*)
 val is_prime_prob: integer -> float
 
 (*[totient n] is the number of units in Z mod n. In other words it is the
-  result of applying the Euler totient (phi) function to n, it is None
-  if the application of this function takes too long*)
-val totient: integer -> integer option
+  result of applying the Euler totient (phi) function to n*)
+val totient: integer -> integer

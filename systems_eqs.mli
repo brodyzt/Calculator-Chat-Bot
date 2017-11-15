@@ -13,6 +13,5 @@ val bezout: integer -> integer -> integer -> (integer * integer) option
 val crt: integer list -> integer list -> (integer * integer)
 
 (*[is_square a n] is Some true if x^2 = a (mod n) for some x,
-  Some false if x^2 != a (mod n) for any x, and is None if the computation
-  takes too long*)
-val is_square: integer -> integer -> Some boolean
+  Some false if x^2 != a (mod n) for any x*)
+val is_square: integer -> integer -> boolean

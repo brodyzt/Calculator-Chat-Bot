@@ -1,4 +1,4 @@
-open Eval
+open Types
 (*[bezout x y c] is a pair (a, b) where x*a + y*b = c, or an exeption value
   if no such pair exists*)
 let bezout x y c = P(N(I x), N(I(y)))

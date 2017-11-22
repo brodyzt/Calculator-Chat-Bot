@@ -1,4 +1,3 @@
-
 type integer = Big_int.big_int
 
 type number = I of integer | F of float
@@ -27,15 +26,3 @@ type value = S of string | N of number | M of matrix | E of exn |
              PubKey of public_key | PrivKey of private_key |
              F of factors | P of pair
 and pair = value * value
-
-(*this is the enviment with all of the function bindings*)
-type env
-
-(*this will be the type for the stack that we will use to store the values
- *on*)
-type stack
-
-(*[evaluate_line s] evaluates the string [s] to a value and then gives back a
- * string form of the value*)
-val evaluate_line : string -> string
-

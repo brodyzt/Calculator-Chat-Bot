@@ -20,9 +20,9 @@ let rec loop _ =
  *)
 let main _ =
   (print_string ("\n\n**Welcome to the CS helper buddy**"^
-              "We can help with, combinatorics, number theory,"^
+              "\nWe can help with, combinatorics, number theory,"^
               " and linear algebra, you are also welcome to make"^
-              "your own macros to extend the functionality");
+              " your own macros to extend the functionality");
   (loop ()))
 
 

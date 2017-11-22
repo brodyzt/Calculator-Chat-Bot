@@ -1,20 +1,33 @@
-(*integers will be big integers so that the values never overflow*)
-type integer = Big_int
 
-(*a number in the language is either an integer or a floating point number*)
+type integer = Big_int.big_int
+
 type number = I of integer | F of float
 
-(*this is the type of a function in the languge*)
-type function
+type func = char list * string
 
-(*this type will represent an exception in the language*)
-type exn
+type exn = string
 
-(*the values of the language will be either strings, numbers or matricies*)
-type value = S of string | N of number | M of Linear_alg.matrix | E of exn
-             PubKey of Rsa.public_key | PrivKey of Rsa.private_key
-             F of Mod_arith.factors | P of pair;
+type matrix
+
+(*A public_key of (n,e) is an RSA public key
+  where gcd(e,n) = 1 and n = pq for some
+  primes p and q*)
+type public_key = integer * integer
+
+(*A private_key of (d,p,q) is an RSA private key (d,pq) for
+  the public key (e,n), where gcd(d,n) = 1
+  and d satisfies e*d = 1 (mod phi(n)), where phi
+  is the Euler phi function*)
+type private_key = integer * integer * integer
+
+(* a list of pairs of primes and their multiplicity for some number*)
+type factors = (integer * integer) list
+
+type value = S of string | N of number | M of matrix | E of exn |
+             PubKey of public_key | PrivKey of private_key |
+             F of factors | P of pair
 and pair = value * value
+
 (*this is the enviment with all of the function bindings*)
 type env
 
@@ -25,3 +38,4 @@ type stack
 (*[evaluate_line s] evaluates the string [s] to a value and then gives back a
  * string form of the value*)
 val evaluate_line : string -> string
+

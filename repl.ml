@@ -6,12 +6,14 @@
 (* [main ()] begins the repl which will continuously promt the user to input
  * commands for the calculator, evaluating them and then printining their result
  *)
-val main : unit -> unit
+let main _ = print_string "> "
 
 (*[promt_and_read ()] will promt the user to input text and then read that
  * back in and return the resulting line in the form of a string*)
-val promt_and_read : unit -> string
+let promt_and_read _ = ""
 
 
 (*[display_output s] will print out the string s to the user*)
-val disply_output : string -> unit
+let disply_output s = print_string s
+
+let () = main ()

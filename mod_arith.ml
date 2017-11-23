@@ -1,18 +1,32 @@
 open Types
 
-let add a b n = N(I a)
+let add a b n =
+  if (n < 0) then E("cannot take the remainder mod a negative number")
+  else N(I((a + b) % n))
 
-let subtract a b n = N(I a)
+let subtract a b n =
+  if (n < 0) then E("cannot take the remainder mod a negative number")
+  else N(I((a - b) % n))
 
-let multiply a b n = N(I a)
+let multiply a b n =
+  if (n < 0) then (E "cannot take the remainder mod a negative number")
+  else N(I((a * b) % n))
 
 let divide a b n = N(I a)
 
+
 let power a b n = N(I a)
 
-let gcd a b = N(I a)
 
-let lcm a b = N(I a)
+let rec gcd a b =
+  if (a < 0) then gcd (-a) b
+  else if (b < 0) then gcd a (-b)
+  else if a < b then gcd b a
+  else if (b == 0) then N(I(a))
+  else gcd b (a mod b)
+
+let lcm a b =
+  N(I(a * b / (gcd a b)))
 
 let gen_prime l = N(I l)
 

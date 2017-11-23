@@ -35,3 +35,4 @@ let null_space m = M(m)
 
 let col_space m = M(m)
 
+let eq m1 m2 = N (I (Big_int.big_int_of_int 0))

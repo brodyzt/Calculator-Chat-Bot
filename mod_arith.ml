@@ -1,5 +1,7 @@
 open Types
 
+let modulus a b = N(I a)
+
 let add a b n = N(I a)
 
 let subtract a b n = N(I a)
@@ -9,6 +11,8 @@ let multiply a b n = N(I a)
 let divide a b n = N(I a)
 
 let power a b n = N(I a)
+
+let eq a b n = N (I (Big_int.big_int_of_int 0))
 
 let gcd a b = N(I a)
 

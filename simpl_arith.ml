@@ -9,3 +9,5 @@ let multiply a b = N(a)
 let divide a b = N(a)
 
 let power a b = N(a)
+
+let eq a b = N (I (Big_int.big_int_of_int 0))

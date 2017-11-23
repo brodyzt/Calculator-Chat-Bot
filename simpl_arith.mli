@@ -26,3 +26,7 @@ val divide: Types.number -> Types.number -> Types.value
 
 (*[power a b] is a^b, warning on floats this value may overflow*)
 val power: Types.number -> Types.number -> Types.value
+
+(*[eq a b] returns a non zero value if [a] [b] are the same value and
+ * a zero value if they are not equal*)
+val eq: Types.number -> Types.number -> Types.value

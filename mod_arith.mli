@@ -1,5 +1,8 @@
 (*arithmatic with congruence classes*)
 
+(*[add a b] is the unique 0 <=r < n such that (a - r) divides b
+  if b <= 0 then the result will be an excpetion value*)
+val modulus: Types.integer -> Types.integer -> Types.value
 
 (*[add a b n] is the unique 0 <=r < n such that (a + b - r) divides n
   if n <= 0 then the result will be an excpetion value*)
@@ -24,6 +27,10 @@ val divide: Types.integer -> Types.integer -> Types.integer -> Types.value
   [multiply a' a n] is 1, or -1 if no such a' exists.
   if n <= 0 then the result will be an excpetion value*)
 val power: Types.integer -> Types.integer -> Types.integer -> Types.value
+
+(*[eq a b n] returns a non zero value if [a] [b] are the same value mod [n] and
+ * a zero value if they are not equal*)
+val eq: Types.number -> Types.number -> Types.number -> Types.value
 
 (*[gcd a b] is the greatest natural number d such
   that d divides a and d divides b

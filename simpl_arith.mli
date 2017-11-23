@@ -18,11 +18,16 @@ val subtract: Types.number -> Types.number -> Types.value
   if they are not the result will be an excpetion value*)
 val multiply: Types.number -> Types.number -> Types.value
 
-(*[multiply a b] is a / b if a and b are both integers, a /. b if a and b are
+(*[divide a b] is a / b if a and b are both integers, a /. b if a and b are
   both floats
   Precondition: a,b are both either integers or floats, a,b are the same type
   and b != 0, if they are not the result will be an excpetion value*)
 val divide: Types.number -> Types.number -> Types.value
+
+(*[modulus a b] is a mod b if a and b are both integers
+  Precondition: a,b are both either integers or floats, a,b are the same type
+  and b != 0, if they are not the result will be an excpetion value*)
+val modulus: Types.integer -> Types.integer -> Types.value
 
 (*[power a b] is a^b, warning on floats this value may overflow*)
 val power: Types.number -> Types.number -> Types.value

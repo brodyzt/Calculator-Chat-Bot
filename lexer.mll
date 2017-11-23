@@ -44,7 +44,7 @@ let bin_op op =
       | "#", M(m1), M(m2) -> Linear_alg.cross_product m2 m1
       | "/", N(n1), N(n2) -> Simpl_arith.divide n2 n1
       | "^", N(n1), N(n2) -> Simpl_arith.power n2 n1
-      | "%", N(I(i1)), N((I i2)) -> Mod_arith.modulus i2 i1
+      | "%", N(I(i1)), N((I i2)) -> Simpl_arith.modulus i2 i1
       | "=", N(n1), N(n2) -> Simpl_arith.eq n2 n1
       | "=", M(m1), M(m2) -> Linear_alg.eq m2 m1
       | "gcd", N(I(i1)), N((I i2)) -> Mod_arith.gcd i2 i1

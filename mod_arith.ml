@@ -2,15 +2,15 @@ open Types
 
 let add a b n =
   if (n < 0) then E("cannot take the remainder mod a negative number")
-  else N(I((a + b) % n))
+  else N(I((a + b) mod n))
 
 let subtract a b n =
   if (n < 0) then E("cannot take the remainder mod a negative number")
-  else N(I((a - b) % n))
+  else N(I((a - b) mod n))
 
 let multiply a b n =
   if (n < 0) then (E "cannot take the remainder mod a negative number")
-  else N(I((a * b) % n))
+  else N(I((a * b) mod n))
 
 let divide a b n = N(I a)
 

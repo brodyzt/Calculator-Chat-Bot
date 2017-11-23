@@ -69,3 +69,7 @@ val null_space: Types.matrix -> Types.value
 
 (* [null_space a] is the matrix containing the basis for the col space of [a] *)
 val col_space: Types.matrix -> Types.value
+
+(*[eq a b] returns a non zero value if [a] [b] are the same matrix and
+ * a zero value if they are not*)
+val eq: Types.matrix -> Types.matrix -> Types.value

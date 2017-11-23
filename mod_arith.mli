@@ -24,6 +24,10 @@ val divide: Types.integer -> Types.integer -> Types.integer -> Types.value
   if n <= 0 then the result will be an exception value*)
 val power: Types.integer -> Types.integer -> Types.integer -> Types.value
 
+(*[eq a b n] returns a non zero value if [a] [b] are the same value mod [n] and
+ * a zero value if they are not equal*)
+val eq: Types.number -> Types.number -> Types.number -> Types.value
+
 (*[gcd a b] is the greatest natural number d such
   that d divides a and d divides b
   note: if a or b <= 0 then [gcd a b] will be the same as gcd applied

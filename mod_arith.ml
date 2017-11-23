@@ -17,6 +17,8 @@ let divide a b n = N(I a)
 
 let power a b n = N(I a)
 
+let eq a b n = N(I (Big_int.big_int_of_int 0))
+
 
 let rec gcd a b =
   if (a < 0) then gcd (-a) b

@@ -5,6 +5,18 @@ open Types
 
 type env = func ID_Map.t*)
 
+let string_of_number n =
+  match n with
+  | I i -> string_of_big_int i
+  | F f -> string_of_float f
+
+let string_of_matrix m =
+  "[\n"^(Array.fold_right ( fun e ac ->
+    "[ "^(Array.fold_right (fun el acc -> (string_of_number el)^" "^acc) e ("]\n"^ac))  )
+    m
+    "]")
+
+
 
 let evaluate_line s =
   let lexbuf = Lexing.from_string s in
@@ -14,8 +26,8 @@ let evaluate_line s =
       if Stack.is_empty Lexer.stack then "" else
         match Stack.top Lexer.stack with
         | S s -> s
-        | N(I i) -> string_of_big_int i
-        | N(F f) -> string_of_float f
+        | N n -> string_of_number n
+        | M m -> string_of_matrix m
         | E e -> e
         | _ -> failwith "unimplemented"
     end

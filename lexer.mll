@@ -1,6 +1,7 @@
 {
 
 open Types
+open Big_int
 (*stuff to directly copy to Lexer.ml*)
 let stack = Stack.create ()
 
@@ -121,13 +122,41 @@ let multi_op op =
       | "solve" -> apply (Systems_eqs.crt) a
       | _ -> E("not a defined operator")
 
+let rec row_to_list s f =
+  let c = String.index_opt s ',' in
+  let len = String.length s in
+  match c with
+    | None -> (f s)::[]
+    | Some x -> (f (String.sub s 0 x))::(row_to_list (String.sub s (x+2) (len-x-2) ) f)
+
+let rec make_rows s f =
+  let beg = String.index_opt s '[' in
+  let en = String.index_opt s ']' in
+  let len = String.length s in
+    match beg, en with
+    | None , _ -> []
+    | _, None -> []
+    | Some b, Some e ->
+      (List.rev (row_to_list (String.sub s (b+1) (e-b-1)) f))::( make_rows (String.sub s (e+1) (len-e-1)) f)
+
+let make_matrix s f =
+  let list_m = List.rev (make_rows (String.sub s 1 ((String.length s) -2)) f) in
+  let m = Array.make_matrix (List.length list_m) (List.length (List.hd list_m)) (F(0.)) in
+    List.iteri (fun i l -> m.(i) <- (Array.of_list l)) list_m; m
+
+
 }
 
 let white = [' ' '\t']+
 let digit = ['0'-'9']
 let int = '-'? digit+
 let float =  '-'? digit+'.'digit*
+let num = int | float
 let letter = ['a'-'z' 'A'-'Z']
+let int_vector = '[' int (", "int) * ']'
+let int_matrix = '[' int_vector (", "int_vector) * ']'
+let vector = '[' num (", "num) * ']'
+let matrix = '[' vector (", "vector) * ']'
 let id = letter+
 let nop = "generate_private_key"
 let uop = "inv" | "transpose" | "echelon" | "reduce" | "det" | "indep"
@@ -145,4 +174,6 @@ rule read =
   | bop   { Stack.push (bin_op (Lexing.lexeme lexbuf)) stack; read lexbuf }
   | id { Stack.push (S (Lexing.lexeme lexbuf)) stack; read lexbuf }
   | int { Stack.push (N(I (Big_int.big_int_of_string (Lexing.lexeme lexbuf)))) stack; read lexbuf }
+  | int_matrix {Stack.push (M(make_matrix (Lexing.lexeme lexbuf) (fun i -> (I(big_int_of_string i))) )) stack; read lexbuf}
+  | matrix {Stack.push (M(make_matrix (Lexing.lexeme lexbuf) (fun f -> (F(float_of_string f))))) stack; read lexbuf}
   | eof {()}

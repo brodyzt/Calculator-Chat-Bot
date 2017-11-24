@@ -1,3 +1,5 @@
+open Array
+open Big_int
 type integer = Big_int.big_int
 
 type number = I of integer | F of float
@@ -6,7 +8,7 @@ type func = char list * string
 
 type exn = string
 
-type matrix
+type matrix = number array array
 
 (*A public_key of (n,e) is an RSA public key
   where gcd(e,n) = 1 and n = pq for some
@@ -24,5 +26,5 @@ type factors = (integer * integer) list
 
 type value = S of string | N of number | M of matrix | E of exn |
              PubKey of public_key | PrivKey of private_key |
-             F of factors | P of pair
+             Fact of factors | P of pair
 and pair = value * value

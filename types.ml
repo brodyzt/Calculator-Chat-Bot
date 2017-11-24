@@ -4,7 +4,7 @@ type integer = Big_int.big_int
 
 type number = I of integer | F of float
 
-type func = char list * string
+
 
 type exn = string
 
@@ -23,8 +23,14 @@ type private_key = integer * integer * integer
 
 (* a list of pairs of primes and their multiplicity for some number*)
 type factors = (integer * integer) list
+module PMap = Map.Make(String)
 
-type value = S of string | N of number | M of matrix | E of exn |
+type env = value PMap.t
+
+and func = env * string list * string
+
+and value = S of string | N of number | M of matrix | E of exn |
              PubKey of public_key | PrivKey of private_key |
-             Fact of factors | P of pair
+             Fact of factors | P of pair | Func of func
 and pair = value * value
+

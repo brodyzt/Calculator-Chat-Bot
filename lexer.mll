@@ -2,7 +2,7 @@
 
 open Types
 open Big_int
-(*stuff to directly copy to Lexer.ml*)
+
 let stack = Stack.create ()
 
 let no_op op =
@@ -122,6 +122,7 @@ let multi_op op =
       | "solve" -> apply (Systems_eqs.crt) a
       | _ -> E("not a defined operator")
 
+
 let rec row_to_list s f =
   let c = String.index_opt s ',' in
   let len = String.length s in
@@ -168,12 +169,29 @@ let top = "?" | "+~" | "-~" | "*~" | "/~" | "^~" | "=~" | "crack" | "public_key"
 let qop = "encrypt" | "decrypt"
 let mop = "solve"
 
-rule read =
-  parse
-  | white { read lexbuf }
-  | bop   { Stack.push (bin_op (Lexing.lexeme lexbuf)) stack; read lexbuf }
-  | id { Stack.push (S (Lexing.lexeme lexbuf)) stack; read lexbuf }
-  | int { Stack.push (N(I (Big_int.big_int_of_string (Lexing.lexeme lexbuf)))) stack; read lexbuf }
-  | int_matrix {Stack.push (M(make_matrix (Lexing.lexeme lexbuf) (fun i -> (I(big_int_of_string i))) )) stack; read lexbuf}
-  | matrix {Stack.push (M(make_matrix (Lexing.lexeme lexbuf) (fun f -> (F(float_of_string f))))) stack; read lexbuf}
+rule read env = parse
+  | white { read env lexbuf }
+  | uop { Stack.push (un_op (Lexing.lexeme lexbuf)) stack; read env lexbuf }
+  | bop   { Stack.push (bin_op (Lexing.lexeme lexbuf)) stack; read env lexbuf }
+  | top   { Stack.push (tri_op (Lexing.lexeme lexbuf)) stack; read env lexbuf }
+  | qop   { Stack.push (quad_op (Lexing.lexeme lexbuf)) stack; read env lexbuf }
+  | mop   { Stack.push (multi_op (Lexing.lexeme lexbuf)) stack; read env lexbuf }
+  | '"' id '"' { Stack.push (S (let s = Lexing.lexeme lexbuf in String.sub (s) 1 ((String.length s)-2 ) )) stack; read env lexbuf }
+  | id {
+      let s = Lexing.lexeme lexbuf in
+      if PMap.mem s env then
+        match PMap.find s env with
+        | Func (env, args, fun_string) -> begin
+          if Stack.length stack < List.length args then (Stack.push (E "wrong number of arguments") stack; read env lexbuf)
+          else
+            let vals = List.rev (get_n (List.length args)) in
+              (read (List.fold_left2 (fun m n v -> PMap.add n v m) env args vals) (Lexing.from_string fun_string); read env lexbuf)
+         end
+        | v -> (Stack.push (v) stack; read env lexbuf)
+      else (Stack.push (E "not defined") stack; read env lexbuf)
+    }
+  | int { Stack.push (N(I (Big_int.big_int_of_string (Lexing.lexeme lexbuf)))) stack; read env lexbuf }
+  | int_matrix {Stack.push (M(make_matrix (Lexing.lexeme lexbuf) (fun i -> (I(big_int_of_string i))) )) stack; read env lexbuf}
+  | matrix {Stack.push (M(make_matrix (Lexing.lexeme lexbuf) (fun f -> (F(float_of_string f))))) stack; read env lexbuf}
   | eof {()}
+

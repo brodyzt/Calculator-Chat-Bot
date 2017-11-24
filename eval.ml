@@ -1,9 +1,6 @@
 open Big_int
 open Types
 
-(*module ID_Map = Map.Make(String)
-
-type env = func ID_Map.t*)
 
 let string_of_number n =
   match n with
@@ -16,18 +13,30 @@ let string_of_matrix m =
     m
     "]")
 
+let rec parse_arg s =
+  if String.index s '-' = 0 then [] else
+    let c = String.index s ' ' in
+    let arg = String.sub s 0 c in
+      arg::(parse_arg (String.sub s (c+1) ( (String.length s) -c-1 )) )
 
+let parse_macro env s =
+  let c = String.index s ':' in
+  let name = String.sub s 0 c in
+  let args = parse_arg s in
+  let b = (String.index s '-') + 2 in
+  let fun_string = String.sub s (b) ((String.length s) - b) in
+    (PMap.add name (Func(env,args,fun_string)) env)
 
-let evaluate_line s =
+let evaluate_line env s =
   let lexbuf = Lexing.from_string s in
     begin
-
-      Lexer.read lexbuf;
-      if Stack.is_empty Lexer.stack then "" else
+      if String.get s 0 = '{' then ("",parse_macro env s) else
+      (Lexer.read env lexbuf;
+      if Stack.is_empty Lexer.stack then "", env else
         match Stack.top Lexer.stack with
-        | S s -> s
-        | N n -> string_of_number n
-        | M m -> string_of_matrix m
-        | E e -> e
-        | _ -> failwith "unimplemented"
+        | S s -> s, env
+        | N n -> string_of_number n, env
+        | M m -> string_of_matrix m, env
+        | E e -> e, env
+        | _ -> failwith "unimplemented")
     end

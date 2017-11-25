@@ -5,7 +5,7 @@ let promt_and_read _ =
   print_string "\n>";
   match read_line () with
   | exception End_of_file -> ""
-  | file_name -> file_name
+  | line -> line
 
 (*[display_output s] will print out the string s to the user*)
 let display_output s = print_string s

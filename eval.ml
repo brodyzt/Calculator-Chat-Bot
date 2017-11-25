@@ -8,10 +8,10 @@ let string_of_number n =
   | F f -> string_of_float f
 
 let string_of_matrix m =
-  "[\n"^(Array.fold_right ( fun e ac ->
-    "[ "^(Array.fold_right (fun el acc -> (string_of_number el)^" "^acc) e ("]\n"^ac))  )
-    m
-    "]")
+  "[\n"^(Array.fold_left ( fun ac e ->
+    "[ "^(Array.fold_left (fun acc el -> (string_of_number el)^" "^acc) ("]\n"^ac) e)  )
+    "]"
+     m)
 
 let rec parse_arg s =
   if String.index s '-' = 0 then [] else
@@ -30,13 +30,13 @@ let parse_macro env s =
 let evaluate_line env s =
   let lexbuf = Lexing.from_string s in
     begin
-      if String.get s 0 = '{' then ("",parse_macro env s) else
+      if String.length s > 0 && String.get s 0 = '{' then (" ",parse_macro env s) else
       (Lexer.read env lexbuf;
-      if Stack.is_empty Lexer.stack then "", env else
-        match Stack.top Lexer.stack with
-        | S s -> s, env
-        | N n -> string_of_number n, env
-        | M m -> string_of_matrix m, env
-        | E e -> e, env
-        | _ -> failwith "unimplemented")
+      if Stack.is_empty Lexer.stack then " ", env else
+        match Stack.pop Lexer.stack with
+        | S s -> (Stack.clear Lexer.stack); s, env
+        | N n -> (Stack.clear Lexer.stack); string_of_number n, env
+        | M m -> (Stack.clear Lexer.stack); string_of_matrix m, env
+        | E e -> (Stack.clear Lexer.stack); e, env
+        | _ -> failwith "unimplemented string conversion")
     end

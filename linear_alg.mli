@@ -3,12 +3,12 @@
 (* [row a x] returns the row of [a] at index [x]
  * if [x] is not an the index of a row in [a], this
  * evaluates to an exeption value*)
-val row: Types.matrix -> Types.number -> Types.value
+val row: Types.matrix -> Types.integer -> Types.value
 
 (* [col a x] returns the column of [a] at index [x]
  * Pif [x] is not an index of a column in [a], this
  * evaluates to an exeption value*)
-val col: Types.matrix -> Types.number -> Types.value
+val col: Types.matrix -> Types.integer -> Types.value
 
 (* [dot_product a b] is [a]•[b]
  * if the width of [a] is not the same as height of [b] then

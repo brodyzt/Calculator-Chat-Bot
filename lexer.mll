@@ -145,6 +145,12 @@ let make_matrix s f =
   let m = Array.make_matrix (List.length list_m) (List.length (List.hd list_m)) (F(0.)) in
     List.iteri (fun i l -> m.(i) <- (Array.of_list l)) list_m; m
 
+(*
+let int_vector = '[' int (", "int) * ']'
+let int_matrix = '[' int_vector (", "int_vector) * ']'
+| int_matrix {Stack.push (M(make_matrix (Lexing.lexeme lexbuf) (fun i -> (I(big_int_of_string i))) )) stack; read env lexbuf}
+*)
+
 
 }
 
@@ -154,9 +160,7 @@ let int = '-'? digit+
 let float =  '-'? digit+'.'digit*
 let num = int | float
 let letter = ['a'-'z' 'A'-'Z']
-let int_vector = '[' int (", "int) * ']'
-let int_matrix = '[' int_vector (", "int_vector) * ']'
-let vector = '[' num (", "num) * ']'
+let vector = '[' float (", "float) * ']'
 let matrix = '[' vector (", "vector) * ']'
 let id = letter+
 let nop = "generate_private_key"
@@ -191,7 +195,6 @@ rule read env = parse
       else (Stack.push (E "not defined") stack; read env lexbuf)
     }
   | int { Stack.push (N(I (Big_int.big_int_of_string (Lexing.lexeme lexbuf)))) stack; read env lexbuf }
-  | int_matrix {Stack.push (M(make_matrix (Lexing.lexeme lexbuf) (fun i -> (I(big_int_of_string i))) )) stack; read env lexbuf}
   | matrix {Stack.push (M(make_matrix (Lexing.lexeme lexbuf) (fun f -> (F(float_of_string f))))) stack; read env lexbuf}
   | eof {()}
 

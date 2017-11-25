@@ -24,11 +24,9 @@ let dot_product m1 m2 =
   let l1 = Array.length m1 in
   let l2 = Array.length m2 in
   let r = Array.make_matrix l1 1 (F(0.) ) in
-  print_string (string_of_int (Array.length r));
     if l1 <> l2 then M(Array.make_matrix 0 0 (F(0.)) )
     else
       let rec mult n =
-        print_string (string_of_int n);
         if n = l1 then () else
           ((match m1.(n).(0), m2.(n).(0) with
           | F(f1), F(f2) -> r.(n).(0) <- F(f1 *. f2)
@@ -37,7 +35,19 @@ let dot_product m1 m2 =
 
 
 
-let cross_product m1 m2 = M m1
+let cross_product m1 m2 =
+  let l1 = Array.length m1 in
+  let l2 = Array.length m2 in
+  let r = Array.make_matrix l1 1 (F(0.) ) in
+    if l1 <> l2 || l1 <> 3 then M(Array.make_matrix 0 0 (F(0.)) )
+    else
+      match m1.(0).(0), m1.(0).(1), m1.(0).(1), m2.(0).(0), m2.(0).(1), m2.(0).(2) with
+      | F(a1), F(a2), F(a3), F(b1), F(b2), F(b3) -> begin
+        r.(0).(0) <-  F(a2 *. b3 +. a3 *. b2);
+        r.(0).(1) <-  F(a3 *. b1 +. a1 *. b3);
+        r.(0).(2) <-  F(a1 *. b2 +. a2 *. b1);
+        M(r)
+      end
 
 let scale m n = M m
 

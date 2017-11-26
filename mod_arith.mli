@@ -46,7 +46,7 @@ val gen_prime: Types.integer -> Types.value
 (*[factor n] is a list of pairs of n's prime factors and their multiplicity,
   ordered from least to greatest if n is positive, and -n's prime factors
   ordered from least to greatest if n is
-  negative. It is the list with the single element 0, if n=0.*)
+  negative. It is the empty list, if n=0 or n=1.*)
 val factor: Types.integer -> Types.value
 
 (*[is_prime n] is 1 (ie true) if n is a prime, 0 (ie false) if n is not a prime

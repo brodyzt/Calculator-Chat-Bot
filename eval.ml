@@ -27,16 +27,35 @@ let parse_macro env s =
   let fun_string = String.sub s (b) ((String.length s) - b) in
     (PMap.add name (Func(env,args,fun_string)) env)
 
+let rec string_of_value v =
+  (Stack.clear Lexer.stack);
+  match v with
+  | S s ->  s
+  | N n -> string_of_number n
+  | M m -> string_of_matrix m
+  | E e -> e
+  | PubKey (n, e) -> begin
+    "n: "^(string_of_big_int n)^" e: "^(string_of_big_int e)
+  end
+  | PrivKey (p, q, d) -> begin
+    "p: "^(string_of_big_int p)^
+    " q: "^(string_of_big_int q)^
+    " d: "^(string_of_big_int d)
+  end
+  | Fact f -> begin
+    List.fold_left
+      (fun acc (i,c) -> acc^"("^string_of_big_int i^","
+                        ^string_of_big_int c^") ")
+      "" f
+  end
+  | P (l, r) -> "("^string_of_value l^","^string_of_value r^")"
+  | Func _ -> "op"
+
 let evaluate_line env s =
   let lexbuf = Lexing.from_string s in
     begin
       if String.length s > 0 && String.get s 0 = '{' then (" ",parse_macro env s) else
       (Lexer.read env lexbuf;
       if Stack.is_empty Lexer.stack then " ", env else
-        match Stack.pop Lexer.stack with
-        | S s -> (Stack.clear Lexer.stack); s, env
-        | N n -> (Stack.clear Lexer.stack); string_of_number n, env
-        | M m -> (Stack.clear Lexer.stack); string_of_matrix m, env
-        | E e -> (Stack.clear Lexer.stack); e, env
-        | _ -> failwith "unimplemented string conversion")
+        (string_of_value (Stack.pop Lexer.stack), env))
     end

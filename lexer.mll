@@ -65,7 +65,11 @@ let tri_op op =
     let two = Stack.pop stack in
     let three = Stack.pop stack in
       match op, one, two, three with
-      | "?", N(n1), N(n2), N(n3) -> failwith "unimplemented"
+      | "?", n1, n2, N(n3) -> begin
+        match n3 with
+        | I i -> if compare_big_int i zero_big_int = 0 then n1 else n2
+        | F f -> if f = 0. then n1 else n2
+      end
       | "+~",  N(I(i1)), N((I i2)), N(I(i3)) -> Mod_arith.add i3 i2 i1
       | "-~",  N(I(i1)), N((I i2)), N(I(i3)) -> Mod_arith.subtract i3 i2 i1
       | "*~",  N(I(i1)), N((I i2)), N(I(i3)) -> Mod_arith.multiply i3 i2 i1
@@ -195,6 +199,7 @@ rule read env = parse
       else (Stack.push (E "not defined") stack; read env lexbuf)
     }
   | int { Stack.push (N(I (Big_int.big_int_of_string (Lexing.lexeme lexbuf)))) stack; read env lexbuf }
+  | float { Stack.push (N(F (float_of_string (Lexing.lexeme lexbuf)))) stack; read env lexbuf }
   | matrix {Stack.push (M(make_matrix (Lexing.lexeme lexbuf) (fun f -> (F(float_of_string f))))) stack; read env lexbuf}
   | eof {()}
 

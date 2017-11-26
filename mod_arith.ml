@@ -63,9 +63,21 @@ let rec factor_helper n d accum =
     then factor_helper (div_big_int n d) d (add_factor accum d)
     else factor_helper n (add_big_int d (big_int_of_int 1)) accum
 
-let factor n = Fact(factor_helper n (big_int_of_int 2) [])
+let factor n =
+  Fact(factor_helper n (big_int_of_int 2) [])
 
-let is_prime n = N(I n)
+let is_prime n =
+  let res = factor n in
+  match res with
+  | Fact factors -> begin
+      match factors with
+      | [] -> failwith "an integer cannot have no factors"
+      | (fact,freq)::t ->
+        if (((compare_big_int freq (big_int_of_int 1))=0) && (t = []))
+        then N(I(big_int_of_int 1))
+        else N(I(zero_big_int))
+    end
+  | _ -> failwith "factored incorrectly"
 
 let is_prime_likely n = N(I n)
 

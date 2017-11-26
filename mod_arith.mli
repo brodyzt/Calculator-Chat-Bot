@@ -49,7 +49,7 @@ val gen_prime: Types.integer -> Types.value
   negative. It is the list with the single element 0, if n=0.*)
 val factor: Types.integer -> Types.value
 
-(*[is_prime n] is t1 (ie true) if n is a prime, 0 (ie false) if n is not a prime
+(*[is_prime n] is 1 (ie true) if n is a prime, 0 (ie false) if n is not a prime
   Can take an excedingly long time for large numbers*)
 val is_prime: Types.integer -> Types.value
 

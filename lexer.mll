@@ -199,6 +199,7 @@ rule read env = parse
       else (Stack.push (E "not defined") stack; read env lexbuf)
     }
   | int { Stack.push (N(I (Big_int.big_int_of_string (Lexing.lexeme lexbuf)))) stack; read env lexbuf }
+  | float { Stack.push (N(F (float_of_string (Lexing.lexeme lexbuf)))) stack; read env lexbuf }
   | matrix {Stack.push (M(make_matrix (Lexing.lexeme lexbuf) (fun f -> (F(float_of_string f))))) stack; read env lexbuf}
   | eof {()}
 

@@ -128,12 +128,26 @@ let mod_arith_tests = [
   ("prime_totient", "35738783", "35738782");
   (*finds a totient of a composite*)
   ("composite_totient", "532501478", "266250738");
+
   (*glass box*)
 
 ]
 
 let comb_arith_tests = [
-
+  (*black box*)
+  (*tests a small factorial*)
+  ("small_fact", "6 !", "120");
+  (*tests a larger factorial*)
+  ("large_fact", "30", "265252859812191058636308480000000");
+  (*computes a small combination*)
+  ("small_choose", "13 5 choose", "1287");
+  (*computes a large choose*)
+  ("large_choose", "217 43 choose", "5601414076770489401221861478881318576914682800");
+  (*computes a small permutation*)
+  ("small_perm", "10 4 perm", "5040");
+  (*computes a large perm*)
+  ("large_perm", "49 25 perm", "980390734080409707851586040233984000000");
+  (*need partition tests*)
 
 ]
 
@@ -157,7 +171,7 @@ let tests = [
   simple_lang_tests;
   (*simpl_arith_tests;*)
   (*mod_arith_tests;*)
-  comb_arith_tests;
+  (*comb_arith_tests;*)
   linear_arith_tests;
   systems_arith_tests;
   rsa_arith_tests;

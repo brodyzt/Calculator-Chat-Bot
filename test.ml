@@ -113,9 +113,9 @@ let mod_arith_tests = [
   (*tests the lcm of two large numbers*)
   ("large_lcm", "1624956750 14873852 lcm", "326613056836500");
   (*tests factoring a small number*)
-  ("simple_factor", "876 factor", "(2,2) (3,1) (73,1)");
+  ("simple_factor", "876 factor", "(2,2) (3,1) (73,1) ");
   (*tests factoring of a large number*)
-  ("largish_factor", "387153510 factor", "(2,1) (3,1) (5,1) (43,1) (300119,1)");
+  ("largish_factor", "387153510 factor", "(2,1) (3,1) (5,1) (43,1) (300119,1) ");
   (*tests that a small composite is not prime*)
   ("small_composite_is_prime", "48 is_prime", "0");
   (*tests that a number which is composite*)

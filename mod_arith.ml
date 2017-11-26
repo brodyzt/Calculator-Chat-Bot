@@ -81,4 +81,14 @@ let is_prime n =
 
 let is_prime_likely n = N(I n)
 
-let totient n = N(I n)
+let rec totient_helper n factors accum =
+  match factors with
+  | [] -> accum
+  | (factor,_)::t ->
+    let term = sub_big_int n (div_big_int n factor) in
+    totient_helper n t (mult_big_int term accum)
+let totient n =
+  let res = factor n in
+  match res with
+  | Fact factors -> N(I(totient_helper n factors (big_int_of_int 1)))
+  | _ -> failwith "n must be factorable"

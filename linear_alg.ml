@@ -49,17 +49,70 @@ let cross_product m1 m2 =
         M(r)
       end
 
-let scale m n = M m
+let scale m n =
+  match n with
+  | I k -> M(Array.map (fun r -> Array.map (fun (F v) -> F((float_of_big_int k) *.v )) r) m)
+  | F f -> M(Array.map (fun r -> Array.map (fun (F v) -> F(f *.v )) r) m)
 
 let inverse m = M m
 
-let transpose m = M m
+let transpose m =
+  let res = Array.make_matrix (Array.length m.(0)) (Array.length m) (F(0.) ) in
+    Array.iteri (fun i r -> Array.iteri (fun j v -> res.(j).(i) <- v ) r ) m; M(res)
 
-let add m1 m2 = M m1
+let add m1 m2 =
+  let n1 = Array.length m1 in
+  let n2 = Array.length m2 in
+  let o1 = Array.length (m1.(0)) in
+  let o2 = Array.length (m2.(0)) in
+  if n1 = n2 && o1 = o2 then
+    M(Array.map2 (fun r1 r2 -> Array.map2 (fun (F a) (F b) -> F(a +. b) ) r1 r2) m1 m2)
+  else
+    M(Array.make_matrix 0 0 (F(0.)) )
 
-let subtract m1 m2 = M m1
+let subtract m1 m2 =
+  let n1 = Array.length m1 in
+  let n2 = Array.length m2 in
+  let o1 = Array.length (m1.(0)) in
+  let o2 = Array.length (m2.(0)) in
+  if n1 = n2 && o1 = o2 then
+    M(Array.map2 (fun r1 r2 -> Array.map2 (fun (F a) (F b) -> F(a -. b) ) r1 r2) m1 m2)
+  else
+    M(Array.make_matrix 0 0 (F(0.)) )
 
-let row_echelon m = M m
+let clear_col j i1 i2 =
+  let F(x), F(y) = i2.(j), i1.(j) in
+  let p = x /. y in
+    Array.mapi (fun i (F v) -> let F(y) = i1.(i) in F(v -. y *. p) ) i2
+
+let rec find_non_zero m i j =
+  let rows = Array.length m in
+  let cols = Array.length (m.(0)) in
+    if i < rows && j < cols then
+      if m.(i).(j) <> F(0.) then i else find_non_zero m (i+1) j
+    else -1
+
+let swap m i1 i2 =
+  let temp = m.(i1) in
+    m.(i1) <- m.(i2);
+    m.(i2) <- temp
+
+let rec red_row_down m i j=
+  let rows = Array.length m in
+  let cols = Array.length (m.(0)) in
+    if i < rows && j < cols then
+      if m.(i).(j) = F( 0.) then
+        let non_zero = find_non_zero m (i+1) j in
+          if non_zero = -1 then red_row_down m i (j+1)
+          else (swap m i non_zero; red_row_down m i j)
+      else
+        (Array.iteri (fun ind row -> m.(ind) <- (clear_col j ( m.(i) ) row ) ) m;
+        red_row_down m (i+1) (j+1))
+    else
+     M(m)
+
+let row_echelon m =
+  red_row_down (Array.map (fun row -> Array.copy row) m) 0 0
 
 let red_row_echelon m = M (m)
 

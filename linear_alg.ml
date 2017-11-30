@@ -84,8 +84,6 @@ let scale m n =
        m)
   end
 
-let inverse m = M m
-
 let transpose m =
   let res = Array.make_matrix (Array.length m.(0)) (Array.length m) (F(0.) ) in
     Array.iteri (fun i r -> Array.iteri (fun j v -> res.(j).(i) <- v ) r ) m;
@@ -180,9 +178,15 @@ let rec red_row_up m i=
     let j = find_pivot m i in
       if j = -1 then red_row_up m (i-1) else
         let F(piv_val) = m.(i).(j) in
-          ( Array.iteri (fun j' (F v) -> m.(i).(j') <- F(v /. piv_val) ) m.(i);
-            Array.iteri (fun ind row -> if ind < i then m.(ind) <- (clear_col j ( m.(i) ) row ) else () ) m;
-            red_row_up m (i-1))
+          ( Array.iteri (fun j' v ->
+            m.(i).(j') <- (
+              (app_num
+                (fun piv_val v -> v /. piv_val )
+                (fun piv_val v -> div_big_int v piv_val ))
+              (m.(i).(j)) v)
+          ) m.(i);
+          Array.iteri (fun ind row -> if ind < i then m.(ind) <- (clear_col j ( m.(i) ) row ) else () ) m;
+          red_row_up m (i-1))
   else
     M(m)
 
@@ -205,6 +209,32 @@ let solve m1 m2 =
             M(read_off_sol (sol) m2)
     else
      E "matrix size issue"
+
+let read_off_inv aug m =
+  let cols = Array.length (m.(0)) in
+    Array.iteri
+          (fun i r -> Array.iteri
+            (fun j v -> m.(i).(j) <- aug.(i).(j+cols)) r) m
+
+let inverse m =
+  let rows = Array.length m in
+  let cols = Array.length (m.(0)) in
+    if rows = cols && rows <> 0 then
+      let z,o =
+        match m.(0).(0) with
+        | I _ -> (I (big_int_of_int 0)),(I (big_int_of_int 1))
+        | F _ -> (F 0.), F(1.)
+      in
+      let aug = Array.make_matrix rows (cols*2) (F 0.) in
+        (Array.iteri
+          (fun i r -> Array.iteri
+            (fun j v -> aug.(i).(j) <- m.(i).(j);
+              aug.(i).(j+cols) <- if i = j then o else z ) r) m;
+        let M(solved) = red_row_echelon aug in
+          read_off_inv solved m; M(m))
+    else
+      E "matrix size error"
+
 
 let rec prod_diag m i j acc =
   let rows = Array.length m in

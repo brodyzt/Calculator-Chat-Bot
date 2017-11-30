@@ -142,10 +142,10 @@ let rec make_rows s f =
     | None , _ -> []
     | _, None -> []
     | Some b, Some e ->
-      (List.rev (row_to_list (String.sub s (b+1) (e-b-1)) f))::( make_rows (String.sub s (e+1) (len-e-1)) f)
+      ((row_to_list (String.sub s (b+1) (e-b-1)) f))::( make_rows (String.sub s (e+1) (len-e-1)) f)
 
 let make_matrix s f =
-  let list_m = List.rev (make_rows (String.sub s 1 ((String.length s) -2)) f) in
+  let list_m = (make_rows (String.sub s 1 ((String.length s) -2)) f) in
   let m = Array.make_matrix (List.length list_m) (List.length (List.hd list_m)) (F(0.)) in
     List.iteri (fun i l -> m.(i) <- (Array.of_list l)) list_m; m
 

@@ -83,7 +83,8 @@ let subtract m1 m2 =
 let clear_col j i1 i2 =
   let F(x), F(y) = i2.(j), i1.(j) in
   let p = x /. y in
-    Array.mapi (fun i (F v) -> let F(y) = i1.(i) in F(v -. y *. p) ) i2
+    (print_string ( (string_of_float x) ^ (string_of_float y) ^ (string_of_float p) );
+    Array.mapi (fun i (F v) -> let F(y) = i1.(i) in F(v -. y *. p) ) i2 )
 
 let rec find_non_zero m i j =
   let rows = Array.length m in
@@ -97,6 +98,18 @@ let swap m i1 i2 =
     m.(i1) <- m.(i2);
     m.(i2) <- temp
 
+let string_of_number n =
+  match n with
+  | I i -> string_of_big_int i
+  | F f -> string_of_float f
+
+let string_of_matrix m =
+  "[\n"^(Array.fold_right ( fun  e ac ->
+    "[ "^(Array.fold_right (fun  el acc -> (string_of_number el)^" "^acc) e ("]\n"^ac))  )
+    m
+    "]"
+     )
+
 let rec red_row_down m i j=
   let rows = Array.length m in
   let cols = Array.length (m.(0)) in
@@ -106,7 +119,8 @@ let rec red_row_down m i j=
           if non_zero = -1 then red_row_down m i (j+1)
           else (swap m i non_zero; red_row_down m i j)
       else
-        (Array.iteri (fun ind row -> m.(ind) <- (clear_col j ( m.(i) ) row ) ) m;
+        (Array.iteri (fun ind row -> if ind > i then m.(ind) <- (clear_col j ( m.(i) ) row ) else () ) m;
+        print_string (string_of_matrix m);
         red_row_down m (i+1) (j+1))
     else
      M(m)
@@ -114,9 +128,44 @@ let rec red_row_down m i j=
 let row_echelon m =
   red_row_down (Array.map (fun row -> Array.copy row) m) 0 0
 
-let red_row_echelon m = M (m)
+let find_pivot m i =
+  let rec piv j =
+    if j >= Array.length m.(i) then -1
+    else if m.(i).(j) <> F(0.) then j else piv (j+1)
+  in piv i
 
-let solve m1 m2 = M (m1)
+
+let rec red_row_up m i=
+  if i >= 0 then
+    let j = find_pivot m i in
+      if j = -1 then red_row_up m (i-1) else
+        let F(piv_val) = m.(i).(j) in
+          ( Array.iteri (fun j' (F v) -> m.(i).(j') <- F(v /. piv_val) ) m.(i);
+            Array.iteri (fun ind row -> if ind < i then m.(ind) <- (clear_col j ( m.(i) ) row ) else () ) m;
+            red_row_up m (i-1))
+  else
+    M(m)
+
+let red_row_echelon m =
+  let M(ech) = row_echelon m in
+    red_row_up ech (Array.length ech -1)
+
+let read_off_sol a m =
+  let len = Array.length a.(0) in
+    Array.iteri (fun i row -> m.(i).(0) <- row.(len-1)) a; m
+
+
+let solve m1 m2 =
+  let rows1 = Array.length m1 in
+  let rows2 = Array.length m2 in
+    if rows1 = 0 || Array.length m1.(0) = 0 || rows1 = rows2 then
+      let aux = Array.make_matrix rows1 ((Array.length m1.(0)) +1) (F 0.) in
+        Array.iteri (fun i row -> Array.iteri (fun j (F v) -> aux.(i).(j) <- m1.(i).(j)) row) m1;
+        Array.iteri (fun i row -> aux.(i).(Array.length m1.(0)) <- row.(0)) m2;
+          let M(sol) = red_row_echelon aux in
+            M(read_off_sol (sol) m2)
+    else
+     E "matrix size issue"
 
 let determinant m = N (I (Big_int.big_int_of_int 0))
 

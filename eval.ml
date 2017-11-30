@@ -5,13 +5,18 @@ open Types
 let string_of_number n =
   match n with
   | I i -> string_of_big_int i
-  | F f -> string_of_float f
+  | F f -> begin
+    (*because apparently -0. is a thing*)
+    if f = 0. then "0." else
+      string_of_float f
+  end
 
 let string_of_matrix m =
-  "[\n"^(Array.fold_left ( fun ac e ->
-    "[ "^(Array.fold_left (fun acc el -> (string_of_number el)^" "^acc) ("]\n"^ac) e)  )
+  "[\n"^(Array.fold_right ( fun  e ac ->
+    "[ "^(Array.fold_right (fun  el acc -> (string_of_number el)^" "^acc) e ("]\n"^ac))  )
+    m
     "]"
-     m)
+     )
 
 let rec parse_arg s =
   if String.index s '-' = 0 then [] else

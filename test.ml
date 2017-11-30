@@ -152,7 +152,43 @@ let comb_arith_tests = [
 ]
 
 let linear_arith_tests = [
+  (*simple adding of two matricies*)
 
+  (*simple subtraction of two matracies*)
+
+  (*simple row reduction*)
+  ("simple_row_red",
+   "[[2., -3.], [-4., 5.]] echelon",
+   "[\n[ 2. -3. ]\n[ 0. -1. ]\n]");
+  (*simple row reduction with more row than col*)
+  ("non_square_rr",
+   "[[2., -3.], [-4., 5.], [8., 7.]] echelon",
+   "[\n[ 2. -3. ]\n[ 0. -1. ]\n[ 0. 0. ]\n]");
+  (*simple row red with more col than row*)
+  ("non_square_rr2",
+   "[[2., -3., -1., 2.], [-4., 7., 5., 16.], [9., -70.5, 8., 7.]] echelon",
+   "[\n[ 2. -3. -1. 2. ]\n[ 0. 1. 3. 20. ]\n[ 0. 0. 183.5 1138. ]\n]");
+  (*lin dep ex.*)
+  ("lin_dep_red",
+   "[[2., -4., 9.], [-4., 8., 14.], [8., -16., -3.]] echelon",
+   "[\n[ 2. -4. 9. ]\n[ 0. 0. 32. ]\n[ 0. 0. 0. ]\n]")
+
+  (*simple row reduction to reduced form*)
+  ("simple_row_red",
+   "[[2., -3.], [-4., 5.]] echelon",
+   "[\n[ 1. 0. ]\n[ 0. 1. ]\n]");
+  (*simple row reduction with more row than col to reduced form*)
+  ("non_square_rr",
+   "[[2., -3.], [-4., 5.], [8., 7.]] echelon",
+   "[\n[ 1. 0. ]\n[ 0. 1. ]\n[ 0. 0. ]\n]");
+  (*simple row red with more col than row to reduced form*)
+  ("non_square_rr2",
+   "[[2., -3., -1., 2.], [-4., 7., 5., 16.], [9., -70.5, 8., 7.]] echelon",
+   "[\n[ 1. 0. 0. 6.19346049046 ]\n[ 0. 1. 0. 1.39509536785 ]\n[ 0. 0. 1. 6.20163487738 ]\n]");
+  (*lin dep ex. to reduced form*)
+  ("lin_dep_red",
+   "[[2., -4., 9.], [-4., 8., 14.], [8., -16., -3.]] echelon",
+   "[\n[ 1. 2. 0. ]\n[ 0. 0. 1. ]\n[ 0. 0. 0. ]\n]")
 
 ]
 

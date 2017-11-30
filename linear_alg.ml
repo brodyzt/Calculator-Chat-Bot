@@ -28,9 +28,9 @@ let dot_product m1 m2 =
     else
       let rec mult n =
         if n = l1 then () else
-          ((match m1.(n).(0), m2.(n).(0) with
+          (match m1.(n).(0), m2.(n).(0) with
           | F(f1), F(f2) -> r.(n).(0) <- F(f1 *. f2)
-          | _ -> failwith "unimplemented"); mult (n+1))
+          | I(i1), I(i2) -> r.(n).(0) <- I(mult_big_int i1 i2); mult (n+1))
       in mult 0; M(r)
 
 
@@ -48,49 +48,88 @@ let cross_product m1 m2 =
         r.(0).(2) <-  F(a1 *. b2 +. a2 *. b1);
         M(r)
       end
+      | I(a1), I(a2), I(a3), I(b1), I(b2), I(b3) -> begin
+        r.(0).(0) <-  I(add_big_int (mult_big_int a2 b3) (mult_big_int a3 b2));
+        r.(0).(1) <-  I(add_big_int (mult_big_int a3 b1) (mult_big_int a1 b3));
+        r.(0).(2) <-  I(add_big_int (mult_big_int a1 b2) (mult_big_int a2 b1));
+        M(r)
+      end
+
+let ap_num f i v =
+  match v with
+  | F(v') -> F(f v')
+  | I(v') -> I(i v')
+
+let app_num f i a b =
+  match a,b with
+  | F(a'), F(b') -> F(f a' b')
+  | F(a'), I(b') -> F(f a' (float_of_big_int b') )
+  | I(a'), F(b') -> F(f (float_of_big_int a') b')
+  | I(a'), I(b') -> I(i a' b')
 
 let scale m n =
   match n with
-  | I k -> M(Array.map (fun r -> Array.map (fun (F v) -> F((float_of_big_int k) *.v )) r) m)
-  | F f -> M(Array.map (fun r -> Array.map (fun (F v) -> F(f *.v )) r) m)
+  | I k -> begin
+    M(Array.map
+      (fun r -> Array.map
+        (ap_num (fun v -> (float_of_big_int k) *.v) (fun v -> mult_big_int k v))
+         r)
+       m)
+  end
+  | F f -> begin
+    M(Array.map
+      (fun r -> Array.map
+        (ap_num (fun v -> (f *.v )) (fun v -> mult_big_int (big_int_of_int (int_of_float f) ) v))
+         r)
+       m)
+  end
 
 let inverse m = M m
 
 let transpose m =
   let res = Array.make_matrix (Array.length m.(0)) (Array.length m) (F(0.) ) in
-    Array.iteri (fun i r -> Array.iteri (fun j v -> res.(j).(i) <- v ) r ) m; M(res)
+    Array.iteri (fun i r -> Array.iteri (fun j v -> res.(j).(i) <- v ) r ) m;
+    M(res)
 
-let add m1 m2 =
+let simple_bin f i m1 m2 =
   let n1 = Array.length m1 in
   let n2 = Array.length m2 in
   let o1 = Array.length (m1.(0)) in
   let o2 = Array.length (m2.(0)) in
   if n1 = n2 && o1 = o2 then
-    M(Array.map2 (fun r1 r2 -> Array.map2 (fun (F a) (F b) -> F(a +. b) ) r1 r2) m1 m2)
+    M(Array.map2
+      (fun r1 r2 -> Array.map2
+        (app_num f i )
+         r1 r2)
+      m1 m2)
   else
-    M(Array.make_matrix 0 0 (F(0.)) )
+    E("matrix size issue")
 
-let subtract m1 m2 =
-  let n1 = Array.length m1 in
-  let n2 = Array.length m2 in
-  let o1 = Array.length (m1.(0)) in
-  let o2 = Array.length (m2.(0)) in
-  if n1 = n2 && o1 = o2 then
-    M(Array.map2 (fun r1 r2 -> Array.map2 (fun (F a) (F b) -> F(a -. b) ) r1 r2) m1 m2)
-  else
-    M(Array.make_matrix 0 0 (F(0.)) )
+let add =
+  simple_bin (+.) (add_big_int)
+
+let subtract =
+  simple_bin (-.) (sub_big_int)
 
 let clear_col j i1 i2 =
-  let F(x), F(y) = i2.(j), i1.(j) in
-  let p = x /. y in
-    (print_string ( (string_of_float x) ^ (string_of_float y) ^ (string_of_float p) );
-    Array.mapi (fun i (F v) -> let F(y) = i1.(i) in F(v -. y *. p) ) i2 )
+  Array.mapi
+    (fun i -> ((app_num
+      (fun y v ->
+        let F(x), F(y) = i1.(j), i2.(j) in
+        let p = x /. y in
+          v -. y *. p)
+      (fun y v ->
+        let I(x), I(y) = i1.(j), i2.(j) in
+        let p = div_big_int x y in
+          sub_big_int v (mult_big_int y p) )) i1.(i))
+    ) i2
+
 
 let rec find_non_zero m i j =
   let rows = Array.length m in
   let cols = Array.length (m.(0)) in
     if i < rows && j < cols then
-      if m.(i).(j) <> F(0.) then i else find_non_zero m (i+1) j
+      if m.(i).(j) <> F(0.) && m.(i).(j) <> I(big_int_of_int 0) then i else find_non_zero m (i+1) j
     else -1
 
 let swap m i1 i2 =
@@ -114,7 +153,7 @@ let rec red_row_down m i j =
   let rows = Array.length m in
   let cols = Array.length (m.(0)) in
     if i < rows && j < cols then
-      if m.(i).(j) = F( 0.) then
+      if m.(i).(j) = F( 0.) || m.(i).(j) = I(big_int_of_int 0) then
         let non_zero = find_non_zero m (i+1) j in
           if non_zero = -1 then red_row_down m i (j+1)
           else
@@ -122,7 +161,6 @@ let rec red_row_down m i j =
               (rr,s+1)
       else
         (Array.iteri (fun ind row -> if ind > i then m.(ind) <- (clear_col j ( m.(i) ) row ) else () ) m;
-        print_string (string_of_matrix m);
         red_row_down m (i+1) (j+1))
     else
      (M(m),0)
@@ -133,7 +171,7 @@ let row_echelon m =
 let find_pivot m i =
   let rec piv j =
     if j >= Array.length m.(i) then -1
-    else if m.(i).(j) <> F(0.) then j else piv (j+1)
+    else if m.(i).(j) <> F(0.) && m.(i).(j) <> I(big_int_of_int 0) then j else piv (j+1)
   in piv i
 
 

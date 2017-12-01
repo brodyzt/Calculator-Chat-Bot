@@ -171,7 +171,7 @@ let linear_arith_tests = [
   (*lin dep ex.*)
   ("lin_dep_red",
    "[[2., -4., 9.], [-4., 8., 14.], [8., -16., -3.]] echelon",
-   "[\n[ 2. -4. 9. ]\n[ 0. 0. 32. ]\n[ 0. 0. 0. ]\n]")
+   "[\n[ 2. -4. 9. ]\n[ 0. 0. 32. ]\n[ 0. 0. 0. ]\n]");
 
   (*simple row reduction to reduced form*)
   ("simple_row_red",

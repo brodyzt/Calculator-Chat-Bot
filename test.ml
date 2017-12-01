@@ -85,7 +85,7 @@ let mod_arith_tests = [
   ("larger_mod_sub", "483275 34261 3 -~", "1");
   (*tests simple multiplication, which us not divisable by the modulo*)
   ("simple_mod_mult", "6 7 5 *~", "2");
-  (*tests the multiplication of two numbers which is divisable by the mdulo*)
+  (*tests the multiplication of two numbers which is divisable by the modulo*)
   ("div_mod_mult", "9 4 6 *~", "0");
   (*tests multiplication by 0*)
   ("zero_mod_mult", "0 8 7 *~", "0");
@@ -97,7 +97,7 @@ let mod_arith_tests = [
   (*tests simple modular powers *)
   ("simpl_mod_pow", "3 4 11 ^~", "4");
   (*tests powers with a large power*)
-  ("large_mod_pow", "2 243567633493504 5 ^~", "0");
+  ("large_mod_pow", "2 243567633493504 5 ^~", "1");
   (*tests simple equality of two small numbers*)
   ("simple_mod_eq", "16 2 15 =~", "0");
   (*tests the modular equality with large numbers*)
@@ -125,9 +125,9 @@ let mod_arith_tests = [
   (*tests that a larger clearly composite number is not prime*)
   ("larger_is_prime_prob", "234976 is_prime_prob", "0");
   (*tests finding the totient of a prime*)
-  ("prime_totient", "35738783", "35738782");
+  ("prime_totient", "35738783 totient", "35738782");
   (*finds a totient of a composite*)
-  ("composite_totient", "532501478", "266250738");
+  ("composite_totient", "532501478 totient", "266250738");
 
   (*glass box*)
 
@@ -193,7 +193,7 @@ let linear_arith_tests = [
 ]
 
 let systems_arith_tests = [
-
+  
 
 ]
 
@@ -206,7 +206,7 @@ let rsa_arith_tests = [
 let tests = [
   simple_lang_tests;
   (*simpl_arith_tests;*)
-  (*mod_arith_tests;*)
+  mod_arith_tests;
   (*comb_arith_tests;*)
   linear_arith_tests;
   systems_arith_tests;

@@ -157,7 +157,7 @@ let linear_arith_tests = [
   (*simple subtraction of two matracies*)
 
   (*simple row reduction*)
-  ("simple_row_red",
+  ("simple_esch",
    "[[2., -3.], [-4., 5.]] echelon",
    "[\n[ 2. -3. ]\n[ 0. -1. ]\n]");
   (*simple row reduction with more row than col*)
@@ -175,25 +175,25 @@ let linear_arith_tests = [
 
   (*simple row reduction to reduced form*)
   ("simple_row_red",
-   "[[2., -3.], [-4., 5.]] echelon",
+   "[[2., -3.], [-4., 5.]] reduce",
    "[\n[ 1. 0. ]\n[ 0. 1. ]\n]");
   (*simple row reduction with more row than col to reduced form*)
   ("non_square_rr",
-   "[[2., -3.], [-4., 5.], [8., 7.]] echelon",
+   "[[2., -3.], [-4., 5.], [8., 7.]] reduce",
    "[\n[ 1. 0. ]\n[ 0. 1. ]\n[ 0. 0. ]\n]");
   (*simple row red with more col than row to reduced form*)
   ("non_square_rr2",
-   "[[2., -3., -1., 2.], [-4., 7., 5., 16.], [9., -70.5, 8., 7.]] echelon",
-   "[\n[ 1. 0. 0. 6.19346049046 ]\n[ 0. 1. 0. 1.39509536785 ]\n[ 0. 0. 1. 6.20163487738 ]\n]");
+   "[[2., -3., -1., 2.], [-4., 7., 5., 16.], [9., -70.5, 8., 7.]] reduce",
+   "[\n[ 1. 0. 0. -9042. ]\n[ 0. 1. 0. -3394. ]\n[ 0. 0. 1. 1138. ]\n]");
   (*lin dep ex. to reduced form*)
   ("lin_dep_red",
-   "[[2., -4., 9.], [-4., 8., 14.], [8., -16., -3.]] echelon",
-   "[\n[ 1. 2. 0. ]\n[ 0. 0. 1. ]\n[ 0. 0. 0. ]\n]")
+   "[[2., -4., 9.], [-4., 8., 14.], [8., -16., -3.]] reduce",
+   "[\n[ 1. -4. 0. ]\n[ 0. 0. 1. ]\n[ 0. 0. 0. ]\n]");
 
 ]
 
 let systems_arith_tests = [
-  
+
 
 ]
 

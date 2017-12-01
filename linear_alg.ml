@@ -113,12 +113,12 @@ let clear_col j i1 i2 =
   Array.mapi
     (fun i -> ((app_num
       (fun y v ->
-        let F(x), F(y) = i1.(j), i2.(j) in
-        let p = x /. y in
+        let F(a), F(b) = i1.(j), i2.(j) in
+        let p = b /. a in
           v -. y *. p)
       (fun y v ->
-        let I(x), I(y) = i1.(j), i2.(j) in
-        let p = div_big_int x y in
+        let I(a), I(b) = i1.(j), i2.(j) in
+        let p = div_big_int b a in
           sub_big_int v (mult_big_int y p) )) i1.(i))
     ) i2
 
@@ -177,13 +177,9 @@ let rec red_row_up m i=
   if i >= 0 then
     let j = find_pivot m i in
       if j = -1 then red_row_up m (i-1) else
-        let F(piv_val) = m.(i).(j) in
-          ( Array.iteri (fun j' v ->
-            m.(i).(j') <- (
-              (app_num
-                (fun piv_val v -> v /. piv_val )
-                (fun piv_val v -> div_big_int v piv_val ))
-              (m.(i).(j)) v)
+          (print_string (string_of_int i);
+           Array.iteri (fun j' v ->
+            m.(i).(j') <- (app_num (/.) (div_big_int) v (m.(i).(j)) )
           ) m.(i);
           Array.iteri (fun ind row -> if ind < i then m.(ind) <- (clear_col j ( m.(i) ) row ) else () ) m;
           red_row_up m (i-1))

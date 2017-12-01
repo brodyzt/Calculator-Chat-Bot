@@ -128,6 +128,10 @@ let is_prime n =
     end
   | _ -> failwith "factored incorrectly"
 
+let fermats_little a n =
+  let result = power a (pred_big_int n) n in
+  if (eq_big_int (as_big_int result) unit_big_int) then true
+  else false
 let is_prime_likely n = N(I n)
 
 let rec totient_helper factors accum =

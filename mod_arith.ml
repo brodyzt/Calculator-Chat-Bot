@@ -1,6 +1,11 @@
 open Types
 open Big_int
 
+let as_big_int i =
+  match i with
+  | N(I(x)) -> x
+  | _ -> failwith "precondition violated"
+
 let add a b n =
   if ((compare_big_int n zero_big_int) <= 0) then E("cannot take the remainder mod a non-positive number")
   else N(I(mod_big_int (add_big_int a b) n))
@@ -13,11 +18,52 @@ let multiply a b n =
   if ((compare_big_int n zero_big_int) <= 0) then (E "cannot take the remainder mod a non-positive number")
   else N(I(mod_big_int (mult_big_int a b) n))
 
-let divide a b n = N(I a)
+let inv a n =
+  if ((compare_big_int n zero_big_int) <= 0) then E("cannot take the remainder mod a non-positive number")
+  else let result = Systems_eqs.bezout a n (big_int_of_int 1) in
+      match result with
+      | E _ -> E("has no inverse mod n")
+      | P (N(I(x)),_) -> N(I(mod_big_int x n))
+      | _ -> failwith "Unimplemented"
 
+let divide a b n =
+  let result = inv b n in
+  match result with
+  | E _ -> E("second arguement is not relatively prime to divisor")
+  | N(I(b_inv)) -> multiply a b_inv n
+  | _ -> failwith "Unimplemented"
 
-let power a b n = N(I a)
+(*only works for positive nums*)
 
+let rec as_bin_list a accum =
+  if eq_big_int a zero_big_int then accum
+  else let (q,r) = quomod_big_int a (big_int_of_int 2) in
+    if eq_big_int r zero_big_int then as_bin_list q (zero_big_int::accum)
+    else as_bin_list q (unit_big_int::accum)
+
+let rec repeated_square a n exp accum =
+  match accum with
+  | [] -> repeated_square a n exp ((mod_big_int a n)::accum)
+  | h::t ->
+    let x_sqr= as_big_int (multiply h h n) in
+    if eq_big_int exp zero_big_int then accum
+    else repeated_square a n (pred_big_int exp) (x_sqr::h::t)
+
+let rec condense n pows bin accum=
+  match pows,bin with
+  | [],[] -> accum
+  | h1::t1,h2::t2 ->
+    if (eq_big_int h2 zero_big_int)
+    then condense n t1 t2 accum
+    else condense n t1 t2 (as_big_int (multiply h1 accum n))
+  | _,_ -> failwith "pows and bin must be the same lenth"
+
+let power a b n =
+  if eq_big_int a zero_big_int then N(I(zero_big_int))
+  else let bin = as_bin_list b [] in
+  let expn = big_int_of_int ((List.length bin) - 1) in
+  let squares = repeated_square a n expn [] in
+  N(I(condense n squares bin unit_big_int))
 (*
 let eq a b n =
   match subtract a b n with
@@ -45,6 +91,7 @@ let lcm a b =
   | _ -> failwith "unreachable case"
 
 let gen_prime l = N(I l)
+
 
 let rec pow_factor p n accum=
   let r = (mod_big_int n p) in

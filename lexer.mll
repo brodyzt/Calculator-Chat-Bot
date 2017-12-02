@@ -75,7 +75,7 @@ let tri_op op =
       | "*~",  N(I(i1)), N((I i2)), N(I(i3)) -> Mod_arith.multiply i3 i2 i1
       | "/~",  N(I(i1)), N((I i2)), N(I(i3)) -> Mod_arith.divide i3 i2 i1
       | "^~",  N(I(i1)), N((I i2)), N(I(i3)) -> Mod_arith.power i3 i2 i1
-      | "=~",  N(I(i1)), N((I i2)), N(I(i3)) -> Mod_arith.subtract i3 i2 i1
+      | "=~",  N(I(i1)), N((I i2)), N(I(i3)) -> Mod_arith.eq i3 i2 i1
       | "bezout",  N(I(i1)), N((I i2)), N(I(i3)) -> Systems_eqs.bezout i3 i2 i1
       | "crack",  N(I(i1)), N((I i2)), N(I(i3)) -> Rsa.crack (i2,i3) i1
       | "public_key", N(I(e)), N(I(q)), N(I(p)) -> Rsa.get_public_key (p,q,e)
@@ -205,5 +205,3 @@ rule read env = parse
   | matrix {Stack.push (M(make_matrix (Lexing.lexeme lexbuf) (fun f -> (F(float_of_string f))))) stack; read env lexbuf}
   | _ {Stack.push (E ("I do not understand the token: "^(Lexing.lexeme lexbuf))) stack}
   | eof {()}
-
-

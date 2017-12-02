@@ -2,6 +2,7 @@ open Types
 open Big_int
 open Random
 
+
 let as_big_int i =
   match i with
   | N(I(x)) -> x
@@ -104,7 +105,7 @@ let is_prime n =
         else N(I(zero_big_int))
     end
   | _ -> failwith "factored incorrectly"
-(*
+
 let eq a b n =
   match subtract a b n with
   | E e -> E e
@@ -115,7 +116,7 @@ let eq a b n =
       | _ -> failwith "Unimplemented"
     end
   | _ -> failwith "unimplemented"
-*)
+
 
 
 let rec gcd a b =

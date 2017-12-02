@@ -136,9 +136,9 @@ let mod_arith_tests = [
 let comb_arith_tests = [
   (*black box*)
   (*tests a small factorial*)
-  ("small_fact", "6 !", "120");
+  ("small_fact", "6 !", "720");
   (*tests a larger factorial*)
-  ("large_fact", "30", "265252859812191058636308480000000");
+  ("large_fact", "30 !", "265252859812191058636308480000000");
   (*computes a small combination*)
   ("small_choose", "13 5 choose", "1287");
   (*computes a large choose*)

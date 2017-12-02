@@ -46,7 +46,7 @@ let simpl_arith_tests = [
   (*tests multiplication of floating point numbers*)
   ("simple_float_mult", "2.5 7. *", "17.5");
   (*tests simple integer division*)
-  ("simple_integer_div", "8 2 /", "3");
+  ("simple_integer_div", "8 2 /", "4");
   (*tests simple floating point division*)
   ("simple_float_div", "27. 5. /", "5.4");
   (*tests modulus for integers*)
@@ -205,9 +205,9 @@ let rsa_arith_tests = [
 
 let tests = [
   simple_lang_tests;
-  (*simpl_arith_tests;*)
+  simpl_arith_tests;
   mod_arith_tests;
-  (*comb_arith_tests;*)
+  comb_arith_tests;
   linear_arith_tests;
   systems_arith_tests;
   rsa_arith_tests;

@@ -18,7 +18,8 @@ let string_of_matrix m =
     "]"
      )
 
-let rec parse_arg s =
+let rec parse_arg str =
+  let s = String.trim str in
   if String.index s '-' = 0 then [] else
     let c = String.index s ' ' in
     let arg = String.sub s 0 c in
@@ -26,10 +27,11 @@ let rec parse_arg s =
 
 let parse_macro env s =
   let c = String.index s ':' in
-  let name = String.sub s 0 c in
-  let args = parse_arg s in
+  let name = String.trim (String.sub s 1 (c-1) ) in
+  let args = parse_arg (String.sub s (c+1) ( (String.length s) - c -1)) in
   let b = (String.index s '-') + 2 in
-  let fun_string = String.sub s (b) ((String.length s) - b) in
+  let e = (String.index s '}') in
+  let fun_string = String.sub s (b) (e - b) in
     (PMap.add name (Func(env,args,fun_string)) env)
 
 let rec string_of_value v =

@@ -167,7 +167,7 @@ let num = int | float
 let letter = ['a'-'z' 'A'-'Z']
 let vector = '[' float (", "float) * ']'
 let matrix = '[' vector (", "vector) * ']'
-let id = letter+
+let id = letter (letter | digit)*
 let nop = "generate_private_key"
 let uop = "inv" | "transpose" | "echelon" | "reduce" | "det" | "indep"
           | "nullspace" | "colspace" | "!" | "factor" | "gen_prime"
@@ -186,10 +186,10 @@ rule read env = parse
   | top   { Stack.push (tri_op (Lexing.lexeme lexbuf)) stack; read env lexbuf }
   | qop   { Stack.push (quad_op (Lexing.lexeme lexbuf)) stack; read env lexbuf }
   | mop   { Stack.push (multi_op (Lexing.lexeme lexbuf)) stack; read env lexbuf }
-  | '"' id '"' { Stack.push (S (let s = Lexing.lexeme lexbuf in String.sub (s) 1 ((String.length s)-2 ) )) stack; read env lexbuf }
+| '"' id '"' { Stack.push (S (let s = Lexing.lexeme lexbuf in String.sub (s) 1 ((String.length s)-2 ) )) stack; read env lexbuf }
   | id {
       let s = Lexing.lexeme lexbuf in
-      if PMap.mem s env then
+      if (PMap.mem s env) then
         match PMap.find s env with
         | Func (env, args, fun_string) -> begin
           if Stack.length stack < List.length args then (Stack.push (E "wrong number of arguments") stack; read env lexbuf)
@@ -203,5 +203,7 @@ rule read env = parse
   | int { Stack.push (N(I (Big_int.big_int_of_string (Lexing.lexeme lexbuf)))) stack; read env lexbuf }
   | float { Stack.push (N(F (float_of_string (Lexing.lexeme lexbuf)))) stack; read env lexbuf }
   | matrix {Stack.push (M(make_matrix (Lexing.lexeme lexbuf) (fun f -> (F(float_of_string f))))) stack; read env lexbuf}
+  | _ {Stack.push (E ("I do not understand the token: "^(Lexing.lexeme lexbuf))) stack}
   | eof {()}
+
 

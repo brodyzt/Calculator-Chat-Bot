@@ -11,13 +11,16 @@ let big_int_of_value v : Types.integer option =
   | _ -> None
 
 let factorial i =
-  let rec factorial_helper accum i =
-    if sign_big_int i = 0 then
-      accum
-    else
-      factorial_helper (mult_big_int i accum) (pred_big_int i)
-  in
-  N(I(factorial_helper (big_int_of_int 1) i))
+  if sign_big_int i = -1 then
+    E(raise (Invalid_argument "Negative values are not allowed"))
+  else
+    let rec factorial_helper accum i =
+      if sign_big_int i = 0 then
+        accum
+      else
+        factorial_helper (mult_big_int i accum) (pred_big_int i)
+    in
+    N(I(factorial_helper (big_int_of_int 1) i))
 
 let combination n k =
   if sign_big_int n = -1 || sign_big_int k = -1 then

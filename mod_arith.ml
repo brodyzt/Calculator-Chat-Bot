@@ -23,22 +23,7 @@ let multiply a b n =
   if ((compare_big_int n zero_big_int) <= 0) then (E "cannot take the remainder mod a non-positive number")
   else N(I(mod_big_int (mult_big_int a b) n))
 
-let inv a n =
-  if ((compare_big_int n zero_big_int) <= 0) then E("cannot take the remainder mod a non-positive number")
-  else let result = Systems_eqs.bezout a n (big_int_of_int 1) in
-      match result with
-      | E _ -> E("has no inverse mod this number")
-      | P (N(I(x)),_) -> N(I(mod_big_int x n))
-      | _ -> failwith "Unimplemented"
 
-let divide a b n =
-  if ((compare_big_int n zero_big_int)<=0) then E("cannot take the remainder mod a non-positive number")
-  else
-  let result = inv b n in
-  match result with
-  | E _ -> E("second arguement is not relatively prime to divisor")
-  | N(I(b_inv)) -> multiply a b_inv n
-  | _ -> failwith "Unimplemented"
 
 (*only works for positive nums*)
 
@@ -69,10 +54,11 @@ let power a b n =
   let b = abs_big_int b in
   if (eq_big_int b zero_big_int) then N(I(unit_big_int))
   else if ((compare_big_int n zero_big_int) <= 0) then E("cannot take the remainder mod a non-positive number")
-  else if eq_big_int a zero_big_int then N(I(zero_big_int))
+  else let a_red = mod_big_int a n in
+  if eq_big_int a_red zero_big_int then N(I(zero_big_int))
   else let bin = as_bin_list b [] in
   let expn = big_int_of_int ((List.length bin) - 1) in
-  let squares = repeated_square a n expn [] in
+  let squares = repeated_square a_red n expn [] in
     N(I(condense n squares bin unit_big_int))
 
 
@@ -225,3 +211,82 @@ let totient n =
   match res with
   | Fact factors -> N(I(totient_helper factors (big_int_of_int 1)))
   | _ -> failwith "n must be factorable"
+
+
+(*[gen_bezout_ceofs a b coefs] is a list of (v,(x',a'),(b') such that
+  v = x'*a' + b', for each of the values a',b' that occur when recursively
+  applying the gcd function to a and b*)
+let rec gen_bezout_coefs a b coefs =
+  if (eq_big_int b zero_big_int) then (a,(zero_big_int,zero_big_int),a)::coefs
+  else let (q,r) = quomod_big_int a b in
+    let coefs' = (a,(q,b),r)::coefs in
+    gen_bezout_coefs b r coefs'
+
+let merge_coefs ((x,b),(y,r),r') ((a),(q,b),r) =
+  let x' = minus_big_int y in
+  let y' = minus_big_int (add_big_int x (mult_big_int y q)) in
+  ((x',a),(y',b),r')
+
+let rec construct_min_bezout_sol eqn coefs =
+  match coefs with
+  | [] -> eqn
+  | h::t -> construct_min_bezout_sol (merge_coefs eqn h) t
+(*[bezout a b c] is a pair (x, y) where x*a + y*b = c, or an exception value
+  if no such pair exists*)
+let get_x_y_gcd coefs =
+  match coefs with
+  | [] -> failwith "error cannot have no coefficients"
+  | ((a),(q,b),r)::t ->
+    let ((x,_),(neg_y,_),res) =
+      construct_min_bezout_sol ((big_int_of_int 1,a),(q,b),r) t in
+    (x,minus_big_int neg_y, res)
+
+
+
+let bezout a b c =
+  let coefs = gen_bezout_coefs a b [] in
+  let (x,y,res) = get_x_y_gcd coefs in
+  if eq_big_int zero_big_int (mod_big_int c res)
+  then let m = div_big_int c res in
+    P(N(I(mult_big_int m x)),N(I(mult_big_int m y)))
+  else E("gcd(a,b) does not divide c, so no solution exists")
+
+
+(*[crt lst1 lst2] is a pair (a,M) such that any integer n congruent to a mod M
+  satisfies n = bi (mod mi) for any 0 <= bi <= j ,
+  where lst1 = [b0,b1,...,bj] and lst2 = [m0,m1,...,mj].
+  Precondition: all elements of lst2 are pairwise relatively prime, and greater
+  than 0, and lst1 and lst2 are of the same length*)
+let crt lst1 lst2 = P(N(I(Big_int.big_int_of_int 0)), N(I(Big_int.big_int_of_int 0)))
+
+(*[is_square a p] is 1 if x^2 = a (mod n) for some x,
+  0 if x^2 != a (mod n) for any x*)
+let is_square a p =
+  let two = big_int_of_int 2 in
+  if (le_big_int p zero_big_int)
+  then E("cannot take the remainder mod a non-positive number")
+  else if (le_big_int p two) then N(I(unit_big_int))
+  else
+    let a_red = mod_big_int a p in
+    let p_minus_one = pred_big_int p in
+    let p_minus_one_div_two = div_big_int p_minus_one two in
+    let legendre = as_big_int (power a_red p_minus_one_div_two p) in
+    if (eq_big_int legendre (p_minus_one)) then N(I(zero_big_int))
+    else N(I(unit_big_int))
+
+let inv a n =
+  if ((compare_big_int n zero_big_int) <= 0) then E("cannot take the remainder mod a non-positive number")
+  else let result = bezout a n (big_int_of_int 1) in
+      match result with
+        | E _ -> E("has no inverse mod this number")
+        | P (N(I(x)),_) -> N(I(mod_big_int x n))
+        | _ -> failwith "Unimplemented"
+
+let divide a b n =
+  if ((compare_big_int n zero_big_int)<=0) then E("cannot take the remainder mod a non-positive number")
+  else
+  let result = inv b n in
+  match result with
+    | E _ -> E("second arguement is not relatively prime to divisor")
+    | N(I(b_inv)) -> multiply a b_inv n
+    | _ -> failwith "Unimplemented"

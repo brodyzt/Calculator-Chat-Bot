@@ -4,8 +4,6 @@ type integer = Big_int.big_int
 
 type number = I of integer | F of float
 
-
-
 type exn = string
 
 type matrix = number array array

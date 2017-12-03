@@ -209,7 +209,7 @@ rule read env = parse
   | top   { Stack.push (tri_op (Lexing.lexeme lexbuf)) stack; read env lexbuf }
   | qop   { Stack.push (quad_op (Lexing.lexeme lexbuf)) stack; read env lexbuf }
   | mop   { Stack.push (multi_op (Lexing.lexeme lexbuf)) stack; read env lexbuf}
-  | '"' id '"' {
+  | '"' (digit | letter) *  '"' {
     Stack.push (S (
       let s = Lexing.lexeme lexbuf in
         String.sub (s) 1 ((String.length s)-2 ) )

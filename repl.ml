@@ -10,6 +10,9 @@ let promt_and_read _ =
 (*[display_output s] will print out the string s to the user*)
 let display_output s = print_string s
 
+
+(*[loop env] continually loops allowing the user to give input evaluating
+ * and displaying the result*)
 let rec loop env =
   let s = promt_and_read () in
   let (result, env') = Eval.evaluate_line env s in

@@ -5,23 +5,26 @@ open Big_int
 let init_matrix x y f =
   Array.init x (fun i -> Array.init y (fun j ->  f i j))
 
+let iterij f =
+  Array.iteri (fun i row -> Array.iteri (fun j v -> f i j v) row)
+
+
+let non_zero v =
+  v <> I(zero_big_int) && v <> F(0.0)
+
 let row m n =
   let i = int_of_big_int n in
     if i < 0 || i >= Array.length m then M(Array.make_matrix 0 0 (F(0.)) )
     else
-      let r = Array.make_matrix 1 (Array.length m) (F(0.) ) in
-      let rec convert j =
-        if j < 0 then () else r.(0).(j) <- m.(j).(i); convert (j-1)
-      in convert ((Array.length m) -1); M(r)
+      M(init_matrix 1 (Array.length m) (fun _ j -> m.(j).(i)))
+
 
 let col m n =
   let i = int_of_big_int n in
     if i < 0 || i >= Array.length m.(0) then M(Array.make_matrix 0 0 (F(0.)) )
     else
-      let r = Array.make_matrix 1 (Array.length m) (F(0.) ) in
-      let rec convert j =
-        if j < 0 then () else r.(0).(j) <- m.(i).(j); convert (j-1)
-      in convert ((Array.length m.(i)) -1); M(r)
+      M(init_matrix 1 (Array.length m) (fun _ j -> m.(i).(j)))
+
 
 let dot_product m1 m2 =
   let l1 = Array.length m1 in
@@ -130,7 +133,7 @@ let rec find_non_zero m i j =
   let rows = Array.length m in
   let cols = Array.length (m.(0)) in
     if i < rows && j < cols then
-      if m.(i).(j) <> F(0.) && m.(i).(j) <> I(big_int_of_int 0) then i else find_non_zero m (i+1) j
+      if non_zero m.(i).(j) then i else find_non_zero m (i+1) j
     else -1
 
 let swap m i1 i2 =
@@ -213,9 +216,7 @@ let solve m1 m2 =
 
 let read_off_inv aug m =
   let cols = Array.length (m.(0)) in
-    Array.iteri
-          (fun i r -> Array.iteri
-            (fun j v -> m.(i).(j) <- aug.(i).(j+cols)) r) m
+    iterij (fun i j v -> m.(i).(j) <- aug.(i).(j+cols)) m
 
 let inverse m =
   let rows = Array.length m in
@@ -226,13 +227,13 @@ let inverse m =
         | I _ -> (I (big_int_of_int 0)),(I (big_int_of_int 1))
         | F _ -> (F 0.), F(1.)
       in
-      let aug = Array.make_matrix rows (cols*2) (F 0.) in
-        (Array.iteri
-          (fun i r -> Array.iteri
-            (fun j v -> aug.(i).(j) <- m.(i).(j);
-              aug.(i).(j+cols) <- if i = j then o else z ) r) m;
+      let aug = (init_matrix rows (cols*2)
+          (fun i j ->
+            if j < cols then m.(i).(j)
+            else if i = j-cols then o else z)
+         ) in
         let M(solved) = red_row_echelon aug in
-          read_off_inv solved m; M(m))
+          (read_off_inv solved m; M(m))
     else
       E "matrix size error"
 
@@ -259,7 +260,27 @@ let lin_dep m =
 
 let null_space m = M(m)
 
-let col_space m = M(m)
+let piv_col m f init=
+  let rows = Array.length m in
+  let cols = Array.length (m.(0)) in
+  let rr = row_echelon m in
+    let rec trav_diag i j acc =
+      if i < rows && j < cols then
+        if non_zero (m.(i).(j)) then
+          trav_diag (i+1) (j+1) (f j acc)
+        else trav_diag (i) (j+1) acc
+      else acc
+    in trav_diag 0 0 init
+
+
+let rank m =
+  piv_col m (fun _ acc -> 1 + acc) 0
+
+let col_space m =
+  let M(rr) = row_echelon m in
+  let piv = Array.of_list (piv_col m (fun j acc -> j::acc) [] ) in
+    M(init_matrix (Array.length rr) (Array.length piv) (fun i j -> m.(i).(piv.(j))))
+
 
 let eq m1 m2 =
   let r1 = Array.length m1 in

@@ -5,11 +5,26 @@ open Big_int
 
 let stack = Stack.create ()
 
+(*[no_op op] matches the [op] with the operators which do not take any arguments
+ * then evaluating the function coresponding to the operator
+ * if the stack does not contain at least 2 elements then this evaluates to a
+ * exception value indicating the wrong number of arguments, if the operator
+ * has not been defined then this will evaluate to an exception value
+ * also any of the argument exception values will be propagated, the earliest
+ * of which takes precidence*)
 let no_op op =
   match op with
   | "generate_private_key" -> Rsa.gen_private_key ()
   | _ -> E("not a defined operator")
 
+(*[un_op op] matches the [op] with the unerary operators, and the top element
+ * on the stack with the legal form for the argument for that
+ * operator, then evaluating the function coresponding to the operator
+ * if the stack does not contain at least 2 elements then this evaluates to a
+ * exception value indicating the wrong number of arguments, if the operator
+ * has not been defined then this will evaluate to an exception value
+ * also any of the argument exception values will be propagated, the earliest
+ * of which takes precidence*)
 let un_op op =
   if Stack.length stack < 1 then E("wrong number of arguments") else
     let one = Stack.pop stack in
@@ -31,6 +46,14 @@ let un_op op =
       | _, E(e) -> E(e)
       | _ -> E("not a defined operator")
 
+(*[bin_op] matches the [op] with the binary operators, and the top 2 elements
+ * on the stack with the legal forms for the arguments for that
+ * operator, then evaluating the function coresponding to the operator
+ * if the stack does not contain at least 2 elements then this evaluates to a
+ * exception value indicating the wrong number of arguments, if the operator
+ * has not been defined then this will evaluate to an exception value
+ * also any of the argument exception values will be propagated, the earliest
+ * of which takes precidence*)
 let bin_op op =
   if Stack.length stack < 2 then E("wrong number of arguments") else
     let one = Stack.pop stack in
@@ -59,6 +82,14 @@ let bin_op op =
       | _, E(e), _ -> E(e)
       | _ -> E("not a defined operator")
 
+(*[tri_op op] matches the [op] with the tirnary operators, and the top 3 elements
+ * on the stack with the legal forms for the arguments for that
+ * operator, then evaluating the function coresponding to the operator
+ * if the stack does not contain at least 3 elements then this evaluates to a
+ * exception value indicating the wrong number of arguments, if the operator
+ * has not been defined then this will evaluate to an exception value
+ * also any of the argument exception values will be propagated, the earliest
+ * of which takes precidence*)
 let tri_op op =
   if Stack.length stack < 3 then E("wrong number of arguments") else
     let one = Stack.pop stack in
@@ -85,6 +116,13 @@ let tri_op op =
       | _, E(e),_,_ -> E(e)
       | _ -> E("not a defined operator")
 
+(*[quad_op op] matches the [op] with the quad operators, and the top 4 elements
+ * on the stack with the legal forms for the arguments for that
+ * operator, then evaluating the function coresponding to the operator
+ * if the stack does not contain at least 4 elements then this evaluates to a
+ * Exception value indicating the wrong number of arguments, if the operator
+ * has not been defined then this will evaluate to an exception value
+ * also any of the argument exception values will be propagated*)
 let quad_op op =
   if Stack.length stack < 4 then E("wrong number of arguments") else
     let one = Stack.pop stack in
@@ -99,16 +137,23 @@ let quad_op op =
       | _, E(e),_,_,_ -> E(e)
       | _ -> E("not a defined operator")
 
+(*[get_n n] gets [n] elements off of the stack returning them in the same order
+ * which they are on the stack (top element on the stack is the first element
+ * in the list)*)
 let rec get_n n =
   if Stack.is_empty stack || n = 0 then [] else
     (Stack.pop stack)::(get_n (n-1))
 
+(*[pair l] makes a pair of lists from [l] in which the odd elements are in
+ * the first list and the even elements are in the second list where odd and
+ * even refer to the ordering of the numbers not the values of the elements *)
 let rec pair = function
   | [] -> ([],[])
   | (N(I a))::(N (I n))::t -> begin
     let (a', n') = pair t in
       (a::a', n::n')
   end
+
 (*[apply f lst] applys the function [f] to a list of the values for wich x is
  * congrent to, and then a list of the modulos for those numbers
  * if any of the values is an exception value then this evaluates to the first
@@ -186,10 +231,16 @@ let float =  '-'? digit+'.'digit*
 let num = int | float
 let letter = ['a'-'z' 'A'-'Z']
 let vector = '[' num (", "num) * ']'
+(*a matrix with any combination of numbers which contains a float will be
+ * converted to a matrix of floats*)
 let matrix = '[' vector (", "vector) * ']'
 let int_vector = '[' int (", "int) * ']'
+(*an int matrix can only contain integers not floats*)
 let int_matrix = '[' int_vector (", "int_vector) * ']'
-let id = letter (letter | digit)*
+(*strings may contain any combination of charactures, but will not contain
+ * any excapsed charactures*)
+let string = '"' _ *  '"'
+let id = letter (letter | digit | "_")*
 let nop = "generate_private_key"
 let uop = "inv" | "transpose" | "echelon" | "reduce" | "det" | "indep"
           | "nullspace" | "colspace" | "!" | "factor" | "gen_prime"
@@ -203,19 +254,21 @@ let mop = "solve"
 
 rule read env = parse
   | white { read env lexbuf }
+  | string {
+    (*this parses strings not function ids*)
+    Stack.push (S (
+      let s = Lexing.lexeme lexbuf in
+        (*this removes the quotation marks from the string*)
+        String.sub (s) 1 ((String.length s)-2 ) )
+    ) stack;
+    read env lexbuf
+  }
   | nop {Stack.push (no_op (Lexing.lexeme lexbuf)) stack; read env lexbuf }
   | uop { Stack.push (un_op (Lexing.lexeme lexbuf)) stack; read env lexbuf }
   | bop   { Stack.push (bin_op (Lexing.lexeme lexbuf)) stack; read env lexbuf }
   | top   { Stack.push (tri_op (Lexing.lexeme lexbuf)) stack; read env lexbuf }
   | qop   { Stack.push (quad_op (Lexing.lexeme lexbuf)) stack; read env lexbuf }
   | mop   { Stack.push (multi_op (Lexing.lexeme lexbuf)) stack; read env lexbuf}
-  | '"' (digit | letter) *  '"' {
-    Stack.push (S (
-      let s = Lexing.lexeme lexbuf in
-        String.sub (s) 1 ((String.length s)-2 ) )
-    ) stack;
-    read env lexbuf
-  }
   | id {
       let s = Lexing.lexeme lexbuf in
       if (PMap.mem s env) then
@@ -241,14 +294,6 @@ rule read env = parse
     Stack.push (N(F (float_of_string (Lexing.lexeme lexbuf)))) stack;
     read env lexbuf
   }
-  | matrix {
-    Stack.push (M(
-      make_matrix
-        (Lexing.lexeme lexbuf)
-        (fun f -> (F(float_of_string f))))
-     ) stack;
-    read env lexbuf
-  }
   | int_matrix {
     Stack.push (M(
       make_matrix
@@ -257,6 +302,15 @@ rule read env = parse
     ) stack;
     read env lexbuf
   }
+  | matrix {
+    Stack.push (M(
+      make_matrix
+        (Lexing.lexeme lexbuf)
+        (fun f -> (F(float_of_string f))))
+     ) stack;
+    read env lexbuf
+  }
+
   | _ {
     Stack.push
       (E("I do not understand the token: "^(Lexing.lexeme lexbuf)))

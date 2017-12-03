@@ -50,7 +50,7 @@ let bin_op op =
       | "=", M(m1), M(m2) -> Linear_alg.eq m2 m1
       | "gcd", N(I(i1)), N((I i2)) -> Mod_arith.gcd i2 i1
       | "lcm", N(I(i1)), N((I i2)) -> Mod_arith.lcm i2 i1
-      | "square", N(I(i1)), N((I i2)) -> Systems_eqs.is_square i2 i1
+      | "square", N(I(i1)), N((I i2)) -> Mod_arith.is_square i2 i1
       | "choose", N(I(i1)), N((I i2)) -> Comb_eval.combination i2 i1
       | "perm", N(I(i1)), N((I i2)) -> Comb_eval.permutation i2 i1
       | "part", N(I(i1)), N((I i2)) -> Comb_eval.partition_identical i2 i1
@@ -76,7 +76,7 @@ let tri_op op =
       | "/~",  N(I(i1)), N((I i2)), N(I(i3)) -> Mod_arith.divide i3 i2 i1
       | "^~",  N(I(i1)), N((I i2)), N(I(i3)) -> Mod_arith.power i3 i2 i1
       | "=~",  N(I(i1)), N((I i2)), N(I(i3)) -> Mod_arith.eq i3 i2 i1
-      | "bezout",  N(I(i1)), N((I i2)), N(I(i3)) -> Systems_eqs.bezout i3 i2 i1
+      | "bezout",  N(I(i1)), N((I i2)), N(I(i3)) -> Mod_arith.bezout i3 i2 i1
       | "crack",  N(I(e)), N((I n)), N(I(c)) -> Rsa.crack (n,e) c
       | "public_key", N(I(q)), N(I(p)), N(I(d)) -> Rsa.get_public_key (d,p,q)
       | "encrypt", N(I(e)), N(I(n)), S(s) -> Rsa.encrypt (n,e) s
@@ -134,7 +134,7 @@ let multi_op op =
     let N(I(n)) = Stack.pop stack in
     let a = get_n (2* (Big_int.int_of_big_int n)) in
       match op with
-      | "solve" -> apply (Systems_eqs.crt) a
+      | "solve" -> apply (Mod_arith.crt) a
       | _ -> E("not a defined operator")
 
 (*[row_to_list s f] converts the string form of a matrix to a list of number

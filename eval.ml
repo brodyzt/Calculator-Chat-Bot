@@ -44,10 +44,10 @@ let rec string_of_value v =
   | PubKey (n, e) -> begin
     "n: "^(string_of_big_int n)^" e: "^(string_of_big_int e)
   end
-  | PrivKey (p, q, d) -> begin
-    "p: "^(string_of_big_int p)^
-    " q: "^(string_of_big_int q)^
-    " d: "^(string_of_big_int d)
+  | PrivKey (d, p, q) -> begin
+    "d: "^(string_of_big_int d)^
+    " p: "^(string_of_big_int p)^
+    " q: "^(string_of_big_int q)
   end
   | Fact f -> begin
     List.fold_left

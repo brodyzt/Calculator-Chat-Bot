@@ -78,7 +78,7 @@ let tri_op op =
       | "=~",  N(I(i1)), N((I i2)), N(I(i3)) -> Mod_arith.eq i3 i2 i1
       | "bezout",  N(I(i1)), N((I i2)), N(I(i3)) -> Systems_eqs.bezout i3 i2 i1
       | "crack",  N(I(i1)), N((I i2)), N(I(i3)) -> Rsa.crack (i2,i3) i1
-      | "public_key", N(I(e)), N(I(q)), N(I(p)) -> Rsa.get_public_key (p,q,e)
+      | "public_key", N(I(d)), N(I(q)), N(I(p)) -> Rsa.get_public_key (p,q,d)
       | "encrypt", N(I(e)), N(I(n)), S(s) -> Rsa.encrypt (n,e) s
       | _, _,_,E(e) -> E(e)
       | _, _,E(e),_ -> E(e)
@@ -197,8 +197,8 @@ let uop = "inv" | "transpose" | "echelon" | "reduce" | "det" | "indep"
 let bop = "+" | "-" | "*" | "/" | "^" | "%" | "=" | "gcd" | "lcm" | "square"
           | "choose" | "perm" | "part" | "." | "#" | "matrix_solve"
 let top = "?" | "+~" | "-~" | "*~" | "/~" | "^~" | "=~" | "crack" | "public_key"
-          | "bezout"
-let qop = "encrypt" | "decrypt"
+          | "bezout" | "encrypt"
+let qop = "decrypt"
 let mop = "solve"
 
 rule read env = parse

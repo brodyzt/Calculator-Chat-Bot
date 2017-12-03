@@ -202,7 +202,7 @@ let gen_prime l =
   else N(I(gen_prime_helper l))
 
 let rec gen_unit_helper n bits =
-  let u = gen_rand_big_int n in
+  let u = gen_rand_big_int bits in
   if eq_big_int (as_big_int (gcd u n)) unit_big_int then u
   else gen_unit_helper n bits
 

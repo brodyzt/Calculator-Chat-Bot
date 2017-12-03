@@ -14,22 +14,9 @@ let merge_coefs ((x,b),(y,r),r') ((a),(q,b),r) =
   let y' = minus_big_int (add_big_int x (mult_big_int y q)) in
   ((x',a),(y',b),r')
 
-  let rec print_equations eqn =
-    match eqn with
-    | [] -> ()
-    | ((x,a),(y,b),r)::t ->
-      let print = print_int (int_of_big_int x ) in
-      let print = print_int (int_of_big_int a ) in
-      let print = print_int (int_of_big_int y ) in
-      let print = print_int (int_of_big_int b ) in
-      let print = print_int (int_of_big_int r ) in
-      let print = print_string "\n\n" in print_equations t
-    | _ -> print_string "invalid format"
-
 let rec construct_min_bezout_sol eqn coefs =
-  let print = print_equations [eqn] in
   match coefs with
-  | [] -> let print = print_equations [eqn] in eqn
+  | [] -> eqn
   | h::t -> construct_min_bezout_sol (merge_coefs eqn h) t
 (*[bezout a b c] is a pair (x, y) where x*a + y*b = c, or an exception value
   if no such pair exists*)

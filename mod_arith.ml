@@ -32,6 +32,8 @@ let inv a n =
       | _ -> failwith "Unimplemented"
 
 let divide a b n =
+  if ((compare_big_int n zero_big_int)<=0) then E("cannot take the remainder mod a non-positive number")
+  else
   let result = inv b n in
   match result with
   | E _ -> E("second arguement is not relatively prime to divisor")
@@ -64,7 +66,10 @@ let rec condense n pows bin accum=
   | _,_ -> failwith "pows and bin must be the same lenth"
 
 let power a b n =
-  if eq_big_int a zero_big_int then N(I(zero_big_int))
+  let b = abs_big_int b in
+  if (eq_big_int b zero_big_int) then N(I(unit_big_int))
+  else if ((compare_big_int n zero_big_int) <= 0) then E("cannot take the remainder mod a non-positive number")
+  else if eq_big_int a zero_big_int then N(I(zero_big_int))
   else let bin = as_bin_list b [] in
   let expn = big_int_of_int ((List.length bin) - 1) in
   let squares = repeated_square a n expn [] in
@@ -182,7 +187,7 @@ let rec is_prime_k_tests n k =
 
 let is_prime_likely n =
   (*hardcoded for now*)
-  let prob_prime = is_prime_k_tests n (big_int_of_int 1000) in
+  let prob_prime = is_prime_k_tests n (big_int_of_int 100) in
   if prob_prime then N(I(unit_big_int))
   else N(I(zero_big_int))
 
@@ -191,7 +196,9 @@ let rec gen_prime_helper n =
   if truthy (is_prime_likely p) then p
   else gen_prime_helper n
 
-let gen_prime l = N(I(gen_prime_helper l))
+let gen_prime l =
+  if ((compare_big_int l unit_big_int)<=0) then E("no primes this small")
+  else N(I(gen_prime_helper l))
 
 
 let rec totient_helper factors accum =
@@ -204,7 +211,7 @@ let rec totient_helper factors accum =
     totient_helper t accum'
 
 let totient n =
-  if ((compare_big_int n zero_big_int)=0) then N(I(zero_big_int))
+  if ((compare_big_int n zero_big_int)<=0) then E("totient undefined for 0")
   else let res = factor n in
   match res with
   | Fact factors -> N(I(totient_helper factors (big_int_of_int 1)))

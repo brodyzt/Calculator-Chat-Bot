@@ -109,25 +109,37 @@ let rec pair = function
     let (a', n') = pair t in
       (a::a', n::n')
   end
+(*[apply f lst] applys the function [f] to a list of the values for wich x is
+ * congrent to, and then a list of the modulos for those numbers
+ * if any of the values is an exception value then this evaluates to the first
+ * exn in [lst] *)
 let apply f lst =
   let l = List.rev lst in
-    if List.exists (fun v -> match v with | E(e) -> true | _ -> false) l then
-       List.find (fun v -> match v with | E(e) -> true | _ -> false) l
+    if List.exists (fun v -> match v with | E(_) -> true | _ -> false) l then
+       List.find (fun v -> match v with | E(_) -> true | _ -> false) l
     else
       let (a,n) = pair l in
         f a n
 
-
+(*[multi_op op] takes an op, then looking at the stack to see how many arguments
+ * will be given, then applys the operation to that number of arguments on the
+ * stack.
+ * if the number if arguments given is less than the number idicated, or
+ * no such number is indicated then this
+ * evaluares to an Exception value for "wrong number of arguments", if the
+ * function called is not one of the listed multi ops then this evaluates
+ * to an Excpetion value witht the text "not a defined operator"*)
 let multi_op op =
   if Stack.length stack < 1 then E("wrong number of arguments") else
     let N(I(n)) = Stack.pop stack in
     let a = get_n (2* (Big_int.int_of_big_int n)) in
       match op with
-      (*needs to check for *)
       | "solve" -> apply (Systems_eqs.crt) a
       | _ -> E("not a defined operator")
 
-
+(*[row_to_list s f] converts the string form of a matrix to a list of number
+ * types. The function f the string version of a single element to a number type
+ *)
 let rec row_to_list s f =
   let c = String.index_opt s ',' in
   let len = String.length s in
@@ -135,6 +147,9 @@ let rec row_to_list s f =
     | None -> (f s)::[]
     | Some x -> (f (String.sub s 0 x))::(row_to_list (String.sub s (x+2) (len-x-2) ) f)
 
+(*[make_rows s f] makes a list of lists wich are the rows of the matrix which
+ * is represented as the string [s] using the function f to convert from a
+ * string to a number tyoe *)
 let rec make_rows s f =
   let beg = String.index_opt s '[' in
   let en = String.index_opt s ']' in
@@ -143,18 +158,23 @@ let rec make_rows s f =
     | None , _ -> []
     | _, None -> []
     | Some b, Some e ->
-      ((row_to_list (String.sub s (b+1) (e-b-1)) f))::( make_rows (String.sub s (e+1) (len-e-1)) f)
+      (((row_to_list (String.sub s (b+1) (e-b-1)) f))::
+      (make_rows (String.sub s (e+1) (len-e-1)) f))
 
+(*[make_matrix s f] gives the matrix in an array which is col major from
+ * the string [s] using the function [f] to convert the string to an number type
+ *)
 let make_matrix s f =
+  (*creates a list of the rows*)
   let list_m = (make_rows (String.sub s 1 ((String.length s) -2)) f) in
-  let m = Array.make_matrix (List.length list_m) (List.length (List.hd list_m)) (F(0.)) in
+  (*creates the double array for the matrix*)
+  let m = Array.make_matrix
+    (List.length list_m)
+    (List.length (List.hd list_m))
+    (F(0.))
+  in
+    (*fills the rows of the matrix with the values*)
     List.iteri (fun i l -> m.(i) <- (Array.of_list l)) list_m; m
-
-(*
-let int_vector = '[' int (", "int) * ']'
-let int_matrix = '[' int_vector (", "int_vector) * ']'
-| int_matrix {Stack.push (M(make_matrix (Lexing.lexeme lexbuf) (fun i -> (I(big_int_of_string i))) )) stack; read env lexbuf}
-*)
 
 
 }
@@ -165,8 +185,10 @@ let int = '-'? digit+
 let float =  '-'? digit+'.'digit*
 let num = int | float
 let letter = ['a'-'z' 'A'-'Z']
-let vector = '[' float (", "float) * ']'
+let vector = '[' num (", "num) * ']'
 let matrix = '[' vector (", "vector) * ']'
+let int_vector = '[' int (", "int) * ']'
+let int_matrix = '[' int_vector (", "int_vector) * ']'
 let id = letter (letter | digit)*
 let nop = "generate_private_key"
 let uop = "inv" | "transpose" | "echelon" | "reduce" | "det" | "indep"
@@ -181,27 +203,63 @@ let mop = "solve"
 
 rule read env = parse
   | white { read env lexbuf }
+  | nop {Stack.push (no_op (Lexing.lexeme lexbuf)) stack; read env lexbuf }
   | uop { Stack.push (un_op (Lexing.lexeme lexbuf)) stack; read env lexbuf }
   | bop   { Stack.push (bin_op (Lexing.lexeme lexbuf)) stack; read env lexbuf }
   | top   { Stack.push (tri_op (Lexing.lexeme lexbuf)) stack; read env lexbuf }
   | qop   { Stack.push (quad_op (Lexing.lexeme lexbuf)) stack; read env lexbuf }
-  | mop   { Stack.push (multi_op (Lexing.lexeme lexbuf)) stack; read env lexbuf }
-| '"' id '"' { Stack.push (S (let s = Lexing.lexeme lexbuf in String.sub (s) 1 ((String.length s)-2 ) )) stack; read env lexbuf }
+  | mop   { Stack.push (multi_op (Lexing.lexeme lexbuf)) stack; read env lexbuf}
+  | '"' id '"' {
+    Stack.push (S (
+      let s = Lexing.lexeme lexbuf in
+        String.sub (s) 1 ((String.length s)-2 ) )
+    ) stack;
+    read env lexbuf
+  }
   | id {
       let s = Lexing.lexeme lexbuf in
       if (PMap.mem s env) then
         match PMap.find s env with
         | Func (env, args, fun_string) -> begin
-          if Stack.length stack < List.length args then (Stack.push (E "wrong number of arguments") stack; read env lexbuf)
+          if Stack.length stack < List.length args then
+            (Stack.push (E "wrong number of arguments") stack; read env lexbuf)
           else
             let vals = List.rev (get_n (List.length args)) in
-              (read (List.fold_left2 (fun m n v -> PMap.add n v m) env args vals) (Lexing.from_string fun_string); read env lexbuf)
+              (read
+                (List.fold_left2 (fun m n v -> PMap.add n v m) env args vals)
+                (Lexing.from_string fun_string);
+              read env lexbuf)
          end
         | v -> (Stack.push (v) stack; read env lexbuf)
       else (Stack.push (E "not defined") stack; read env lexbuf)
     }
-  | int { Stack.push (N(I (Big_int.big_int_of_string (Lexing.lexeme lexbuf)))) stack; read env lexbuf }
-  | float { Stack.push (N(F (float_of_string (Lexing.lexeme lexbuf)))) stack; read env lexbuf }
-  | matrix {Stack.push (M(make_matrix (Lexing.lexeme lexbuf) (fun f -> (F(float_of_string f))))) stack; read env lexbuf}
-  | _ {Stack.push (E ("I do not understand the token: "^(Lexing.lexeme lexbuf))) stack}
+  | int {
+    Stack.push (N(I (Big_int.big_int_of_string (Lexing.lexeme lexbuf)))) stack;
+    read env lexbuf
+  }
+  | float {
+    Stack.push (N(F (float_of_string (Lexing.lexeme lexbuf)))) stack;
+    read env lexbuf
+  }
+  | matrix {
+    Stack.push (M(
+      make_matrix
+        (Lexing.lexeme lexbuf)
+        (fun f -> (F(float_of_string f))))
+     ) stack;
+    read env lexbuf
+  }
+  | int_matrix {
+    Stack.push (M(
+      make_matrix
+        (Lexing.lexeme lexbuf)
+        (fun i -> (I(big_int_of_string i))) )
+    ) stack;
+    read env lexbuf
+  }
+  | _ {
+    Stack.push
+      (E("I do not understand the token: "^(Lexing.lexeme lexbuf)))
+      stack
+  }
   | eof {()}

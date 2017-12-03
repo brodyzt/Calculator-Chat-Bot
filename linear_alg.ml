@@ -2,6 +2,9 @@
 open Types
 open Big_int
 
+let init_matrix x y f =
+  Array.init x (fun i -> Array.init y (fun j ->  f i j))
+
 let row m n =
   let i = int_of_big_int n in
     if i < 0 || i >= Array.length m then M(Array.make_matrix 0 0 (F(0.)) )
@@ -177,9 +180,11 @@ let rec red_row_up m i=
   if i >= 0 then
     let j = find_pivot m i in
       if j = -1 then red_row_up m (i-1) else
+        let piv_val = m.(i).(j) in
           (print_string (string_of_int i);
            Array.iteri (fun j' v ->
-            m.(i).(j') <- (app_num (/.) (div_big_int) v (m.(i).(j)) )
+            print_int j';
+            m.(i).(j') <- (app_num (/.) (div_big_int) v (piv_val) )
           ) m.(i);
           Array.iteri (fun ind row -> if ind < i then m.(ind) <- (clear_col j ( m.(i) ) row ) else () ) m;
           red_row_up m (i-1))
@@ -230,7 +235,6 @@ let inverse m =
           read_off_inv solved m; M(m))
     else
       E "matrix size error"
-
 
 let rec prod_diag m i j acc =
   let rows = Array.length m in

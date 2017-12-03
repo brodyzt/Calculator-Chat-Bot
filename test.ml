@@ -199,6 +199,10 @@ let mod_arith_tests = [
 
 let comb_arith_tests = [
   (*black box*)
+  (*tests that zero factorial is 1*)
+  ("zero_fact", "0 !", "1");
+  (*tests that a 1 factorial is 1*)
+  ("one_fact", "1 !", "1");
   (*tests a small factorial*)
   ("small_fact", "6 !", "720");
   (*tests a larger factorial*)
@@ -217,9 +221,11 @@ let comb_arith_tests = [
 
 let linear_arith_tests = [
   (*simple adding of two matricies*)
-
+  ("simple_add_matrix", "[[2., -3.], [-4., 5.]] [[7., 34.], [56., -19.]] +",
+   "[\n[ 9. 31. ]\n[ 52. -14. ]\n]");
   (*simple subtraction of two matracies*)
-
+  ("simple_sub_matrix", "[[5., -3.], [-10., 5.], [5.6, 7.1]] [[7., 12.], [23., -19.], [13., 5.]] -",
+   "[\n[ -2. -15. ]\n[ -33. 24. ]\n[ -7.4 2.1 ]\n]");
   (*simple row reduction*)
   ("simple_esch",
    "[[2., -3.], [-4., 5.]] echelon",
@@ -248,11 +254,11 @@ let linear_arith_tests = [
   (*simple row red with more col than row to reduced form*)
   ("non_square_rr2",
    "[[2., -3., -1., 2.], [-4., 7., 5., 16.], [9., -70.5, 8., 7.]] reduce",
-   "[\n[ 1. 0. 0. -9042. ]\n[ 0. 1. 0. -3394. ]\n[ 0. 0. 1. 1138. ]\n]");
+   "[\n[ 1. 0. 0. 6.19346049046 ]\n[ 0. 1. 0. 1.39509536785 ]\n[ 0. 0. 1. 6.20163487738 ]\n]");
   (*lin dep ex. to reduced form*)
   ("lin_dep_red",
    "[[2., -4., 9.], [-4., 8., 14.], [8., -16., -3.]] reduce",
-   "[\n[ 1. -4. 0. ]\n[ 0. 0. 1. ]\n[ 0. 0. 0. ]\n]");
+   "[\n[ 1. -2. 0. ]\n[ 0. 0. 1. ]\n[ 0. 0. 0. ]\n]");
 
 ]
 

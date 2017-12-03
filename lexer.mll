@@ -108,8 +108,8 @@ let tri_op op =
       | "^~",  N(I(i1)), N((I i2)), N(I(i3)) -> Mod_arith.power i3 i2 i1
       | "=~",  N(I(i1)), N((I i2)), N(I(i3)) -> Mod_arith.eq i3 i2 i1
       | "bezout",  N(I(i1)), N((I i2)), N(I(i3)) -> Systems_eqs.bezout i3 i2 i1
-      | "crack",  N(I(i1)), N((I i2)), N(I(i3)) -> Rsa.crack (i2,i3) i1
-      | "public_key", N(I(d)), N(I(q)), N(I(p)) -> Rsa.get_public_key (p,q,d)
+      | "crack",  N(I(e)), N((I n)), N(I(c)) -> Rsa.crack (n,e) c
+      | "public_key", N(I(q)), N(I(p)), N(I(d)) -> Rsa.get_public_key (d,p,q)
       | "encrypt", N(I(e)), N(I(n)), S(s) -> Rsa.encrypt (n,e) s
       | _, _,_,E(e) -> E(e)
       | _, _,E(e),_ -> E(e)
@@ -130,7 +130,7 @@ let quad_op op =
     let three = Stack.pop stack in
     let four = Stack.pop stack in
       match op, one, two, three, four with
-      | "decrypt", N(I(d)), N(I(q)), N(I(p)), N(I(i)) -> Rsa.decrypt (d,p,q) i
+      | "decrypt", N(I(q)), N(I(p)), N(I(d)), N(I(i)) -> Rsa.decrypt (d,p,q) i
       | _, _,_,_,E(e) -> E(e)
       | _, _,_,E(e),_ -> E(e)
       | _, _,E(e),_,_ -> E(e)

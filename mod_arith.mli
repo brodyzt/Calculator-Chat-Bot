@@ -1,5 +1,17 @@
 (*arithmatic with congruence classes*)
 
+(*[as_big_int v] is x if v takes the form N(I(x))
+  Precondition: v takes the form N(I(x))*)
+val as_big_int: Types.value -> Types.integer
+
+(*[gen_unit n] is a unit mod n
+  Precondition: n >= 2*)
+val gen_unit: Types.integer ->  Types.integer
+
+(*[inv a n] is the multiplicative inverse of a mod n, if the inverse exists
+  and is an exception value if n <= 0 or a has no inverse mod n*)
+val inv: Types.integer -> Types.integer -> Types.value
+
 (*[add a b n] is the unique 0 <=r < n such that (a + b - r) divides n
   if n <= 0 then the result will be an excpetion value*)
 val add: Types.integer -> Types.integer -> Types.integer -> Types.value
@@ -37,10 +49,7 @@ val gcd: Types.integer -> Types.integer -> Types.value
 (*[lcm a v] is the smallest natural number n
   such that a divides n and v divides n*)
 val lcm: Types.integer -> Types.integer -> Types.value
-(*[gen_rand_big_int n] is a big_int that is representable with n bits
-  Precondition: n > 0*)
 
-val gen_rand_big_int: Types.integer -> Types.integer
 (*[gen_prime l] is a psuedorandomly generated natrual number n with a high
  * probability being prime that is l bits and which given a large l
  * may take a long time. If l is 1 or 0 an exception value is given*)

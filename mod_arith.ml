@@ -27,7 +27,7 @@ let inv a n =
   if ((compare_big_int n zero_big_int) <= 0) then E("cannot take the remainder mod a non-positive number")
   else let result = Systems_eqs.bezout a n (big_int_of_int 1) in
       match result with
-      | E _ -> E("has no inverse mod n")
+      | E _ -> E("has no inverse mod this number")
       | P (N(I(x)),_) -> N(I(mod_big_int x n))
       | _ -> failwith "Unimplemented"
 
@@ -99,11 +99,12 @@ let factor n =
   else Fact(List.rev (factor_helper n (big_int_of_int 2) []))
 
 let is_prime n =
-  let res = factor n in
+  if ((compare_big_int n unit_big_int)<=0) then N(I(zero_big_int))
+  else let res = factor n in
   match res with
   | Fact factors -> begin
       match factors with
-      | [] -> failwith "an integer cannot have no factors"
+      | [] -> N(I(zero_big_int))
       | (fact,freq)::t ->
         if (((compare_big_int freq (big_int_of_int 1))=0) && (t = []))
         then N(I(big_int_of_int 1))
@@ -200,6 +201,14 @@ let gen_prime l =
   if ((compare_big_int l unit_big_int)<=0) then E("no primes this small")
   else N(I(gen_prime_helper l))
 
+let rec gen_unit_helper n bits =
+  let u = gen_rand_big_int n in
+  if eq_big_int (as_big_int (gcd u n)) unit_big_int then u
+  else gen_unit_helper n bits
+
+let gen_unit n =
+  let num_bits = get_num_bits n in
+  gen_unit_helper n (pred_big_int num_bits)
 
 let rec totient_helper factors accum =
   match factors with

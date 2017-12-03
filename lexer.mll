@@ -92,7 +92,7 @@ let quad_op op =
     let three = Stack.pop stack in
     let four = Stack.pop stack in
       match op, one, two, three, four with
-      | "decrypt", N(I(d)), N(I(q)), N(I(p)), N(I(i)) -> Rsa.decrypt (p,q,d) i
+      | "decrypt", N(I(d)), N(I(q)), N(I(p)), N(I(i)) -> Rsa.decrypt (d,p,q) i
       | _, _,_,_,E(e) -> E(e)
       | _, _,_,E(e),_ -> E(e)
       | _, _,E(e),_,_ -> E(e)

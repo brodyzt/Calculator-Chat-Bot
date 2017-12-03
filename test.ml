@@ -73,6 +73,11 @@ let mod_arith_tests = [
   (*tests the addition of two numbers which is not divisible by the modulo
    * but their sum is*)
   ("non_div_mod_add", "5 6 11 +~", "0");
+  (*test the addition two numbers mod 0*)
+  ("add_mod_zero","4 5 0 +~","cannot take the remainder mod a non-positive number");
+  (**test the addition two numbers mod 0 a negative number*)
+  ("add_mod_neg","4 0 -63 +~","cannot take the remainder mod a non-positive number");
+
   (*tests the simple modular subtraction of 2 numbers which is not divisable by
    * the modulo*)
   ("simple_mod_sub", "9 4 2 -~", "1");
@@ -83,21 +88,45 @@ let mod_arith_tests = [
   ("no_div_mod_sub", "37 20 17 -~", "0");
   (*tests the subtraction of two larger numbers*)
   ("larger_mod_sub", "483275 34261 3 -~", "1");
+  (*tests the subtraction of two numbers mod 0*)
+  ("sub_mod_zero","4 5 0 -~","cannot take the remainder mod a non-positive number");
+  (*tests the subtraction of two numbers mod a non-zero number*)
+  ("sub_mod_zero","4 5 -1 -~","cannot take the remainder mod a non-positive number");
   (*tests simple multiplication, which us not divisable by the modulo*)
   ("simple_mod_mult", "6 7 5 *~", "2");
   (*tests the multiplication of two numbers which is divisable by the modulo*)
   ("div_mod_mult", "9 4 6 *~", "0");
   (*tests multiplication by 0*)
   ("zero_mod_mult", "0 8 7 *~", "0");
-  (*testsdivision of two numbers which the denom divides the numerator*)
+  (*tests multiplication mod 0*)
+  ("mult_mod_zero", "10 12 0 *~", "cannot take the remainder mod a non-positive number");
+  (*tests multiplication mod a negative number*)
+  ("mult_mod_zero", "10 0 -3 *~", "cannot take the remainder mod a non-positive number");
+  (*tests division of two numbers for which the denom divides the numerator*)
   ("rel_prime&divis_mod_div", "49 7 5 /~", "2");
   (*tests the division of numbers which the denom does not divide the numerator
    * but the divisor is rel prime to the modulo*)
   ("rel_prime_mod_div", "9 5 7 /~", "6");
+  (*tests the divions of numbers in which the denom is not rel prime to the modulous*)
+  ("non_rel_prime_div", "10 4 2 /~", "second arguement is not relatively prime to divisor");
+  (*tests the division of numbers mod 0*)
+  ("div_mod_zero", "10 4 0 /~", "cannot take the remainder mod a non-positive number");
+  (*test the divions of numbers mod a negative number*)
+  ("div_mod_neg", "9 2 -1 /~", "cannot take the remainder mod a non-positive number");
   (*tests simple modular powers *)
   ("simpl_mod_pow", "3 4 11 ^~", "4");
   (*tests powers with a large power*)
   ("large_mod_pow", "2 243567633493504 5 ^~", "1");
+  (*tests 0 to a power*)
+  ("zero_mod_pow","0 829375 12 ^~", "0");
+  (*tests 0 to a pow mod 0*)
+  ("zero_pow_mod_zero","0 829375 0 ^~", "cannot take the remainder mod a non-positive number");
+  (*tests a number to the 0 mod a number*)
+  ("to_the_zero","12 0 7 ^~","1");
+  (*tests powers mod 0*)
+  ("pow_mod_zero", "3285 293 0 ^~", "cannot take the remainder mod a non-positive number");
+  (*tests powers mod negative number*)
+  ("pow_mod_neg", "0 23 -1 ^~", "cannot take the remainder mod a non-positive number");
   (*tests simple equality of two small numbers*)
   ("simple_mod_eq", "16 2 15 =~", "0");
   (*tests the modular equality with large numbers*)
@@ -108,27 +137,62 @@ let mod_arith_tests = [
   ("large_1_gcd", "100000037 1000000345537 gcd", "1");
   (*tests the gcd of two large numbers which are not rel prime*)
   ("large_1_gcd", "8753735081401 9696994354185197 gcd", "411301747");
+  (*test the gcd with one number negative*)
+  ("simple_gcd_neg", "-68 51 gcd", "17");
+  (*test the gcd with the second number negative*)
+  ("other_gcd_neg", "68 -51 gcd", "17");
+  (*test the gcd with one number 0 number negative*)
+  ("gcd_zero", "68 0 gcd", "68");
+  (*test the gcd with one number diving the other*)
+  ("gcd_div","999999999 9 ","9");
   (*tests a small lcm*)
   ("small_lcm", "56 62 lcm", "1736");
   (*tests the lcm of two large numbers*)
   ("large_lcm", "1624956750 14873852 lcm", "326613056836500");
+  (*tests the lcm of two large negative integers*)
+  ("large_lcm_neg", "-1624956750 -14873852 lcm", "326613056836500");
+  (*tests the lcm with one number 0*)
+  ("lcm_0", "0 12 lcm", "0");
   (*tests factoring a small number*)
   ("simple_factor", "876 factor", "(2,2) (3,1) (73,1) ");
   (*tests factoring of a large number*)
   ("largish_factor", "387153510 factor", "(2,1) (3,1) (5,1) (43,1) (300119,1) ");
+  (*tests factor for a large composite number with small divisors*)
+  ("large_factor_small_div","3541171240000000000 factor","(2,12) (5,10) (97,4) ");
+  (*tests factor for a prime*)
+  ("prime_factor","617 factor", "(617,1) ");
+  (*tests factor for 0*)
+  ("zero_factor","0 factor", "");
+  (*tests factor for 1*)
+  ("one_factor","1 factor", "");
   (*tests that a small composite is not prime*)
   ("small_composite_is_prime", "48 is_prime", "0");
-  (*tests that a number which is composite*)
+  (*tests that a number is composite*)
   ("composite_is_prime", "387153510 is_prime", "0");
   (*test an is prime prob for a small number that should clearly be not prime*)
   ("small_composite_is_prime_likely", "56 is_prime_prob", "0");
   (*tests that a larger clearly composite number is not prime*)
   ("larger_is_prime_prob", "234976 is_prime_prob", "0");
+  (*tests that a very large compositve nubmer is not prime*)
+  ("very_large_non_prime", "856361215938558998591710718116059059061475058229 is_prime_prob", "0");
+  (*tests that a very large prime is probably prime*)
+  ("very_large_prime", "1582375376486522645799264544143004449330845988412246964181752084476603692779420515602503876711832499362684765390499372107885862811732185802600456088127 is_prime_prob","1");
+  (*tests invalid bits for gen primes*)
+  ("0_bit_prime","0 gen_prime","no primes this small");
+  (*tests invalid bits for gen primes*)
+  ("1_bit_prime","1 gen_prime","no primes this small");
+  (*tests generating a small prime*)
+  ("small_prime","3 gen_prime is_prime","1");
+  (*test generating a somewhat large prime*)
+  ("large_prime","200 gen_prime is_prime_prob", "1");
   (*tests finding the totient of a prime*)
   ("prime_totient", "35738783 totient", "35738782");
   (*finds a totient of a composite*)
   ("composite_totient", "532501478 totient", "266250738");
-
+  (*tests totient of zero*)
+  ("zero_totient", "0 totient", "totient undefined for 0");
+  (*test totient of 1*)
+  ("one_totient", "1 totient", "1")
   (*glass box*)
 
 ]

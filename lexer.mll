@@ -12,10 +12,21 @@ let stack = Stack.create ()
  * has not been defined then this will evaluate to an exception value
  * also any of the argument exception values will be propagated, the earliest
  * of which takes precidence*)
-let no_op op =
+let no_op env op =
   match op with
-  | "generate_private_key" -> Rsa.gen_private_key ()
-  | _ -> E("not a defined operator")
+  | "generate_private_key" -> begin
+    let PrivKey(d, p, q) = Rsa.gen_private_key () in
+      (PrivKey(d, p, q),
+       env |> PMap.add "`p" (N (I p)) |> PMap.add "`q" (N (I q)) |> PMap.add "`d" (N (I  d)) )
+  end
+  | "`prime" -> PMap.find "`prime" env, env
+  | "`p" -> PMap.find "`p" env, env
+  | "`q" -> PMap.find "`q" env, env
+  | "`n" -> PMap.find "`n" env, env
+  | "`d" -> PMap.find "`d" env, env
+  | "`e" -> PMap.find "`e" env, env
+  | "`prime_prob" -> PMap.find "`prime_prob" env, env
+  | _ -> E("not a defined operator"), env
 
 (*[un_op op] matches the [op] with the unerary operators, and the top element
  * on the stack with the legal form for the argument for that
@@ -25,26 +36,38 @@ let no_op op =
  * has not been defined then this will evaluate to an exception value
  * also any of the argument exception values will be propagated, the earliest
  * of which takes precidence*)
-let un_op op =
-  if Stack.length stack < 1 then E("wrong number of arguments") else
+let un_op env op =
+  if Stack.length stack < 1 then E("wrong number of arguments"), env else
     let one = Stack.pop stack in
       match op, one with
-      | "inv" , M(m) -> Linear_alg.inverse m
-      | "transpose", M(m) -> Linear_alg.transpose m
-      | "echelon", M(m) -> Linear_alg.row_echelon m
-      | "reduce", M(m) -> Linear_alg.red_row_echelon m
-      | "det", M(m) -> Linear_alg.determinant m
-      | "indep", M(m) -> Linear_alg.lin_ind m
-      | "nullspace", M(m) -> Linear_alg.null_space m
-      | "colspace", M(m) -> Linear_alg.col_space m
-      | "!", N(I(i)) -> Comb_eval.factorial i
-      | "factor", N(I(i)) -> Mod_arith.factor i
-      | "gen_prime", N(I(i)) -> Mod_arith.gen_prime i
-      | "is_prime", N(I(i)) -> Mod_arith.is_prime i
-      | "is_prime_prob", N(I(i)) -> Mod_arith.is_prime_likely i
-      | "totient", N(I(i)) -> Mod_arith.totient i
-      | _, E(e) -> E(e)
-      | _ -> E("not a defined operator")
+      | "inv" , M(m) -> Linear_alg.inverse m, env
+      | "transpose", M(m) -> Linear_alg.transpose m, env
+      | "echelon", M(m) -> Linear_alg.row_echelon m, env
+      | "reduce", M(m) -> Linear_alg.red_row_echelon m, env
+      | "det", M(m) -> Linear_alg.determinant m, env
+      | "indep", M(m) -> Linear_alg.lin_ind m, env
+      | "nullspace", M(m) -> Linear_alg.null_space m, env
+      | "colspace", M(m) -> Linear_alg.col_space m, env
+      | "!", N(I(i)) -> Comb_eval.factorial i, env
+      | "factor", N(I(i)) -> Mod_arith.factor i, env
+      | "gen_prime", N(I(i)) -> begin
+         let prime = Mod_arith.gen_prime i in
+           (prime, env |> PMap.add "`prime" prime)
+      end
+      | "is_prime", N(I(i)) -> Mod_arith.is_prime i, env
+      | "is_prime_prob", N(I(i)) -> begin
+        let is_prime = Mod_arith.is_prime_likely i in
+          (is_prime, env |> PMap.add "`prime_prob" is_prime)
+      end
+      | "totient", N(I(i)) -> Mod_arith.totient i, env
+      (*these operators are not actually un_ops, but they need to be able to
+       * take the results of corresponding methods*)
+      | "public_key", PrivKey(d, p, q) -> begin
+          let PubKey(n, e) = Rsa.get_public_key (d,p,q) in
+            (PubKey(n,e), env |> PMap.add "`n" (N (I n)) |> PMap.add "`e" (N(I e)) )
+        end
+      | _, E(e) -> E(e), env
+      | _ -> E("not a defined operator"), env
 
 (*[bin_op] matches the [op] with the binary operators, and the top 2 elements
  * on the stack with the legal forms for the arguments for that
@@ -55,7 +78,7 @@ let un_op op =
  * also any of the argument exception values will be propagated, the earliest
  * of which takes precidence*)
 let bin_op op =
-  if Stack.length stack < 2 then E("wrong number of arguments") else
+  if Stack.length stack < 2 then E("wrong number of arguments for bin op") else
     let one = Stack.pop stack in
     let two = Stack.pop stack in
       match op, one, two with
@@ -78,9 +101,12 @@ let bin_op op =
       | "perm", N(I(i1)), N((I i2)) -> Comb_eval.permutation i2 i1
       | "part", N(I(i1)), N((I i2)) -> Comb_eval.partition_identical i2 i1
       | "matrix_solve", M(m1), M(m2) -> Linear_alg.solve m2 m1
+      | "encrypt", PubKey(n,e), S(s) -> Rsa.encrypt (n,e) s
+      | "decrypt", PrivKey(d,p,q), N(I(i)) -> Rsa.decrypt (d,p,q) i
+      | "crack", PubKey(n,e), N(I(i)) -> Rsa.crack (n,e) i
       | _, _, E(e) -> E(e)
       | _, E(e), _ -> E(e)
-      | _ -> E("not a defined operator")
+      | _ -> E("not a defined bin operator")
 
 (*[tri_op op] matches the [op] with the tirnary operators, and the top 3 elements
  * on the stack with the legal forms for the arguments for that
@@ -90,31 +116,39 @@ let bin_op op =
  * has not been defined then this will evaluate to an exception value
  * also any of the argument exception values will be propagated, the earliest
  * of which takes precidence*)
-let tri_op op =
-  if Stack.length stack < 3 then E("wrong number of arguments") else
-    let one = Stack.pop stack in
-    let two = Stack.pop stack in
-    let three = Stack.pop stack in
-      match op, one, two, three with
-      | "?", n1, n2, N(n3) -> begin
-        match n3 with
-        | I i -> if compare_big_int i zero_big_int = 0 then n1 else n2
-        | F f -> if f = 0. then n1 else n2
-      end
-      | "+~",  N(I(i1)), N((I i2)), N(I(i3)) -> Mod_arith.add i3 i2 i1
-      | "-~",  N(I(i1)), N((I i2)), N(I(i3)) -> Mod_arith.subtract i3 i2 i1
-      | "*~",  N(I(i1)), N((I i2)), N(I(i3)) -> Mod_arith.multiply i3 i2 i1
-      | "/~",  N(I(i1)), N((I i2)), N(I(i3)) -> Mod_arith.divide i3 i2 i1
-      | "^~",  N(I(i1)), N((I i2)), N(I(i3)) -> Mod_arith.power i3 i2 i1
-      | "=~",  N(I(i1)), N((I i2)), N(I(i3)) -> Mod_arith.eq i3 i2 i1
-      | "bezout",  N(I(i1)), N((I i2)), N(I(i3)) -> Systems_eqs.bezout i3 i2 i1
-      | "crack",  N(I(e)), N((I n)), N(I(c)) -> Rsa.crack (n,e) c
-      | "public_key", N(I(q)), N(I(p)), N(I(d)) -> Rsa.get_public_key (d,p,q)
-      | "encrypt", N(I(e)), N(I(n)), S(s) -> Rsa.encrypt (n,e) s
-      | _, _,_,E(e) -> E(e)
-      | _, _,E(e),_ -> E(e)
-      | _, E(e),_,_ -> E(e)
-      | _ -> E("not a defined operator")
+let tri_op env op =
+  if Stack.length stack < 3 then
+    if Stack.length stack > 0 && op = "public_key" then un_op env op
+    else if Stack.length stack > 1 && op = "encrypt" then bin_op op, env
+    else if Stack.length stack > 1 && op = "crack" then bin_op op, env
+    else E("wrong number of arguments for tri op"), env
+  else
+      let one = Stack.pop stack in
+      let two = Stack.pop stack in
+      let three = Stack.pop stack in
+        match op, one, two, three with
+        | "?", n1, n2, N(n3) -> begin
+          (match n3 with
+          | I i -> if compare_big_int i zero_big_int = 0 then n1 else n2
+          | F f -> if f = 0. then n1 else n2), env
+        end
+        | "+~",  N(I(i1)), N((I i2)), N(I(i3)) -> Mod_arith.add i3 i2 i1, env
+        | "-~",  N(I(i1)), N((I i2)), N(I(i3)) -> Mod_arith.subtract i3 i2 i1, env
+        | "*~",  N(I(i1)), N((I i2)), N(I(i3)) -> Mod_arith.multiply i3 i2 i1, env
+        | "/~",  N(I(i1)), N((I i2)), N(I(i3)) -> Mod_arith.divide i3 i2 i1, env
+        | "^~",  N(I(i1)), N((I i2)), N(I(i3)) -> Mod_arith.power i3 i2 i1, env
+        | "=~",  N(I(i1)), N((I i2)), N(I(i3)) -> Mod_arith.eq i3 i2 i1, env
+        | "bezout",  N(I(i1)), N((I i2)), N(I(i3)) -> Systems_eqs.bezout i3 i2 i1, env
+        | "crack",  N(I(e)), N((I n)), N(I(c)) -> Rsa.crack (n,e) c, env
+        | "public_key", N(I(q)), N(I(p)), N(I(d)) -> begin
+          let PubKey(n, e) = Rsa.get_public_key (d,p,q) in
+            (PubKey(n,e), env |> PMap.add "`n" (N(I n)) |> PMap.add "`e" (N(I e)) )
+        end
+        | "encrypt", N(I(e)), N(I(n)), S(s) -> Rsa.encrypt (n,e) s, env
+        | _, _,_,E(e) -> E(e), env
+        | _, _,E(e),_ -> E(e), env
+        | _, E(e),_,_ -> E(e), env
+        | _ -> E("not a defined operator"), env
 
 (*[quad_op op] matches the [op] with the quad operators, and the top 4 elements
  * on the stack with the legal forms for the arguments for that
@@ -124,7 +158,10 @@ let tri_op op =
  * has not been defined then this will evaluate to an exception value
  * also any of the argument exception values will be propagated*)
 let quad_op op =
-  if Stack.length stack < 4 then E("wrong number of arguments") else
+  if Stack.length stack < 4 then
+    if Stack.length stack > 1 && op = "decrypt" then bin_op op
+    else E("wrong number of arguments")
+  else
     let one = Stack.pop stack in
     let two = Stack.pop stack in
     let three = Stack.pop stack in
@@ -135,7 +172,7 @@ let quad_op op =
       | _, _,_,E(e),_ -> E(e)
       | _, _,E(e),_,_ -> E(e)
       | _, E(e),_,_,_ -> E(e)
-      | _ -> E("not a defined operator")
+      | _ -> E("not a defined quad operator")
 
 (*[get_n n] gets [n] elements off of the stack returning them in the same order
  * which they are on the stack (top element on the stack is the first element
@@ -240,17 +277,20 @@ let int_matrix = '[' int_vector (", "int_vector) * ']'
 (*strings may contain any combination of charactures, but will not contain
  * any excapsed charactures*)
 let string = '"' _ *  '"'
-let id = letter (letter | digit | "_")*
+let id = (letter ) (letter | digit | "_")*
 let nop = "generate_private_key"
 let uop = "inv" | "transpose" | "echelon" | "reduce" | "det" | "indep"
           | "nullspace" | "colspace" | "!" | "factor" | "gen_prime"
-          | "is_prime" | "is_prime_prob" | "totient"
+          | "is_prime" | "is_prime_prob" | "totient" | "`prime" | "`p"
+          | "`q" | "`n" | "`d" | "`e" | "`prime_prob"
 let bop = "+" | "-" | "*" | "/" | "^" | "%" | "=" | "gcd" | "lcm" | "square"
           | "choose" | "perm" | "part" | "." | "#" | "matrix_solve"
 let top = "?" | "+~" | "-~" | "*~" | "/~" | "^~" | "=~" | "crack" | "public_key"
           | "bezout" | "encrypt"
 let qop = "decrypt"
 let mop = "solve"
+let op = id | nop | uop | bop | top | qop | mop
+
 
 rule read env = parse
   | white { read env lexbuf }
@@ -263,13 +303,7 @@ rule read env = parse
     ) stack;
     read env lexbuf
   }
-  | nop {Stack.push (no_op (Lexing.lexeme lexbuf)) stack; read env lexbuf }
-  | uop { Stack.push (un_op (Lexing.lexeme lexbuf)) stack; read env lexbuf }
-  | bop   { Stack.push (bin_op (Lexing.lexeme lexbuf)) stack; read env lexbuf }
-  | top   { Stack.push (tri_op (Lexing.lexeme lexbuf)) stack; read env lexbuf }
-  | qop   { Stack.push (quad_op (Lexing.lexeme lexbuf)) stack; read env lexbuf }
-  | mop   { Stack.push (multi_op (Lexing.lexeme lexbuf)) stack; read env lexbuf}
-  | id {
+  | op {
       let s = Lexing.lexeme lexbuf in
       if (PMap.mem s env) then
         match PMap.find s env with
@@ -284,7 +318,9 @@ rule read env = parse
               read env lexbuf)
          end
         | v -> (Stack.push (v) stack; read env lexbuf)
-      else (Stack.push (E "not defined") stack; read env lexbuf)
+      else
+        let env' = baked_in env (Lexing.from_string (Lexing.lexeme lexbuf)) in
+          read env' lexbuf
     }
   | int {
     Stack.push (N(I (Big_int.big_int_of_string (Lexing.lexeme lexbuf)))) stack;
@@ -314,6 +350,38 @@ rule read env = parse
   | _ {
     Stack.push
       (E("I do not understand the token: "^(Lexing.lexeme lexbuf)))
-      stack
+      stack; env
   }
-  | eof {()}
+  | eof {env }
+and baked_in env = parse
+  | nop   {
+    let value, env' = no_op env (Lexing.lexeme lexbuf) in
+      Stack.push (value) stack; env'
+  }
+  | uop   {
+    let value, env' = un_op env (Lexing.lexeme lexbuf) in
+      Stack.push (value) stack; env'
+  }
+  | bop   {
+    let value = bin_op (Lexing.lexeme lexbuf) in
+    Stack.push (value) stack; env
+  }
+  | top   {
+    let value, env' = tri_op env (Lexing.lexeme lexbuf) in
+      Stack.push (value) stack; env'
+  }
+  | qop   {
+    let value = quad_op (Lexing.lexeme lexbuf) in
+      Stack.push (value) stack; env
+  }
+  | mop   {
+    let value = multi_op (Lexing.lexeme lexbuf) in
+      Stack.push (value) stack; env
+  }
+  | _     { Stack.push (E "not defined") stack; env}
+
+
+
+
+
+

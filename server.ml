@@ -76,13 +76,16 @@ let test req =
   let res_body = "Hello " ^ req.req_body ^ "!" in
   {headers; status; res_body}
 
+let env = ref init_enviro
 let webhook req =
   let headers = Header.init_with "Content-Type" "application/json" in
   let j = Yojson.Basic.from_string req.req_body in
     let command =  (j |> member "command" |> to_string) in
     let status = `OK in
-    let res_body = "Test:" ^ (fst (Eval.evaluate_line init_enviro command)) in
-      {headers; status; res_body}
+    let (result, env') = (Eval.evaluate_line !env command) in
+    (env := env';
+    let res_body = result in
+      {headers; status; res_body})
 
 let webhook_verif req =
   let headers = Header.init_with "Content-Type" "text/plain" in

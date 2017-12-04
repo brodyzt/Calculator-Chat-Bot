@@ -89,7 +89,7 @@ let webhook req =
 
 let webhook_verif req =
   let headers = Header.init_with "Content-Type" "text/plain" in
-  let verify_token = "erybcnasdgkadsda" in
+  let verify_token = "sdfkjsflkgjassodofiwpoeirhskxmcnbmdfsldjf" in
     if List.mem_assoc "hub.mode" req.params
     && List.mem_assoc "hub.verify_token" req.params
     && List.mem_assoc "hub.challenge" req.params

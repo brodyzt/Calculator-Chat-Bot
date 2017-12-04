@@ -19,8 +19,8 @@ let gen_private_key _ =
 let get_public_key (d,p,q) =
   let n = mult_big_int p q in
   let phi = easy_totient p q in
-  let e = Mod_arith.inv d phi in
-  P(N(I(n)),e)
+  let N(I(e)) = Mod_arith.inv d phi in
+    (PubKey(n,e))
 
 (*Note: ocaml documents a similar verion of this function,
   but does not implement it in the standard library,

@@ -36,10 +36,10 @@ let combination n k =
     | _ -> E(raise(Invalid_argument "Inputs are not integers"))
 
 let partition_identical n k =
-  if sign_big_int n = -1 || sign_big_int k = -1 then
-    E(raise (Invalid_argument "Negative values are not allowed"))
-  else
-    div_big_int n k |> factorial
+  combination
+    ( sub_big_int (add_big_int n k) (big_int_of_int 1) )
+    ( sub_big_int (k) (big_int_of_int 1) )
+
 
 
 let permutation n k =

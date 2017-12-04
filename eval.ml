@@ -83,7 +83,7 @@ let evaluate_line env s =
       then parse_macro env s else
         (*parses a stack program, returning the string form of the top
          * element on the resulting stack*)
-        (Lexer.read env lexbuf;
-        if Stack.is_empty Lexer.stack then " ", env else
-          (string_of_value (Stack.pop Lexer.stack), env))
+        let env' = Lexer.read env lexbuf in
+        if Stack.is_empty Lexer.stack then " ", env' else
+          (string_of_value (Stack.pop Lexer.stack), env')
     end

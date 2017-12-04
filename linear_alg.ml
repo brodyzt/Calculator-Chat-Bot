@@ -2,28 +2,31 @@
 open Types
 open Big_int
 
+(*[init_matrix x y f] creates a 2D matrix with [x] rows and [y] cols
+ * using the function [f] to get the value for each cell*)
 let init_matrix x y f =
   Array.init x (fun i -> Array.init y (fun j ->  f i j))
 
+(*[iterij f] iterates over a 2D array applying the function f to each of the
+ * cells*)
 let iterij f =
   Array.iteri (fun i row -> Array.iteri (fun j v -> f i j v) row)
 
-
+(*[non_zero v] tests that [v] is not zero*)
 let non_zero v =
   v <> I(zero_big_int) && v <> F(0.0)
 
 let row m n =
   let i = int_of_big_int n in
-    if i < 0 || i >= Array.length m then M(Array.make_matrix 0 0 (F(0.)) )
-    else
-      M(init_matrix 1 (Array.length m) (fun _ j -> m.(j).(i)))
-
-
-let col m n =
-  let i = int_of_big_int n in
     if i < 0 || i >= Array.length m.(0) then M(Array.make_matrix 0 0 (F(0.)) )
     else
       M(init_matrix 1 (Array.length m) (fun _ j -> m.(i).(j)))
+
+let col m n =
+  let i = int_of_big_int n in
+    if i < 0 || i >= Array.length m then M(Array.make_matrix 0 0 (F(0.)) )
+    else
+      M(init_matrix (Array.length m) 1 (fun i' _ -> m.(i').(i)))
 
 
 let dot_product m1 m2 =
@@ -38,8 +41,6 @@ let dot_product m1 m2 =
           | F(f1), F(f2) -> r.(n).(0) <- F(f1 *. f2)
           | I(i1), I(i2) -> r.(n).(0) <- I(mult_big_int i1 i2); mult (n+1))
       in mult 0; M(r)
-
-
 
 let cross_product m1 m2 =
   let l1 = Array.length m1 in
@@ -61,11 +62,15 @@ let cross_product m1 m2 =
         M(r)
       end
 
+(*[ap_num f i v] applys the function [f] to [v] if v is a float value and applys
+ * [i] to [v] if [v] is an integer value*)
 let ap_num f i v =
   match v with
   | F(v') -> F(f v')
   | I(v') -> I(i v')
 
+(*[app_num f i a b] applies the function [f] to [a] and [b] if either [a]
+ * or [b] is a float otherwise the function [i] is used*)
 let app_num f i a b =
   match a,b with
   | F(a'), F(b') -> F(f a' b')
@@ -95,6 +100,9 @@ let transpose m =
     Array.iteri (fun i r -> Array.iteri (fun j v -> res.(j).(i) <- v ) r ) m;
     M(res)
 
+(*[simple_bin f i m1 m2] applies the function [f] to the float entries of the
+ * matricies [m1] and [m2] to combine them and applys the [i] function to float
+ * entries*)
 let simple_bin f i m1 m2 =
   let n1 = Array.length m1 in
   let n2 = Array.length m2 in
@@ -115,6 +123,9 @@ let add =
 let subtract =
   simple_bin (-.) (sub_big_int)
 
+(*[clear_col j i1 i2] substracts a multiple of i1 from i2 such that the
+ * leading entry of i2 will become 0(the leading entry is in the [j]
+ * col)*)
 let clear_col j i1 i2 =
   Array.mapi
     (fun i -> ((app_num
@@ -128,7 +139,8 @@ let clear_col j i1 i2 =
           sub_big_int v (mult_big_int y p) )) i1.(i))
     ) i2
 
-
+(*[fin_non_zero m i j] findes the first non_zero entry in the col [j] of
+ * the matrix [m]*)
 let rec find_non_zero m i j =
   let rows = Array.length m in
   let cols = Array.length (m.(0)) in
@@ -136,6 +148,7 @@ let rec find_non_zero m i j =
       if non_zero m.(i).(j) then i else find_non_zero m (i+1) j
     else -1
 
+(*[swap m i1 i2] swaps the [i1] and [i2] rows in the matrix [m]*)
 let swap m i1 i2 =
   let temp = m.(i1) in
     m.(i1) <- m.(i2);
@@ -152,7 +165,9 @@ let string_of_matrix m =
     m
     "]"
      )
-
+(*[red_row_down m i j] reduces the [m] into row reduced form where the matrix
+ * row [i] and col [j] is already of that form that result is then paired with
+ * the number of row swaps made though the process*)
 let rec red_row_down m i j =
   let rows = Array.length m in
   let cols = Array.length (m.(0)) in
@@ -172,13 +187,16 @@ let rec red_row_down m i j =
 let row_echelon m =
   fst (red_row_down (Array.map (fun row -> Array.copy row) m) 0 0)
 
+(*[find_pivot m i] finds the pivot (first non zero number) in the row [i]
+ * of the matrix [m]*)
 let find_pivot m i =
   let rec piv j =
     if j >= Array.length m.(i) then -1
     else if m.(i).(j) <> F(0.) && m.(i).(j) <> I(big_int_of_int 0) then j else piv (j+1)
   in piv i
 
-
+(*[red_row_up m i] transforms the matrix from row echelon form to row
+ * reduced form where [m] below the row [i] is alrady of that form*)
 let rec red_row_up m i=
   if i >= 0 then
     let j = find_pivot m i in
@@ -198,22 +216,11 @@ let red_row_echelon m =
   let M(ech) = row_echelon m in
     red_row_up ech (Array.length ech -1)
 
-let read_off_sol a m =
-  let len = Array.length a.(0) in
-    Array.iteri (fun i row -> m.(i).(0) <- row.(len-1)) a; m
 
-let solve m1 m2 =
-  let rows1 = Array.length m1 in
-  let rows2 = Array.length m2 in
-    if rows1 = 0 || Array.length m1.(0) = 0 || rows1 = rows2 then
-      let aug = Array.make_matrix rows1 ((Array.length m1.(0)) +1) (F 0.) in
-        Array.iteri (fun i row -> Array.iteri (fun j (F v) -> aug.(i).(j) <- m1.(i).(j)) row) m1;
-        Array.iteri (fun i row -> aug.(i).(Array.length m1.(0)) <- row.(0)) m2;
-          let M(sol) = red_row_echelon aug in
-            M(read_off_sol (sol) m2)
-    else
-     E "matrix size issue"
 
+(*[read_off_inv aug m] given the augmented matrix [aug] which has twice as many
+ * col as [m] transfers the inverse of m into the matrix m it self which will be
+ * the right square matrix in [aug]*)
 let read_off_inv aug m =
   let cols = Array.length (m.(0)) in
     iterij (fun i j v -> m.(i).(j) <- aug.(i).(j+cols)) m
@@ -237,19 +244,24 @@ let inverse m =
     else
       E "matrix size error"
 
-let rec prod_diag m i j acc =
+(*[prod_diag m i j acc] takes the product of the entries along the primary
+ * diagonal of [m] where the entries to the left and above [i] have already been
+ * taken into account
+ * requires: m has been reduced to row eschelon form *)
+let rec prod_diag m i acc =
   let rows = Array.length m in
   let cols = Array.length (m.(0)) in
-    if i < rows && j < cols then
-      match m.(i).(j) with
-      | F(f) -> prod_diag m (i+1) (j+1) (acc *. f)
-      | _ -> failwith "unimplemented"
+    if i < rows && i < cols then
+      match m.(i).(i), acc with
+      | F(f), F(a) -> prod_diag m (i+1) (F(a *. f))
+      | I(n), I(a) -> prod_diag m (i+1) (I (mult_big_int a n))
     else acc
 
 
 let determinant m =
   let M(rr),swap_count = red_row_down m 0 0 in
-    N(F(prod_diag m 0 0 (if swap_count mod 2 = 1 then -1. else 1.)))
+    (*needs to work for ints too*)
+    N(prod_diag m 0 (F(if swap_count mod 2 = 1 then -1. else 1.)))
 
 
 let lin_ind m =
@@ -258,29 +270,101 @@ let lin_ind m =
 let lin_dep m =
   if determinant m = N(F(0.)) then N (I (Big_int.big_int_of_int 1)) else N (I (Big_int.big_int_of_int 0))
 
-let null_space m = M(m)
 
-let piv_col m f init=
+(*[piv_col m f init] applys the function f to the col number of the pivot col
+ * in the row eschelon matrix [m]
+ * requires: m has been reduced to row echelon form*)
+let piv_col m f g pinit ninit=
   let rows = Array.length m in
   let cols = Array.length (m.(0)) in
   let rr = row_echelon m in
-    let rec trav_diag i j acc =
+    let rec trav_diag i j pacc nacc =
       if i < rows && j < cols then
         if non_zero (m.(i).(j)) then
-          trav_diag (i+1) (j+1) (f j acc)
-        else trav_diag (i) (j+1) acc
-      else acc
-    in trav_diag 0 0 init
+          trav_diag (i+1) (j+1) (f i j pacc) (g i j nacc)
+        else trav_diag (i) (j+1) pacc nacc
+      else (pacc, nacc)
+    in trav_diag 0 0 pinit ninit
 
+let negate v =
+  match v with
+  | I(i) -> I (minus_big_int i)
+  | F(f) -> F(-1. *. f)
+
+
+let rec rem v l =
+  match l with
+  | [] -> []
+  | h::t -> if h = v then t else h::(rem v t)
+
+let rec from i n acc =
+  if i = n then acc else (from (i+1) n (i::acc) )
+
+let rec check_consitant m i =
+  if i < 0 then true else
+    let rows = Array.length m in
+      if (non_zero m.(i).(rows-1)) then check_consitant m (i -1)
+      else
+        if Array.exists (non_zero) (m.(i)) then check_consitant m (i-1)
+        else false
+
+
+(*[read_off_sol m] for a matrix that is in augmented form and has one singular
+ * solution this reads off the solution*)
+let read_off_sol m =
+  let cols = Array.length (m.(0)) in
+  let (piv, non_piv) = piv_col m (fun i j acc -> (i,j)::acc) (fun _ j acc -> rem j acc ) [] (from 0 (cols) [])in
+  let z,o =
+        match m.(0).(0) with
+        | I _ -> (I (big_int_of_int 0)),(I (big_int_of_int 1))
+        | F _ -> (F 0.), F(1.)
+  in
+  let result = Array.make_matrix (Array.length m.(0)-1) ((List.length non_piv)) z in
+    print_string (string_of_matrix m);
+    List.fold_right (fun (i,j) _ -> print_string "*"; print_int i; print_string ","; print_int j; print_string "*") piv ();
+    List.fold_right (fun j _ -> print_string "$"; print_int j; print_string "$") non_piv ();
+    List.iter
+      (fun (i,j) -> List.iteri
+        (fun n ( j') ->
+          if j' = cols-1 then result.(j).(n) <- (m.(i).(j'))
+          else result.(j).(n) <- negate (m.(i).(j'))
+        ) non_piv
+      ) piv;
+    List.iteri (fun i (j) -> if j = cols-1 then () else result.(i).(j) <- o) non_piv;
+    result
+
+let solve m1 m2 =
+  let rows1 = Array.length m1 in
+  let rows2 = Array.length m2 in
+    if rows1 = 0 || Array.length m1.(0) = 0 || rows1 = rows2 then
+      let aug = Array.make_matrix rows1 ((Array.length m1.(0)) +1) (F 0.) in
+        Array.iteri (fun i row -> Array.iteri (fun j (F v) -> aug.(i).(j) <- m1.(i).(j)) row) m1;
+        Array.iteri (fun i row -> aug.(i).(Array.length m1.(0)) <- row.(0)) m2;
+          let M(sol) = red_row_echelon aug in
+            if check_consitant sol ((Array.length sol) -1) then M(read_off_sol sol)
+            else E("this system is not consitiant")
+    else
+     E "matrix size issue"
 
 let rank m =
-  piv_col m (fun _ acc -> 1 + acc) 0
+  N(I(big_int_of_int (fst(piv_col m (fun _ _ acc -> 1 + acc) (fun _ _ _ -> ()) 0 ()))))
+
+let null_space m =
+  let z =
+        match m.(0).(0) with
+        | I _ -> (I (big_int_of_int 0))
+        | F _ -> (F 0.)
+  in
+  let M(arr) = solve m (Array.make_matrix (Array.length m) (1) (z)) in
+    if (Array.length arr.(0)) > 1 then
+      M(init_matrix (Array.length arr)  (Array.length arr.(0)) (fun i j -> arr.(i).(j+1)))
+    else
+      M(arr)
 
 let col_space m =
   let M(rr) = row_echelon m in
-  let piv = Array.of_list (piv_col m (fun j acc -> j::acc) [] ) in
+  let piv = Array.of_list (fst (piv_col m (fun _ j acc -> j::acc) (fun _ _ _ -> ()) [] () )) in
     M(init_matrix (Array.length rr) (Array.length piv) (fun i j -> m.(i).(piv.(j))))
-
 
 let eq m1 m2 =
   let r1 = Array.length m1 in

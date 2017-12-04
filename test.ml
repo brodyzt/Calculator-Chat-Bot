@@ -259,13 +259,13 @@ let linear_arith_tests = [
   ("lin_dep_red",
    "[[2., -4., 9.], [-4., 8., 14.], [8., -16., -3.]] reduce",
    "[\n[ 1. -2. 0. ]\n[ 0. 0. 1. ]\n[ 0. 0. 0. ]\n]");
+  (*tests solving a siple system of eqn*)
+  ("simple_solve",
+   "[[2., -3.], [-4., 5.]] [[1.], [1.]] matrix_solve",
+   "[\n[ -4. ]\n[ -3. ]\n]");
 
 ]
 
-let systems_arith_tests = [
-
-
-]
 
 let rsa_arith_tests = [
 
@@ -279,7 +279,6 @@ let tests = [
   mod_arith_tests;
   comb_arith_tests;
   linear_arith_tests;
-  systems_arith_tests;
   rsa_arith_tests;
 ]
 

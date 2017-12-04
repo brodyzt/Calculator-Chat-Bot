@@ -1,11 +1,14 @@
 open Types
 open Big_int
-open Random
-
+include Random
 
 let as_big_int i =
   match i with
   | N(I(x)) -> x
+  | _ -> failwith "precondition violated"
+let as_big_int_pair p =
+  match p with
+  | P(N(I(x)),N(I(y))) -> (x,y)
   | _ -> failwith "precondition violated"
 let truthy b =
   match b with
@@ -58,7 +61,7 @@ let power a b n =
   if eq_big_int a_red zero_big_int then N(I(zero_big_int))
   else let bin = as_bin_list b [] in
   let expn = big_int_of_int ((List.length bin) - 1) in
-  let squares = repeated_square a_red n expn [] in
+  let squares = repeated_square a n expn [] in
     N(I(condense n squares bin unit_big_int))
 
 
@@ -124,8 +127,9 @@ let lcm a b =
   | _ -> failwith "unreachable case"
 
 let rec gen_rand_bits_helper num_bits accum =
+  Random.self_init ();
   if eq_big_int num_bits zero_big_int then accum
-  else let is_one = bool () in
+  else let is_one = Random.bool () in
     if is_one
     then gen_rand_bits_helper (pred_big_int num_bits) (unit_big_int::accum)
     else gen_rand_bits_helper (pred_big_int num_bits) (zero_big_int::accum)
@@ -251,13 +255,30 @@ let bezout a b c =
     P(N(I(mult_big_int m x)),N(I(mult_big_int m y)))
   else E("gcd(a,b) does not divide c, so no solution exists")
 
+let join_congruence_pair bi mi bj mj =
+  if not(eq_big_int (as_big_int (gcd mi mj)) unit_big_int) then E("not relatively prime")
+  else let m' = mult_big_int mi mj in
+    let coefs = as_big_int_pair (bezout mi mj unit_big_int) in
+    let fst_term = as_big_int (multiply (mult_big_int (fst coefs) mi) bi m') in
+    let snd_term = as_big_int (multiply (mult_big_int (snd coefs) mj) bj m') in
+    let res = (add fst_term snd_term m') in
+    P(res,N(I(m')))
 
+let rec crt_helper lst1 lst2 accum =
+  match lst1,lst2 with
+  | [],[] -> accum
+  | bi::t1,mi::t2 ->
+    let (a,m) = as_big_int_pair accum in
+    let accum' = join_congruence_pair bi mi a m in
+    crt_helper t1 t2 accum'
+  | _,_ -> E("lists are not the same length")
 (*[crt lst1 lst2] is a pair (a,M) such that any integer n congruent to a mod M
   satisfies n = bi (mod mi) for any 0 <= bi <= j ,
   where lst1 = [b0,b1,...,bj] and lst2 = [m0,m1,...,mj].
   Precondition: all elements of lst2 are pairwise relatively prime, and greater
   than 0, and lst1 and lst2 are of the same length*)
-let crt lst1 lst2 = P(N(I(Big_int.big_int_of_int 0)), N(I(Big_int.big_int_of_int 0)))
+let crt lst1 lst2 =
+  crt_helper lst1 lst2 (P(N(I(zero_big_int)),N(I(zero_big_int))))
 
 (*[is_square a p] is 1 if x^2 = a (mod n) for some x,
   0 if x^2 != a (mod n) for any x*)

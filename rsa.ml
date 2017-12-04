@@ -1,6 +1,5 @@
 open Types
 open Big_int
-
 let a_ascii = Char.code 'a'
 
 let easy_totient p q =
@@ -9,7 +8,7 @@ let easy_totient p q =
   mult_big_int p' q'
 
 let gen_private_key _ =
-  let half_key_size = big_int_of_int 32 in
+  let half_key_size = big_int_of_int 64 in
   let p = Mod_arith.as_big_int (Mod_arith.gen_prime half_key_size) in
   let q = Mod_arith.as_big_int (Mod_arith.gen_prime half_key_size) in
   let n = mult_big_int p q in

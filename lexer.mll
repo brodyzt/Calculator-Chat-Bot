@@ -46,6 +46,7 @@ let un_op env op =
       | "reduce", M(m) -> Linear_alg.red_row_echelon m, env
       | "det", M(m) -> Linear_alg.determinant m, env
       | "indep", M(m) -> Linear_alg.lin_ind m, env
+      | "rank", M(m) -> Linear_alg.rank m, env
       | "nullspace", M(m) -> Linear_alg.null_space m, env
       | "colspace", M(m) -> Linear_alg.col_space m, env
       | "!", N(I(i)) -> Comb_eval.factorial i, env
@@ -100,6 +101,8 @@ let bin_op op =
       | "choose", N(I(i1)), N((I i2)) -> Comb_eval.combination i2 i1
       | "perm", N(I(i1)), N((I i2)) -> Comb_eval.permutation i2 i1
       | "part", N(I(i1)), N((I i2)) -> Comb_eval.partition_identical i2 i1
+      | "row", N(I(i)), M(m) -> Linear_alg.row m i
+      | "col", N(I(i)), M(m) -> Linear_alg.col m i
       | "matrix_solve", M(m1), M(m2) -> Linear_alg.solve m2 m1
       | "encrypt", PubKey(n,e), S(s) -> Rsa.encrypt (n,e) s
       | "decrypt", PrivKey(d,p,q), N(I(i)) -> Rsa.decrypt (d,p,q) i
@@ -282,9 +285,10 @@ let nop = "generate_private_key"
 let uop = "inv" | "transpose" | "echelon" | "reduce" | "det" | "indep"
           | "nullspace" | "colspace" | "!" | "factor" | "gen_prime"
           | "is_prime" | "is_prime_prob" | "totient" | "`prime" | "`p"
-          | "`q" | "`n" | "`d" | "`e" | "`prime_prob"
+          | "`q" | "`n" | "`d" | "`e" | "`prime_prob" | "rank"
 let bop = "+" | "-" | "*" | "/" | "^" | "%" | "=" | "gcd" | "lcm" | "square"
-          | "choose" | "perm" | "part" | "." | "#" | "matrix_solve"
+          | "choose" | "perm" | "part" | "." | "#" | "matrix_solve" | "row" |
+           "col"
 let top = "?" | "+~" | "-~" | "*~" | "/~" | "^~" | "=~" | "crack" | "public_key"
           | "bezout" | "encrypt"
 let qop = "decrypt"

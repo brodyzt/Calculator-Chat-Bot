@@ -58,6 +58,9 @@ val solve: Types.matrix -> Types.matrix -> Types.value
  * if [a] is not a square matrix this evaluates to an exception value*)
 val determinant: Types.matrix -> Types.value
 
+(*[rank m] calculates the rank of the matrix [m]*)
+val rank: Types.matrix -> Types.value
+
 (* [lind_ind a] is whether [a] is linearly independent or not *)
 val lin_ind: Types.matrix -> Types.value
 

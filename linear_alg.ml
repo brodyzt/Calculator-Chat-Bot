@@ -18,16 +18,16 @@ let non_zero v =
 
 let row m n =
   let i = int_of_big_int n in
-    if i < 0 || i >= Array.length m then M(Array.make_matrix 0 0 (F(0.)) )
-    else
-      M(init_matrix 1 (Array.length m) (fun _ j -> m.(j).(i)))
-
-
-let col m n =
-  let i = int_of_big_int n in
     if i < 0 || i >= Array.length m.(0) then M(Array.make_matrix 0 0 (F(0.)) )
     else
       M(init_matrix 1 (Array.length m) (fun _ j -> m.(i).(j)))
+
+let col m n =
+  let i = int_of_big_int n in
+    if i < 0 || i >= Array.length m then M(Array.make_matrix 0 0 (F(0.)) )
+    else
+      M(init_matrix (Array.length m) 1 (fun i' _ -> m.(i').(i)))
+
 
 let dot_product m1 m2 =
   let l1 = Array.length m1 in
@@ -347,7 +347,7 @@ let solve m1 m2 =
      E "matrix size issue"
 
 let rank m =
-  fst(piv_col m (fun _ _ acc -> 1 + acc) (fun _ _ _ -> ()) 0 ())
+  N(I(big_int_of_int (fst(piv_col m (fun _ _ acc -> 1 + acc) (fun _ _ _ -> ()) 0 ()))))
 
 let null_space m =
   let z =

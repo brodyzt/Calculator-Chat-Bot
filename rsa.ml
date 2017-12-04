@@ -1,6 +1,5 @@
 open Types
 open Big_int
-let a_ascii = Char.code 'a'
 
 let easy_totient p q =
   let p' = pred_big_int p in
@@ -8,7 +7,7 @@ let easy_totient p q =
   mult_big_int p' q'
 
 let gen_private_key _ =
-  let half_key_size = big_int_of_int 64 in
+  let half_key_size = big_int_of_int 128 in
   let p = Mod_arith.as_big_int (Mod_arith.gen_prime half_key_size) in
   let q = Mod_arith.as_big_int (Mod_arith.gen_prime half_key_size) in
   let n = mult_big_int p q in
@@ -31,11 +30,11 @@ let explode s =
   exp (String.length s - 1) []
 
 let encode_char_as_big_int c =
-  let code = (Char.code c) - a_ascii + 10 in
+  let code = (Char.code c) + 100 in
   big_int_of_int code
 
 let encode_string_as_big_int s =
-  let shift = big_int_of_int 100 in
+  let shift = big_int_of_int 1000 in
   let char_lst = explode s in
   let rec encode_lst_as_big_int l accum =
     match l with
@@ -47,17 +46,17 @@ let encode_string_as_big_int s =
   encode_lst_as_big_int char_lst zero_big_int
 
 let decode_big_int_as_char i =
-  Char.chr ((int_of_big_int i) + a_ascii - 10)
+  try Char.chr ((int_of_big_int i) - 100)
+  with | Invalid_argument _ -> Char.chr 0
 
 let decode_big_int_as_string i =
   let rec decode_big_int_as_lst i accum =
     if (eq_big_int i zero_big_int) then accum
-    else let i' = div_big_int i (big_int_of_int 100) in
-      let r = mod_big_int i (big_int_of_int 100) in
+    else let i' = div_big_int i (big_int_of_int 1000) in
+      let r = mod_big_int i (big_int_of_int 1000) in
       decode_big_int_as_lst i' (Char.escaped (decode_big_int_as_char r)::accum)
   in
   String.concat "" (decode_big_int_as_lst i [])
-
 
 let encrypt (n,e) s =
   let m = encode_string_as_big_int s in

@@ -258,11 +258,12 @@ let bezout a b c =
   else E("gcd(a,b) does not divide c, so no solution exists")
 
 let join_congruence_pair bi mi bj mj =
-  if not(eq_big_int (as_big_int (gcd mi mj)) unit_big_int) then E("not relatively prime")
+  if not(eq_big_int (as_big_int (gcd mi mj)) unit_big_int)
+  then E("not relatively prime")
   else let m' = mult_big_int mi mj in
     let coefs = as_big_int_pair (bezout mi mj unit_big_int) in
-    let fst_term = as_big_int (multiply (mult_big_int (fst coefs) mi) bi m') in
-    let snd_term = as_big_int (multiply (mult_big_int (snd coefs) mj) bj m') in
+    let fst_term = as_big_int (multiply (mult_big_int (fst coefs) mi) bj m') in
+    let snd_term = as_big_int (multiply (mult_big_int (snd coefs) mj) bi m') in
     let res = (add fst_term snd_term m') in
     P(res,N(I(m')))
 
@@ -270,8 +271,8 @@ let rec crt_helper lst1 lst2 accum =
   match lst1,lst2 with
   | [],[] -> accum
   | bi::t1,mi::t2 ->
-    let (a,m) = as_big_int_pair accum in
-    let accum' = join_congruence_pair bi mi a m in
+    let (b,m) = as_big_int_pair accum in
+    let accum' = join_congruence_pair bi mi b m in
     crt_helper t1 t2 accum'
   | _,_ -> E("lists are not the same length")
 (*[crt lst1 lst2] is a pair (a,M) such that any integer n congruent to a mod M
@@ -280,7 +281,10 @@ let rec crt_helper lst1 lst2 accum =
   Precondition: all elements of lst2 are pairwise relatively prime, and greater
   than 0, and lst1 and lst2 are of the same length*)
 let crt lst1 lst2 =
-  crt_helper lst1 lst2 (P(N(I(zero_big_int)),N(I(zero_big_int))))
+  match lst1,lst2 with
+  | [],_ -> E("must supply at least one congruence equation")
+  | _,[] -> E("must supply at least one congruence equation")
+  | b0::t1,m0::t2 -> crt_helper t1 t2 (P(N(I(b0)),N(I(m0))))
 
 (*[is_square a p] is 1 if x^2 = a (mod n) for some x,
   0 if x^2 != a (mod n) for any x*)

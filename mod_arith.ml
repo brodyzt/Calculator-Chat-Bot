@@ -2,6 +2,8 @@ open Types
 open Big_int
 include Random
 
+let is_init = ref false
+
 let as_big_int i =
   match i with
   | N(I(x)) -> x
@@ -112,8 +114,6 @@ let eq a b n =
     end
   | _ -> failwith "unimplemented"
 
-
-
 let rec gcd a b =
   if ((compare_big_int a zero_big_int) < 0) then gcd (minus_big_int a) b
   else if ((compare_big_int b zero_big_int) < 0) then gcd a (minus_big_int b)
@@ -126,8 +126,12 @@ let lcm a b =
   | N (I v) -> N(I (div_big_int (mult_big_int a b) v))
   | _ -> failwith "unreachable case"
 
+let ensure_rand_init _ =
+  if not(!is_init) then begin Random.self_init (); is_init := true end
+  else ()
+
 let rec gen_rand_bits_helper num_bits accum =
-  Random.self_init ();
+  ensure_rand_init ();
   if eq_big_int num_bits zero_big_int then accum
   else let is_one = Random.bool () in
     if is_one
@@ -244,8 +248,6 @@ let get_x_y_gcd coefs =
     let ((x,_),(neg_y,_),res) =
       construct_min_bezout_sol ((big_int_of_int 1,a),(q,b),r) t in
     (x,minus_big_int neg_y, res)
-
-
 
 let bezout a b c =
   let coefs = gen_bezout_coefs a b [] in

@@ -106,7 +106,7 @@ let webhook req =
   let headers = Header.init_with "Content-Type" "application/json" in
   let j = Yojson.Basic.from_string req.req_body in
   (
-    print_endline j;
+    print_endline (j |> to_string);
     let entries =  j |> to_list in
     let status = `OK in
     let handle_entry entry = (

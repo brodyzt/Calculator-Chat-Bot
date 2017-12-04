@@ -286,7 +286,10 @@ let piv_col m f g pinit ninit=
       else (pacc, nacc)
     in trav_diag 0 0 pinit ninit
 
-let negate v = v
+let negate v =
+  match v with
+  | I(i) -> I (minus_big_int i)
+  | F(f) -> F(-1. *. f)
 
 
 let rec rem v l =
@@ -296,6 +299,15 @@ let rec rem v l =
 
 let rec from i n acc =
   if i = n then acc else (from (i+1) n (i::acc) )
+
+let rec check_consitant m i =
+  if i < 0 then true else
+    let rows = Array.length m in
+      if (non_zero m.(i).(rows-1)) then check_consitant m (i -1)
+      else
+        if Array.exists (non_zero) (m.(i)) then check_consitant m (i-1)
+        else false
+
 
 (*[read_off_sol m] for a matrix that is in augmented form and has one singular
  * solution this reads off the solution*)
@@ -329,7 +341,8 @@ let solve m1 m2 =
         Array.iteri (fun i row -> Array.iteri (fun j (F v) -> aug.(i).(j) <- m1.(i).(j)) row) m1;
         Array.iteri (fun i row -> aug.(i).(Array.length m1.(0)) <- row.(0)) m2;
           let M(sol) = red_row_echelon aug in
-            M(read_off_sol sol)
+            if check_consitant sol ((Array.length sol) -1) then M(read_off_sol sol)
+            else E("this system is not consitiant")
     else
      E "matrix size issue"
 
@@ -342,7 +355,11 @@ let null_space m =
         | I _ -> (I (big_int_of_int 0))
         | F _ -> (F 0.)
   in
-    solve m (Array.make_matrix (Array.length m) (1) (z))
+  let M(arr) = solve m (Array.make_matrix (Array.length m) (1) (z)) in
+    if (Array.length arr.(0)) > 1 then
+      M(init_matrix (Array.length arr)  (Array.length arr.(0)) (fun i j -> arr.(i).(j+1)))
+    else
+      M(arr)
 
 let col_space m =
   let M(rr) = row_echelon m in

@@ -1,2 +1,2 @@
-true: use_menhir, package(oUnit), package(str), use_nums
+true: package(oUnit), package(str), use_nums
 

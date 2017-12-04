@@ -76,6 +76,31 @@ let test req =
   let res_body = "Hello " ^ req.req_body ^ "!" in
   {headers; status; res_body}
 
+
+
+
+let callSendAPI sender_psid response = 
+  let request_body = "{
+    \"recipient\" : {
+      \"id\" : ^" ^ sender_psid ^
+    "},
+    \"message\":" ^ response ^
+  "}" in
+
+  Client.post 
+    ~body:(Cohttp_lwt.Body.of_string request_body)
+    (Uri.of_string "https://graph.facebook.com/v2.6/me/messages?access_token=EAAEZBhqyWObQBAED8CndCr1WRaFMTjCwdF1qfLb78CXt3G15ZC6POeaaSjPzUiY8ve9by9PJk2OmJs7P8daeqFQz6Bj05MKhWNgmiJJFyyr8fzuZAh3G8gIZBzkvOO6UFXBio1Yf4oLZAoCuOLC3ZBMsEXqo94LOyhB0kl2wtzmDyFUSyZAj7nv")
+    >>= fun (resp, body) ->
+    let code = resp |> Response.status |> Code.code_of_status in
+    Printf.printf "Response code: %d\n" code;
+    Printf.printf "Headers: %s\n" (resp |> Response.headers |> Header.to_string);
+    body |> Cohttp_lwt.Body.to_string >|= fun body ->
+    Printf.printf "Body of length: %d\n" (String.length body); body
+
+let handleMessage sender_psid received_message = 
+  let text = received_message |> member "text" |> to_string in
+  callSendAPI sender_psid ("\"text\": " ^ text)
+
 let env = ref init_enviro
 let webhook req =
   let headers = Header.init_with "Content-Type" "application/json" in
@@ -86,6 +111,7 @@ let webhook req =
     (env := env';
     let res_body = result in
       {headers; status; res_body})
+
 
 let webhook_verif req =
   let headers = Header.init_with "Content-Type" "text/plain" in

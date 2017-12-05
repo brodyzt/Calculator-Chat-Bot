@@ -171,7 +171,7 @@ let webhook req =
       let sender_psid = webhook_event |> member "sender" |> member "id" |> to_string in
       print_endline ("Message: " ^ (webhook_event |> member "message" |> Yojson.Basic.to_string));
       let regex = Str.regexp "\n" in
-      let command = webhook_event |> member "message" |> member "text" |> to_string in
+      let command = webhook_event |> member "message" |> member "text" |> to_string |> String.lowercase_ascii in
       let (result, env') = (Eval.evaluate_line (get_env sender_psid) command) in
       (Hashtbl.replace user_environments sender_psid env';
       let message = ("{\"text\": \"" ^ (result  |> Str.global_replace regex "\\n") ^ "\"}") in

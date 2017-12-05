@@ -44,7 +44,7 @@ let parse_macro env s =
   let b = (String.index s '-') + 2 in
   let e = (String.index s '}') in
   let fun_string = String.sub s (b) (e - b) in
-    ("The macro "^name^"has been successfully created",
+    ("The macro "^name^" has been successfully created",
      PMap.add name (Func(env,args,fun_string)) env)
 
 (*[string_of_value v] converts [v] to a string*)

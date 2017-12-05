@@ -75,22 +75,21 @@ let mod_arith_tests = [
   ("non_div_mod_add", "5 6 11 +~", "0");
   (*test the addition two numbers mod 0*)
   ("add_mod_zero","4 5 0 +~","cannot take the remainder mod a non-positive number");
-  (**test the addition two numbers mod 0 a negative number*)
+  (**test the addition two numbers mod a negative number*)
   ("add_mod_neg","4 0 -63 +~","cannot take the remainder mod a non-positive number");
-
   (*tests the simple modular subtraction of 2 numbers which is not divisable by
    * the modulo*)
   ("simple_mod_sub", "9 4 2 -~", "1");
   (*tests the subtraction of the same number which would be 0 regardless of mod*)
   ("0_mod_sub", "7 7 20 -~", "0");
-  (*tests the subtraction of two numbers which is non zero, but is divisable
+  (*tests the subtraction of two numbers which are non zero, but is divisable
    * by the modulo*)
   ("no_div_mod_sub", "37 20 17 -~", "0");
   (*tests the subtraction of two larger numbers*)
   ("larger_mod_sub", "483275 34261 3 -~", "1");
   (*tests the subtraction of two numbers mod 0*)
   ("sub_mod_zero","4 5 0 -~","cannot take the remainder mod a non-positive number");
-  (*tests the subtraction of two numbers mod a non-zero number*)
+  (*tests the subtraction of two numbers mod a negative number*)
   ("sub_mod_zero","4 5 -1 -~","cannot take the remainder mod a non-positive number");
   (*tests simple multiplication, which us not divisable by the modulo*)
   ("simple_mod_mult", "6 7 5 *~", "2");
@@ -127,10 +126,18 @@ let mod_arith_tests = [
   ("pow_mod_zero", "3285 293 0 ^~", "cannot take the remainder mod a non-positive number");
   (*tests powers mod negative number*)
   ("pow_mod_neg", "0 23 -1 ^~", "cannot take the remainder mod a non-positive number");
+  (*tests powers to a negative number *)
+  ("pow_to_neg","5 -7 4 ^~","1");
   (*tests simple equality of two small numbers*)
-  ("simple_mod_eq", "16 2 15 =~", "0");
+  ("simple_mod_eq", "17 2 15 =~", "1");
   (*tests the modular equality with large numbers*)
-  ("large_mod_eq", "726476239857380 52 358893 =~", "0");
+  ("large_mod_eq", "726476239857380 89771 358893 =~", "1");
+  (*tests modular inequality of two numbesr*)
+  ("mod_ineq","892735 8927350 97=~","0");
+  (*tests equality mod 0*)
+  ("mod_eq_zero","892735 8927350 0 =~","cannot take the remainder mod a non-positive number");
+  (*tests equality mod -1*)
+  ("mod_eq_zero","-12 0 -1 =~","cannot take the remainder mod a non-positive number");
   (*tests the gcd of two small numbers which have a common division above 1*)
   ("simple_gcd", "68 51 gcd", "17");
   (*tests the gcd of two large rel prime numbers*)
@@ -153,6 +160,8 @@ let mod_arith_tests = [
   ("large_lcm_neg", "-1624956750 -14873852 lcm", "326613056836500");
   (*tests the lcm with one number 0*)
   ("lcm_0", "0 12 lcm", "0");
+  (*tests lcm with both numbers 0*)
+  ("lcm_0_0","0 0 lcm", "0");
   (*tests factoring a small number*)
   ("simple_factor", "876 factor", "(2,2) (3,1) (73,1) ");
   (*tests factoring of a large number*)
@@ -165,10 +174,20 @@ let mod_arith_tests = [
   ("zero_factor","0 factor", "");
   (*tests factor for 1*)
   ("one_factor","1 factor", "");
+  (*tests factor of negative number*)
+  ("neg_factor", "-24 factor","(2,3) (3,1) ");
+  (*test factor for -1*)
+  ("neg_unit_factor", "-1 factor","");
+  (*tests that a negative nubmer is not prime*)
+  ("neg_not_prime","-7 is_prime","0");
   (*tests that a small composite is not prime*)
   ("small_composite_is_prime", "48 is_prime", "0");
   (*tests that a number is composite*)
   ("composite_is_prime", "387153510 is_prime", "0");
+  (*tests small prime is prime*)
+  ("is_prime_small","7 is_prime","1");
+  (*tests large prime is prime*)
+  ("is_prime_larger", "1008667313 is_prime", "1");
   (*test an is prime prob for a small number that should clearly be not prime*)
   ("small_composite_is_prime_likely", "56 is_prime_prob", "0");
   (*tests that a larger clearly composite number is not prime*)
@@ -190,10 +209,51 @@ let mod_arith_tests = [
   (*finds a totient of a composite*)
   ("composite_totient", "532501478 totient", "266250738");
   (*tests totient of zero*)
-  ("zero_totient", "0 totient", "totient undefined for 0");
-  (*test totient of 1*)
-  ("one_totient", "1 totient", "1")
-  (*glass box*)
+  ("zero_totient", "0 totient", "totient undefined for non_positive values");
+  (*tests totient of 1*)
+  ("one_totient", "1 totient", "1");
+  (*tests for negative totient*)
+  ("neg_totient","-12 totient","totient undefined for non_positive values");
+  (*tests bezouts for simple relatively prime numbers*)
+  ("bezout_simpl", "3 4 5 bezout", "(-5,5)");
+  (*tests bezouts for non-relatively prime numbers that doesn't have solution*)
+  ("bezout_simpl", "6 4 5 bezout", "gcd(a,b) does not divide c, so no solution exists");
+  (*tests bezouts for negative first number, with no solution*)
+  ("bezout_neg_fst", "-6 4 5 bezout", "gcd(a,b) does not divide c, so no solution exists");
+  (*tests bezouts for negative second number, with no solution*)
+  ("bezout_neg_snd", "6 -9 5 bezout", "gcd(a,b) does not divide c, so no solution exists");
+  (*tests bezouts for negative first number*)
+  ("bezout_neg_fst_soln", "-35 7 14 bezout","(0,2)");
+  (*tests bezouts for negative second number*)
+  ("bezout_neg_snd_soln", "12 -6 36 bezout","(0,-6)");
+  (*tests bezouts first number 0*)
+  ("bezout_fst_zero", "0 2 12 bezout","(0,6)");
+  (*tests bezouts second number 0*)
+  ("bezout_fst_zero", "1 0 17 bezout","(17,0)");
+  (*tests bezouts for both negative*)
+  ("bezout_both_neg","-12 -17 97 bezout","(679,-485)");
+  (*tests bezout for very large mutually prime numbers*)
+  ("bezout_large","429765647491 1029159179 827385723 bezout", "(73237333028758542,-30583111429080899181)");
+  (*tests if a square is a square mod a number*)
+  ("trivial_square","4 3 square","1");
+  (*tests if a non-square is a square mod a number*)
+  ("no_square","7 4 square","0");
+  (*tests if negative number is square mod a number*)
+  ("neg_square","-3 4 square","1");
+  (*tests if number is square mod 0*)
+  ("square_0","-3 0 square","cannot take the remainder mod a non-positive number");
+  (*tests if number is square mod a negative number*)
+  ("square_neg","3 -15 square","cannot take the remainder mod a non-positive number");
+  (*tests if 2 is a square mod a number congruent to 1 mod 8*)
+  ("square_2_true","2 9 square","1");
+  (*tests if 2 is a square mod a number congruent to 8 mod 8*)
+  ("square_2_true2","2 7 square","1");
+  (*tests if 2 is a square mod a number congruent to 3 mod 8*)
+  ("square_2_false","2 11 square","0");
+  (*tests if 2 is a square mod a number congruent to 5 mod 8*)
+  ("square_2_false2","2 13 square","0");
+  (*tests is_square for a large pair of numbers*)
+  ("square_large","428293582935 209409118403 square","1")
 
 ]
 
@@ -219,17 +279,134 @@ let comb_arith_tests = [
 
 ]
 
+let xempty = "[]"
+let a11 = "[[1.]]"
+let b11 = "[[-7.]]"
+let a21 = "[[2.], [4.]]"
+let a12 = "[[2., -3.]]"
+let b12 = "[[7., 34.]]"
+let i22 = "[[1., 0.], [0., 1.]]"
+let a22 = "[[2., -3.], [-4., 5.]]"
+let b22 = "[[7., 34.], [56., -19.]]"
+let c22 = "[[4., 3.], [3., 2.]]"
+let i33 = "[[1., 0., 0.], [0., 1., 0.], [0., 0., 1.]]"
+let a13 = "[[1., 2., 3.]]"
+let b13 = "[[4., 5., 6.]]"
+let a33 = "[[6., 3., 5.], [6., 2., 9.], [0., -5., 1.]]"
+let b33 = "[[5., 1., -7.], [0., -2., 6.], [2., 2., 8.]]"
+let c33 = "[[1., 2., 3.], [0., 1., 4.], [5., 6., 0.]]"
 let linear_arith_tests = [
+  (*-------- + --------*)
   (*simple adding of two matricies*)
-  ("simple_add_matrix", "[[2., -3.], [-4., 5.]] [[7., 34.], [56., -19.]] +",
+  ("simple_add_1x1", a11 ^ " " ^ b11 ^ " +",
+   "[\n[ -6. ]\n]");
+  ("simple_add_1x2", a12 ^ " " ^ b12 ^ " +",
+   "[\n[ 9. 31. ]\n]");
+  ("simple_add_2x2", a22 ^ " " ^ b22 ^ " +",
    "[\n[ 9. 31. ]\n[ 52. -14. ]\n]");
-  (*simple subtraction of two matracies*)
+  ("simple_add_3x3", a33 ^ " " ^ b33 ^ " +",
+   "[\n[ 11. 4. -2. ]\n[ 6. 0. 15. ]\n[ 2. -3. 9. ]\n]");
+
+  (*-------- - --------*)
+  (*simple subtraction of two matricies*)
   ("simple_sub_matrix", "[[5., -3.], [-10., 5.], [5.6, 7.1]] [[7., 12.], [23., -19.], [13., 5.]] -",
    "[\n[ -2. -15. ]\n[ -33. 24. ]\n[ -7.4 2.1 ]\n]");
+
+  (*-------- scale --------*)
+  (*scaling an int matrix*)
+  ("simpl_float_scale", "2. [[2., 3.], [5., 7.]] scale", "[\n[ 4. 6. ]\n[ 10. 14. ]\n]");
+  (*scaling an int matrix*)
+  ("simpl_int_scale", "2 [[2, 3], [5, 7]] scale", "[\n[ 4 6 ]\n[ 10 14 ]\n]");
+
+  (*-------- . --------*)
+  ("simple_dot_1x1", a11 ^ " " ^ b11 ^ " .",
+   "-7.");
+  (*simple int dot product*)
+  ("simple_int_dot_prod", "[[2], [5], [4]] [[5], [3], [1]] .", "29");
+  (*simple float dot product*)
+  ("simple_float_dot_prod", "[[2.], [7.], [4.]] [[3.], [3.], [1.5]] .", "33.");
+
+  (*-------- # --------*)
+  (*simple cross product ints*)
+  ("simple_int_cross_prod", "[[1], [2], [4]] [[6], [2], [1]] #", "[\n[ -6 ]\n[ 23 ]\n[ -10 ]\n]");
+  (*simple cross product floatss*)
+  ("simple_float_cross_prod", "[[6.5], [3.5], [4.]] [[2.], [4.], [10.]] #", "[\n[ 19. ]\n[ -57. ]\n[ 19. ]\n]");
+
+  (*-------- = --------*)
+  ("equal_1x3", a13 ^ " " ^ a13 ^ " =",
+   "1");
+
+  (*-------- row --------*)
+  ("row_1x1", a11 ^ " " ^ "0" ^ " row",
+   "[\n[ 1. ]\n]");
+  ("row_1x1_out_of_bounds", a11 ^ " " ^ "1" ^ " row",
+   "index out of bounds");
+  ("row_1x2", a12 ^ " " ^ "0" ^ " row",
+  "[\n[ 2. -3. ]\n]");
+  ("row_2x1", a21 ^ " " ^ "0" ^ " row",
+  "[\n[ 2. ]\n]");
+  ("row_2x2", a22 ^ " " ^ "1" ^ " row",
+  "[\n[ -4. 5. ]\n]");
+  ("row_3x3", a33 ^ " " ^ "2" ^ " row",
+  "[\n[ 0. -5. 1. ]\n]");
+  ("row_3x3_out_of_bounds", a33 ^ " " ^ "3" ^ " row",
+  "index out of bounds");
+
+  (*-------- col --------*)
+  ("col_1x1", a11 ^ " " ^ "0" ^ " col",
+   "[\n[ 1. ]\n]");
+  ("col_1x1_out_of_bounds", a11 ^ " " ^ "1" ^ " col",
+   "index out of bounds");
+  ("col_1x2", a12 ^ " " ^ "0" ^ " col",
+  "[\n[ 2. ]\n]");
+  ("col_2x1", a21 ^ " " ^ "0" ^ " col",
+  "[\n[ 2. ]\n[ 4. ]\n]");
+  ("col_2x2", a22 ^ " " ^ "1" ^ " col",
+  "[\n[ -3. ]\n[ 5. ]\n]");
+  ("col_3x3", a33 ^ " " ^ "2" ^ " col",
+  "[\n[ 5. ]\n[ 9. ]\n[ 1. ]\n]");
+  ("col_3x3_out_of_bounds", a33 ^ " " ^ "3" ^ " col",
+  "index out of bounds");
+
+  (*-------- matrix_solve --------*)
+  (*tests solving a siple system of eqn*)
+  ("simple_solve",
+   "[[2., -3.], [-4., 5.]] [[1.], [1.]] matrix_solve",
+   "[\n[ -4. ]\n[ -3. ]\n]");
+
+  (*-------- inv --------*)
+  ("inv_1x1", a11 ^ " inv",
+   "[\n[ 1. ]\n]");
+  ("inv_2x2", c22 ^ " inv",
+   "[\n[ -2. 3. ]\n[ 3. -4. ]\n]");
+  ("inv_invalid_2x1", a21 ^ " inv",
+   "matrix size error");
+  ("inv_invalid_1x2", a12 ^ " inv",
+   "matrix size error");
+  ("inv_3x3", c33 ^ " inv",
+   "[\n[ -24. 18. 5. ]\n[ 20. -15. -4. ]\n[ -5. 4. 1. ]\n]");
+
+  (*-------- transpose --------*)
+  ("transpose_1x1", a11 ^ " transpose",
+   "[\n[ 1. ]\n]");
+  ("transpose_2x2", a22 ^ " transpose",
+   "[\n[ 2. -4. ]\n[ -3. 5. ]\n]");
+  ("transpose_2x1", a21 ^ " transpose",
+   "[\n[ 2. 4. ]\n]");
+  ("transpose_1x2", a12 ^ " transpose",
+   "[\n[ 2. ]\n[ -3. ]\n]");
+  ("transpose_3x3", a33 ^ " transpose",
+   "[\n[ 6. 6. 0. ]\n[ 3. 2. -5. ]\n[ 5. 9. 1. ]\n]");
+
+  (*-------- echelon --------*)
   (*simple row reduction*)
-  ("simple_esch",
+  ("simple_ech",
    "[[2., -3.], [-4., 5.]] echelon",
    "[\n[ 2. -3. ]\n[ 0. -1. ]\n]");
+  (*simple row reduction for a small integer matrix*)
+  ("simple_int_ech",
+   "[[2, -3], [4, 6]] echelon",
+   "[\n[ 2 -3 ]\n[ 0 12 ]\n]");
   (*simple row reduction with more row than col*)
   ("non_square_rr",
    "[[2., -3.], [-4., 5.], [8., 7.]] echelon",
@@ -243,6 +420,7 @@ let linear_arith_tests = [
    "[[2., -4., 9.], [-4., 8., 14.], [8., -16., -3.]] echelon",
    "[\n[ 2. -4. 9. ]\n[ 0. 0. 32. ]\n[ 0. 0. 0. ]\n]");
 
+  (*-------- reduce --------*)
   (*simple row reduction to reduced form*)
   ("simple_row_red",
    "[[2., -3.], [-4., 5.]] reduce",
@@ -259,17 +437,30 @@ let linear_arith_tests = [
   ("lin_dep_red",
    "[[2., -4., 9.], [-4., 8., 14.], [8., -16., -3.]] reduce",
    "[\n[ 1. -2. 0. ]\n[ 0. 0. 1. ]\n[ 0. 0. 0. ]\n]");
-  (*tests solving a siple system of eqn*)
-  ("simple_solve",
-   "[[2., -3.], [-4., 5.]] [[1.], [1.]] matrix_solve",
-   "[\n[ -4. ]\n[ -3. ]\n]");
 
+  (*-------- det --------*)
+  ("det_1x1", a11 ^ " det",
+   "1.");
+
+  (*-------- indep --------*)
+  (*-------- rank --------*)
+  (*-------- nullspace --------*)
+  (*-------- colspace --------*)
 ]
 
 
 let rsa_arith_tests = [
-
-
+  (*tests generating public key from a private key computed beforehand*)
+  ("gen_public_key","828508379315564229059901503743195890152288255550180775166444773564370495849 46823044180172892277581086552993376467 49226809994174581742439410872943569091 public_key", "n: 2304949099206212918857206153784356881859586917658227064795189032785987981497 e: 1613767402931803709848268727346680063096854248011089402527081469813588614409");
+  (*test cracking a message encrypted with a small public key*)
+  ("crack_small_key", "436127747 600282101 183129281 crack", "hi!");
+  (*tests decrypting message in small public key coresponding to the
+    given private key*)
+  ("decrypt_small_key", "436127747 332532521 24631 24371 decrypt", "hi!");
+  (*Descripts "Hello World!" when using a larger key*)
+  ("decrypt_large_key","36811825527290006912528373474500742165121558710088755054352605829758001844521 49865981988111168073411299457568574845326435683397292992624028577888245241871 217732754162686778772189526558422014371 271814926074039197007457045329062122427 decrypt","Hello World!");
+  (*Decripts A string ao ascii characters that are not all characters*)
+  ("decrypt_strange","4681768394463021453743047398362594156618121502944021046860601989734498485 311296661144438380085479553025783322441168863090489376579001194531304074481 71131826786915666159699380046190925721 43255453359216288668744181576802303777 decrypt","{}!  #$)*")
 ]
 
 

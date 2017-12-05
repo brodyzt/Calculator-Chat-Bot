@@ -88,6 +88,7 @@ let bin_op op =
       | "-", N(n1), N(n2) -> Simpl_arith.subtract n2 n1
       | "-", M(m1), M(m2) -> Linear_alg.subtract m2 m1
       | "*", N(n1), N(n2) -> Simpl_arith.multiply n2 n1
+      | "scale", M(m1), N(n2) -> Linear_alg.scale m1 n2
       | ".", M(m1), M(m2) -> Linear_alg.dot_product m2 m1
       | "#", M(m1), M(m2) -> Linear_alg.cross_product m2 m1
       | "/", N(n1), N(n2) -> Simpl_arith.divide n2 n1
@@ -288,7 +289,7 @@ let uop = "inv" | "transpose" | "echelon" | "reduce" | "det" | "indep"
           | "`q" | "`n" | "`d" | "`e" | "`prime_prob" | "rank"
 let bop = "+" | "-" | "*" | "/" | "^" | "%" | "=" | "gcd" | "lcm" | "square"
           | "choose" | "perm" | "part" | "." | "#" | "matrix_solve" | "row" |
-           "col"
+           "col" | "scale"
 let top = "?" | "+~" | "-~" | "*~" | "/~" | "^~" | "=~" | "crack" | "public_key"
           | "bezout" | "encrypt"
 let qop = "decrypt"

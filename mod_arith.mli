@@ -13,20 +13,20 @@ val gen_unit: Types.integer ->  Types.integer
 val inv: Types.integer -> Types.integer -> Types.value
 
 (*[add a b n] is the unique 0 <=r < n such that (a + b - r) divides n
-  if n <= 0 then the result will be an excpetion value*)
+  if n <= 0 then the result will be an exception value*)
 val add: Types.integer -> Types.integer -> Types.integer -> Types.value
 
 (*[subtract a b n] is the unique 0 <= r < n such that (a - b - r) divides n
-  if n <= 0 then the result will be an excpetion value*)
+  if n <= 0 then the result will be an exception value*)
 val subtract: Types.integer -> Types.integer -> Types.integer -> Types.value
 
-(*[eq a b n] is a non-zero a and b are congruent mod n the zero value if
+(*[eq a b n] is non-zero if a and b are congruent mod n or the zero value if
   a b are not congruent mod n, and if n <= 0 then the result will be an
   exception value *)
 val eq: Types.integer -> Types.integer -> Types.integer -> Types.value
 
 (*[multiply a b n] is the unique 0 <= r < n such that (a*b - r) divides n
-Precondition: n > 0*)
+or if n <= 0 then the result will be an exception valu*)
 val multiply: Types.integer -> Types.integer -> Types.integer -> Types.value
 
 (*[divide a b n] is the unique 0 <= r < n such that (a*b' - r) divides n, where
@@ -36,7 +36,6 @@ val divide: Types.integer -> Types.integer -> Types.integer -> Types.value
 
 (*[power a b n] is the unique 0 <= r < n such that (a^b -r) divides n if b >=0,
   instead the unique 0 <= r < n such that (a'^-b -r) divides n, where
-  [multiply a' a n] is 1, or -1 if no such a' exists.
   if n <= 0 then the result will be an exception value*)
 val power: Types.integer -> Types.integer -> Types.integer -> Types.value
 
@@ -73,9 +72,6 @@ val is_prime_likely: Types.integer -> Types.value
   result of applying the Euler totient (phi) function to n
   if n <= 0 then the result will be an exception value*)
 val totient: Types.integer -> Types.value
-
-(*solving systems of eq with modular arith*)
-
 
 (*[bezout x y c] is a pair (a, b) where x*a + y*b = c, or an exeption value
   if no such pair exists*)

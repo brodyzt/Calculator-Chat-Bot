@@ -7,9 +7,12 @@ let string_of_number n =
   | I i -> string_of_big_int i
   | F f -> begin
     (*so that -0. will be displayed as 0. not -0.*)
-    if f = 0. then "0." else
-      string_of_float f
+    if f = 0. then "0." else string_of_float f
   end
+  | Q (a, b) ->
+    if eq_big_int b unit_big_int then string_of_big_int a
+    else (string_of_big_int a )^ "/" ^ (string_of_big_int b)
+
 
 (*[string_of_matrix m] converts the matrix [m] to a string*)
 let string_of_matrix m =

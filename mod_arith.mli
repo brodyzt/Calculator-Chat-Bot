@@ -73,9 +73,6 @@ val is_prime_likely: Types.integer -> Types.value
   if n <= 0 then the result will be an exception value*)
 val totient: Types.integer -> Types.value
 
-(*solving systems of eq with modular arith*)
-
-
 (*[bezout x y c] is a pair (a, b) where x*a + y*b = c, or an exeption value
   if no such pair exists*)
 val bezout: Types.integer -> Types.integer -> Types.integer -> Types.value

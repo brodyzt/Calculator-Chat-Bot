@@ -12,7 +12,7 @@ let big_int_of_value v : Types.integer option =
 
 let factorial i =
   if sign_big_int i = -1 then
-    E(raise (Invalid_argument "Negative values are not allowed"))
+    E("Negative values are not allowed")
   else
     let rec factorial_helper accum i =
       if sign_big_int i = 0 then
@@ -24,7 +24,7 @@ let factorial i =
 
 let combination n k =
   if sign_big_int n = -1 || sign_big_int k = -1 then
-    E(raise (Invalid_argument "Negative values are not allowed"))
+    E( "Negative values are not allowed")
   else
     let numerator_option = factorial n |> big_int_of_value in
     let leftdenom_option = factorial k |> big_int_of_value in
@@ -33,21 +33,19 @@ let combination n k =
     | Some numerator, Some ldenom, Some rdenom ->
       let denom = mult_big_int ldenom rdenom in
       N(I(div_big_int numerator denom))
-    | _ -> E(raise(Invalid_argument "Inputs are not integers"))
+    | _ -> E("Inputs are not integers")
 
 let partition_identical n k =
   combination
     ( sub_big_int (add_big_int n k) (big_int_of_int 1) )
     ( sub_big_int (k) (big_int_of_int 1) )
 
-
-
 let permutation n k =
   if sign_big_int n = -1 || sign_big_int k = -1 then
-    E(raise (Invalid_argument "Negative values are not allowed"))
+    E("Negative values are not allowed")
   else
     let numerator_big_int_option = factorial n |> big_int_of_value in
     let denom_big_int_option = sub_big_int n k |> factorial |> big_int_of_value in
     match numerator_big_int_option, denom_big_int_option with
     | Some numerator, Some denom -> N(I(div_big_int numerator denom))
-    | _ -> E(raise (Invalid_argument "Inputs are not integers"))
+    | _ -> E("Inputs are not integers")

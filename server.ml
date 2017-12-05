@@ -84,8 +84,8 @@ let callSendAPI sender_psid response =
     \"recipient\" : {
       \"id\" : \"" ^ sender_psid ^
     "\"},
-    \"message\": \"" ^ response ^
-  "\"}" in
+    \"message\":" ^ response ^
+  "}" in
   ( print_endline request_body;
   Client.post 
     ~body:(Cohttp_lwt.Body.of_string request_body)
@@ -117,7 +117,7 @@ let webhook req =
       let command = webhook_event |> member "message" |> member "text" |> to_string in
       let (result, env') = (Eval.evaluate_line !env command) in
       (env := env';
-      let message = ("{\"text\": " ^ result ^ "}") in
+      let message = ("{\"text\": \"" ^ result ^ "\"}") in
       print_endline ("Result" ^ result);
       callSendAPI sender_psid message)
     ) in (

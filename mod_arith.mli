@@ -4,7 +4,8 @@
   Precondition: v takes the form N(I(x))*)
 val as_big_int: Types.value -> Types.integer
 
-(*[gen_unit n] is a unit mod n
+(*[gen_unit n] is number 0 <= r < n such that there exits r^-1
+  such that r*r^-1 = 1 (mod n)
   Precondition: n >= 2*)
 val gen_unit: Types.integer ->  Types.integer
 
@@ -26,7 +27,7 @@ val subtract: Types.integer -> Types.integer -> Types.integer -> Types.value
 val eq: Types.integer -> Types.integer -> Types.integer -> Types.value
 
 (*[multiply a b n] is the unique 0 <= r < n such that (a*b - r) divides n
-or if n <= 0 then the result will be an exception valu*)
+  or if n <= 0 then the result will be an exception valu*)
 val multiply: Types.integer -> Types.integer -> Types.integer -> Types.value
 
 (*[divide a b n] is the unique 0 <= r < n such that (a*b' - r) divides n, where
@@ -42,7 +43,7 @@ val power: Types.integer -> Types.integer -> Types.integer -> Types.value
 (*[gcd a b] is the greatest natural number d such
   that d divides a and d divides b
   note: if a or b <= 0 then [gcd a b] will be the same as gcd applied
-    to the absolute value of those two numbers*)
+  to the absolute value of those two numbers*)
 val gcd: Types.integer -> Types.integer -> Types.value
 
 (*[lcm a v] is the smallest natural number n
@@ -50,8 +51,8 @@ val gcd: Types.integer -> Types.integer -> Types.value
 val lcm: Types.integer -> Types.integer -> Types.value
 
 (*[gen_prime l] is a psuedorandomly generated natrual number n with a high
- * probability being prime that is l bits and which given a large l
- * may take a long time. If l is 1 or 0 an exception value is given*)
+   probability being prime that is l bits and which given a large l
+   may take a long time. If l is 1 or 0 an exception value is given*)
 val gen_prime: Types.integer -> Types.value
 
 (*[factor n] is a list of pairs of n's prime factors and their multiplicity,
@@ -65,16 +66,13 @@ val factor: Types.integer -> Types.value
 val is_prime: Types.integer -> Types.value
 
 (*[is_prime_prob n] This is a faster version of is_prime, but without
- * absolute certainty of result*)
+   absolute certainty of result*)
 val is_prime_likely: Types.integer -> Types.value
 
 (*[totient n] is the number of units in Z mod n. In other words it is the
   result of applying the Euler totient (phi) function to n
   if n <= 0 then the result will be an exception value*)
 val totient: Types.integer -> Types.value
-
-(*solving systems of eq with modular arith*)
-
 
 (*[bezout x y c] is a pair (a, b) where x*a + y*b = c, or an exeption value
   if no such pair exists*)
@@ -88,5 +86,5 @@ val bezout: Types.integer -> Types.integer -> Types.integer -> Types.value
 val crt: Types.integer list -> Types.integer list -> Types.value
 
 (*[is_square a p] is 1 if x^2 = a (mod p) for some x,
-  0 if x^2 != a (mod n) for any x*)
+  0 if x^2 != a (mod n) for any x, and an exception value if p <= 0*)
 val is_square: Types.integer -> Types.integer -> Types.value

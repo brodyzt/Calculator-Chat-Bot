@@ -310,7 +310,11 @@ let gen_unit n =
   let num_bits = get_num_bits n in
   gen_unit_helper n (pred_big_int num_bits)
 
-(**)
+(*[totient_helper factors accum] is the euler totient function applied to
+  the number n times accum, where n is the number represted as factors,
+  where factors = (p1,e1,...,pn,en) are all distinct prime
+  factors of n and mulptilicites of those factors, respectively
+  Precondtion: factors is a list of tuples of non_negative big_ints*)
 let rec totient_helper factors accum =
   match factors with
   | [] -> accum
@@ -319,40 +323,53 @@ let rec totient_helper factors accum =
     let term2 = div_big_int term1 factor in
     let accum' = mult_big_int (sub_big_int term1 term2) accum in
     totient_helper t accum'
-
+(*[totient n] is E("totient undefined for non_positive values")
+  if n is less than or equal to zero_big_int,
+  otherwise it is N(I(u)) where u is the result
+  of apply the euler totient function to n*)
 let totient n =
-  if (le_big_int n zero_big_int) then E("totient undefined for 0")
+  if (le_big_int n zero_big_int) then E("totient undefined for non_positive values")
   else let res = factor n in
   match res with
-  | Fact factors -> N(I(totient_helper factors (big_int_of_int 1)))
+  | Fact factors -> N(I(totient_helper factors unit_big_int))
   | _ -> failwith "n must be factorable"
-
 
 (*[gen_bezout_ceofs a b coefs] is a list of (v,(x',a'),(b') such that
   v = x'*a' + b', for each of the values a',b' that occur when recursively
-  applying the gcd function to a and b*)
+  applying the euclidian gcd function to a and b*)
 let rec gen_bezout_coefs a b coefs =
   if (eq_big_int b zero_big_int) then (a,(zero_big_int,zero_big_int),a)::coefs
   else let (q,r) = quomod_big_int a b in
     let coefs' = (a,(q,b),r)::coefs in
     gen_bezout_coefs b r coefs'
 
+(*[merg_coefs ((x,b),(y,r),r') ((a),(q,b),r)] is the result of using the
+  back-substitution on the pair of equations x*b = y*r + r' and a = q*b + r
+  to generate a new, valid solution of the form ((x',a),(y',b),r')*)
 let merge_coefs ((x,b),(y,r),r') ((a),(q,b),r) =
   let x' = minus_big_int y in
   let y' = minus_big_int (add_big_int x (mult_big_int y q)) in
   ((x',a),(y',b),r')
 
+(*[construct_min_bezout_sol eqn coef] is the solution with minimal coeficients
+  to the equation a*x+b*y = gcd(a,b) where coefs are the coeficients generated
+  from applying the recursive euclidian gcd algorithm to a,b.
+  Precondtion: coefs is empty, or has valid coeficients*)
 let rec construct_min_bezout_sol eqn coefs =
   match coefs with
   | [] -> eqn
   | h::t -> construct_min_bezout_sol (merge_coefs eqn h) t
 
+(*[get_x_y_gcd coefs] is (x,y,gcd) where coefs are the coeficients
+  generated from  applying the recursive euclidian gcd algorithm to a,b and
+  a*x + b*y = gcd(a,b) = gcd
+  Precondtion:coefs is not empty and has valid coeficients*)
 let get_x_y_gcd coefs =
   match coefs with
   | [] -> failwith "error cannot have no coefficients"
   | ((a),(q,b),r)::t ->
     let ((x,_),(neg_y,_),res) =
-      construct_min_bezout_sol ((big_int_of_int 1,a),(q,b),r) t in
+      construct_min_bezout_sol ((unit_big_int,a),(q,b),r) t in
     (x,minus_big_int neg_y, res)
 
 (*[bezout a b c] is a pair (x, y) where x*a + y*b = c, or an exception value
@@ -365,6 +382,10 @@ let bezout a b c =
     P(N(I(mult_big_int m x)),N(I(mult_big_int m y)))
   else E("gcd(a,b) does not divide c, so no solution exists")
 
+(*[join_congruence_pair bi mi bj mj] is P(a,m) where if x = bi (mod mi)
+  and x = bj (mod mj), then it is necissary and sufficient that
+  x = a (mod m)
+  Precondtion: mi mj are mutually prime, and mi,mj > 0*)
 let join_congruence_pair bi mi bj mj =
   if not(eq_big_int (as_big_int (gcd mi mj)) unit_big_int)
   then E("not relatively prime")
@@ -375,6 +396,13 @@ let join_congruence_pair bi mi bj mj =
     let res = (add fst_term snd_term m') in
     P(res,N(I(m')))
 
+(*[crt_helper lst1 lst2 accum] is a pair (a,M) such that any
+  integer n congruent to a mod M satisfies n = bi (mod mi) for any 0 <= bi <= j
+  and n = q (mod m') if accum = (q,m')
+  where lst1 = [b0,b1,...,bj] and lst2 = [m0,m1,...,mj].
+  Precondtion: all elements of lst2 (with the additional element of (snd accum )
+  if it is exsits) are pairwise relatively prime, and greater
+  than 0, and lst1 and lst2 are of the same length*)
 let rec crt_helper lst1 lst2 accum =
   match lst1,lst2 with
   | [],[] -> accum
@@ -388,15 +416,16 @@ let rec crt_helper lst1 lst2 accum =
   satisfies n = bi (mod mi) for any 0 <= bi <= j ,
   where lst1 = [b0,b1,...,bj] and lst2 = [m0,m1,...,mj].
   Precondition: all elements of lst2 are pairwise relatively prime, and greater
-  than 0, and lst1 and lst2 are of the same length*)
+  than 0, and lst1 and lst2 are of the same length and non-empty*)
 let crt lst1 lst2 =
   match lst1,lst2 with
   | [],_ -> E("must supply at least one congruence equation")
   | _,[] -> E("must supply at least one congruence equation")
   | b0::t1,m0::t2 -> crt_helper t1 t2 (P(N(I(b0)),N(I(m0))))
 
-(*[is_square a p] is 1 if x^2 = a (mod n) for some x,
-  0 if x^2 != a (mod n) for any x*)
+(*[is_square a p] is N(I(1)) if x^2 = a (mod n) for some x,
+  N(I(0)) if x^2 != a (mod n) for any x, or
+  E("cannot take the remainder mod a non-positive number") if n <= 0*)
 let is_square a p =
   let two = big_int_of_int 2 in
   if (le_big_int p zero_big_int)
@@ -410,6 +439,9 @@ let is_square a p =
     if (eq_big_int legendre (p_minus_one)) then N(I(zero_big_int))
     else N(I(unit_big_int))
 
+(*[inv a n] is E("cannot take the remainder mod a non-positive number")
+  if n <= 0, if n > 0, and there exists some b such that a*b = 1 (mod n), then
+  N(I(b)), otherwise, E("has no inerse mod this number") *)
 let inv a n =
   if (le_big_int n zero_big_int) then E("cannot take the remainder mod a non-positive number")
   else let result = bezout a n (big_int_of_int 1) in
@@ -418,10 +450,13 @@ let inv a n =
         | P (N(I(x)),_) -> N(I(mod_big_int x n))
         | _ -> failwith "Unimplemented"
 
+(*[divide a b n] if E("cannot take the remainder mod a non-positive number") if
+  n <= 0, if n > 0 then if b has multiplicative inverse mod n, b^-1, and
+  r = a*b^-1 (mod n) for 0 <= r < n, it is N(I(r)), otherwise
+  E("second arguement is not relatively prime to divisor")*)
 let divide a b n =
   if (le_big_int n zero_big_int) then E("cannot take the remainder mod a non-positive number")
-  else
-  let result = inv b n in
+  else let result = inv b n in
   match result with
     | E _ -> E("second arguement is not relatively prime to divisor")
     | N(I(b_inv)) -> multiply a b_inv n

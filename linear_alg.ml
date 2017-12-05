@@ -282,8 +282,14 @@ let neg_unit v =
   | Q _ -> Q(minus_big_int unit_big_int, unit_big_int)
 
 let determinant m =
-  let M(rr),swap_count = red_row_down m 0 0 in
-    N(prod_diag m 0 (if swap_count mod 2 = 1 then neg_unit m.(0).(0) else reg_unit m.(0).(0)))
+  let rows = Array.length m in
+  let cols = Array.length (m.(0)) in
+  if rows = cols then
+    let M(rr),swap_count = red_row_down m 0 0 in
+      N(prod_diag m 0 (
+        if swap_count mod 2 = 1 then neg_unit m.(0).(0)
+        else reg_unit m.(0).(0)))
+  else E("matrix size issue")
 
 
 let lin_ind m =

@@ -87,7 +87,7 @@ let callSendAPI sender_psid response =
     "\"},
     \"message\":" ^ response ^
   "}" in
-  ( print_endline request_body;
+  ( print_endline ("Request body: " ^ request_body);
    Client.post 
     ~headers:(Cohttp.Header.init_with "Content-Type" "application/json")
     ~body:(Cohttp_lwt.Body.of_string request_body)

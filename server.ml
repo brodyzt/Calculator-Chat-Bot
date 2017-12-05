@@ -96,10 +96,10 @@ let callSendAPI sender_psid response =
     Printf.printf "Headers: %s\n" (resp |> Response.headers |> Header.to_string);
     body |> Cohttp_lwt.Body.to_string >|= fun body ->
     Printf.printf "Body of length: %d\n" (String.length body); body
-
-let handleMessage sender_psid received_message = 
+(* 
+let handleMessage sender_psid (received_message: Yojson.Basic.json) = 
   let text = received_message |> member "text" |> to_string in
-  callSendAPI sender_psid ("\"text\": " ^ text)
+  callSendAPI sender_psid ("\"text\": " ^ text) *)
 
 let env = ref init_enviro
 let webhook req =
@@ -107,16 +107,16 @@ let webhook req =
   let j = Yojson.Basic.from_string req.req_body in
   (
     print_endline (j |> to_string);
-    let entries =  j |> to_list in
+    let entries =  j |> member "entry" |> to_list in
     let status = `OK in
     let handle_entry entry = (
-      let webhook_event = List.nth (entry |> to_list) 0 in
+      let webhook_event = List.nth (entry |> member "messaging" |> to_list) 0 in
       let sender_psid = webhook_event |> member "sender" |> member "id" |> to_string in
       let command = webhook_event |> member "message" |> member "text" |> to_string in
       let (result, env') = (Eval.evaluate_line !env command) in
       (env := env';
       let message = ("\"text\": " ^ result) in
-      handleMessage sender_psid )
+      callSendAPI sender_psid message)
     ) in (
       List.map handle_entry entries;
       let res_body = "Processed request successfully" in

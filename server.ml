@@ -95,7 +95,9 @@ let callSendAPI sender_psid response =
     Printf.printf "Response code: %d\n" code;
     Printf.printf "Headers: %s\n" (resp |> Response.headers |> Header.to_string);
     body |> Cohttp_lwt.Body.to_string >|= fun body ->
-    Printf.printf "Body of length: %d\n" (String.length body); body)
+    Printf.printf "Body of length: %d\n" (String.length body); 
+    print_endline "Sent api request";
+    body)
 (* 
 let handleMessage sender_psid (received_message: Yojson.Basic.json) = 
   let text = received_message |> member "text" |> to_string in

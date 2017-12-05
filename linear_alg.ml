@@ -346,8 +346,6 @@ let read_off_sol m =
   let (piv, non_piv) = piv_col m (fun i j acc -> (i,j)::acc) (fun _ j acc -> rem j acc ) [] (from 0 (cols) [])in
   let z,o = zero (m.(0).(0)), reg_unit (m.(0).(0)) in
   let result = Array.make_matrix (Array.length m.(0)-1) ((List.length non_piv)) z in
-    List.fold_right (fun (i,j) _ -> print_string "*"; print_int i; print_string ","; print_int j; print_string "*") piv ();
-    List.fold_right (fun j _ -> print_string "$"; print_int j; print_string "$") non_piv ();
     List.iter
       (fun (i,j) -> List.iteri
         (fun n ( j') ->

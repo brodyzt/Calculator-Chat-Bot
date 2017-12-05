@@ -586,7 +586,43 @@ let linear_arith_tests = [
    "1");
    ("rank_a23", a23 ^ " rank",
    "2");
+
   (*-------- nullspace --------*)
+  ("nullspace_a11", a11 ^ " nullspace",
+   "[\n[ 0. ]\n]");
+   ("nullspace_a21", a21 ^ " nullspace",
+   "[\n[ 1. ]\n[ 0. ]\n]");
+   ("nullspace_a12", a12 ^ " nullspace",
+   "[\n[ 1.5 ]\n[ 1. ]\n]");
+   ("nullspace_a22", a22 ^ " nullspace",
+   "[\n[ 0. ]\n[ 0. ]\n]");
+   ("nullspace_b11", b11 ^ " nullspace",
+   "[\n[ 0. ]\n]");
+   ("nullspace_b22", b22 ^ " nullspace",
+   "[\n[ 0. ]\n[ 0. ]\n]");
+   ("nullspace_c22", c22 ^ " nullspace",
+   "[\n[ 0. ]\n[ 0. ]\n]");
+   ("nullspace_a13", a13 ^ " nullspace",
+   "[\n[ -2.0 -3.0 ]\n[ 1. 0. ]\n[ 0. 1. ]\n]");
+   ("nullspace_b13", b13 ^ " nullspace",
+   "[\n[ -1.25 -1.5 ]\n[ 1. 0. ]\n[ 0. 1. ]\n]");
+   ("nullspace_b12", b12 ^ " nullspace",
+   "[\n[ -0.428571428571 -0.571428571429 ]\n[ 1. 0. ]\n[ 0. 1. ]\n]");
+   ("nullspace_i22", i22 ^ " nullspace",
+   "[\n[ 0. ]\n[ 0. ]\n]");
+   ("nullspace_i33", i33 ^ " nullspace",
+   "[\n[ 0. ]\n[ 0. ]\n[ 0. ]\n]");
+   ("nullspace_a110", a110 ^ " nullspace",
+   "[\n[ 1. ]\n]");
+   ("nullspace_a220", a220 ^ " nullspace",
+   "[\n[ 1. 0. ]\n[ 0. 1. ]\n]");
+   ("nullspace_a330", a330 ^ " nullspace",
+   "[\n[ 1. 0. 0. ]\n[ 0. 1. 0. ]\n[ 0. 0. 1. ]\n]");
+   ("nullspace_a231", a231 ^ " nullspace",
+   "[\n[ -1. -1. ]\n[ 1. 0. ]\n[ 0. 1. ]\n]");
+   ("nullspace_a23", a23 ^ " nullspace",
+   "[\n[ -0.576923076923 ]\n[ 0.230769230769 ]\n[ 1. ]\n]");
+
   (*-------- colspace --------*)
 ]
 

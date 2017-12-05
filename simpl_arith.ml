@@ -8,30 +8,48 @@ let reduce (a,b) =
     Q(num, denom)
 
 let add a b =
-  match a, b with
-  | I(a), I(b) -> N(I(add_big_int a b))
-  | F(a), F(b) -> N(F(a+.b))
-  | Q(a, b), Q(c, d) -> N(reduce (add_big_int (mult_big_int a d) (mult_big_int b c), (mult_big_int b d) ))
-  | _ -> E("Incorrect Types")
+  let add_rat a b c d =
+    N(reduce (add_big_int
+      (mult_big_int a d) (mult_big_int b c),
+      (mult_big_int b d) ))
+  in
+    match a, b with
+    | I(a), I(b) -> N(I(add_big_int a b))
+    | F(a), F(b) -> N(F(a+.b))
+    | Q(a, b), Q(c, d) -> add_rat a b c d
+    | Q(a, b), I(c) -> add_rat a b c (unit_big_int)
+    | I(a), Q(c, d) -> add_rat a (unit_big_int) c d
+    | _ -> E("Incorrect Types")
 
 let subtract a b =
-  match a, b with
-  | I(a), I(b) -> N(I(sub_big_int a b))
-  | F(a), F(b) -> N(F(a-.b))
-  | Q(a, b), Q(c, d) -> N(reduce (sub_big_int (mult_big_int a d) (mult_big_int b c), mult_big_int b d))
-  | _ -> E("Incorrect Types")
+  let sub_rat a b c d=
+    N(reduce (sub_big_int
+      (mult_big_int a d) (mult_big_int b c),
+       mult_big_int b d))
+  in
+    match a, b with
+    | I(a), I(b) -> N(I(sub_big_int a b))
+    | F(a), F(b) -> N(F(a-.b))
+    | Q(a, b), Q(c, d) -> sub_rat a b c d
+    | Q(a, b), I(c) -> sub_rat a b c (unit_big_int)
+    | I(a), Q(c, d) -> sub_rat a (unit_big_int) c d
+    | _ -> E("Incorrect Types")
 
 let multiply a b =
   match a, b with
   | I(a), I(b) -> N(I(mult_big_int a b))
   | F(a), F(b) -> N(F(a*.b))
   | Q(a, b), Q(c, d) ->  N(reduce ((mult_big_int a c),(mult_big_int b d)))
+  | Q(a, b), I(c) -> N(reduce ((mult_big_int a c),b))
+  | I(a), Q(c, d) -> N(reduce ((mult_big_int a c),d))
   | _ -> E("Incorrect Types")
 
 let divide a b =
   match a, b with
   | I(a), I(b) -> N(I(div_big_int a b))
   | F(a), F(b) -> N(F(a/.b))
+  | Q(a, b), I(c) -> N(reduce (a,(mult_big_int b c)))
+  | I(a), Q(b, c) -> N(reduce ((mult_big_int a c),b))
   | a, Q(c, d) ->  multiply a (Q (d, c))
   | _ -> E("Incorrect Types")
 

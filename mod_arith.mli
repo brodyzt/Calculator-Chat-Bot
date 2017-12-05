@@ -13,7 +13,7 @@ val gen_unit: Types.integer ->  Types.integer
 val inv: Types.integer -> Types.integer -> Types.value
 
 (*[add a b n] is the unique 0 <=r < n such that (a + b - r) divides n
-  if n <= 0 then the result will be an excpetion value*)
+  if n <= 0 then the result will be an exception value*)
 val add: Types.integer -> Types.integer -> Types.integer -> Types.value
 
 (*[subtract a b n] is the unique 0 <= r < n such that (a - b - r) divides n
@@ -26,7 +26,7 @@ val subtract: Types.integer -> Types.integer -> Types.integer -> Types.value
 val eq: Types.integer -> Types.integer -> Types.integer -> Types.value
 
 (*[multiply a b n] is the unique 0 <= r < n such that (a*b - r) divides n
-Precondition: n > 0*)
+or if n <= 0 then the result will be an exception valu*)
 val multiply: Types.integer -> Types.integer -> Types.integer -> Types.value
 
 (*[divide a b n] is the unique 0 <= r < n such that (a*b' - r) divides n, where
@@ -36,7 +36,6 @@ val divide: Types.integer -> Types.integer -> Types.integer -> Types.value
 
 (*[power a b n] is the unique 0 <= r < n such that (a^b -r) divides n if b >=0,
   instead the unique 0 <= r < n such that (a'^-b -r) divides n, where
-  [multiply a' a n] is 1, or -1 if no such a' exists.
   if n <= 0 then the result will be an exception value*)
 val power: Types.integer -> Types.integer -> Types.integer -> Types.value
 

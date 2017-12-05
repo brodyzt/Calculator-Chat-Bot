@@ -140,6 +140,8 @@ Defining a New Operator
 `{<name of function>: <param₁> … <paramn> -> <stack program for method>}`
 Then to execute the function the user can list the arguments and then place the 
 function name after the arguments listed in order
+* ex. ```{ add1 : x -> x 1 + }
+             3 add1```
 - note₀: we do not have constant variable definitions, but if you want 
 to define a variable they could create a constant function that will always 
 evaluate to some value.

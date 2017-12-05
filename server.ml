@@ -142,7 +142,7 @@ let webhook req =
       let webhook_event = List.nth (entry |> member "messaging" |> to_list) 0 in
       let sender_psid = webhook_event |> member "sender" |> member "id" |> to_string in
       print_endline ("Message: " ^ (webhook_event |> member "message" |> Yojson.Basic.pretty_to_string));
-      let command = webhook_event |> member "message" |> member "text" |> to_string |> String.escaped in
+      let command = webhook_event |> member "message" |> member "text" |> to_string in
       let (result, env') = (Eval.evaluate_line !env command) in
       (env := env';
       let message = ("{\"text\": \"" ^ result ^ "\"}") in

@@ -88,4 +88,7 @@ let evaluate_line env s =
           if Stack.is_empty Lexer.stack then " ", env' else
             (string_of_value (Stack.pop Lexer.stack), env')
       end
-    with _ -> ("Exception", env)
+    with _ -> (
+      print_endline "Exception thrown";
+      ("Exception", env)
+    )

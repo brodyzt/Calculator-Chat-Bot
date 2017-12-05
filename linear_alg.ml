@@ -292,15 +292,7 @@ let determinant m =
   else E("matrix size issue")
 
 
-let lin_ind m =
-  let N(d) = determinant m in
-    if not (non_zero (d)) then N (I (Big_int.big_int_of_int 0))
-    else N (I (Big_int.big_int_of_int 1))
 
-let lin_dep m =
-  let N(d) = determinant m in
-    if not (non_zero (d)) then N (I (Big_int.big_int_of_int 1))
-    else N (I (Big_int.big_int_of_int 0))
 
 
 (*[piv_col m f init] applys the function f to the col number of the pivot col
@@ -317,6 +309,7 @@ let piv_col m f g pinit ninit=
         else trav_diag (i) (j+1) pacc nacc
       else (pacc, nacc)
     in trav_diag 0 0 pinit ninit
+
 
 (*[negate v] negates the value [v]*)
 let negate v =
@@ -380,6 +373,18 @@ let solve m1 m2 =
 
 let rank m =
   N(I(big_int_of_int (fst(piv_col m (fun _ _ acc -> 1 + acc) (fun _ _ _ -> ()) 0 ()))))
+
+let lin_ind m =
+  let N(I(r)) = rank m in
+    if eq_big_int r (big_int_of_int (Array.length m.(0)) )
+    then N (I (unit_big_int))
+    else N (I (zero_big_int))
+
+let lin_dep m =
+  let N(I(r)) = rank m in
+    if eq_big_int r (big_int_of_int (Array.length m.(0)) )
+    then N (I (zero_big_int))
+    else N (I (unit_big_int))
 
 let null_space m =
   let z = zero (m.(0).(0)) in

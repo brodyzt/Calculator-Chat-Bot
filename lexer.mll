@@ -46,6 +46,7 @@ let un_op env op =
       | "reduce", M(m) -> Linear_alg.red_row_echelon m, env
       | "det", M(m) -> Linear_alg.determinant m, env
       | "indep", M(m) -> Linear_alg.lin_ind m, env
+      | "dep", M(m) -> Linear_alg.lin_dep m, env
       | "rank", M(m) -> Linear_alg.rank m, env
       | "nullspace", M(m) -> Linear_alg.null_space m, env
       | "colspace", M(m) -> Linear_alg.col_space m, env
@@ -283,7 +284,7 @@ let int_matrix = '[' int_vector (", "int_vector) * ']'
 let string = '"' _ *  '"'
 let id = (letter ) (letter | digit | "_")*
 let nop = "generate_private_key"
-let uop = "inv" | "transpose" | "echelon" | "reduce" | "det" | "indep"
+let uop = "inv" | "transpose" | "echelon" | "reduce" | "det" | "indep" | "dep"
           | "nullspace" | "colspace" | "!" | "factor" | "gen_prime"
           | "is_prime" | "is_prime_prob" | "totient" | "`prime" | "`p"
           | "`q" | "`n" | "`d" | "`e" | "`prime_prob" | "rank"

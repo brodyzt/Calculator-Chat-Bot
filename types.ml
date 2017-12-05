@@ -2,7 +2,7 @@ open Array
 open Big_int
 type integer = Big_int.big_int
 
-type number = I of integer | F of float
+type number = I of integer | F of float | Q of integer * integer
 
 type exn = string
 

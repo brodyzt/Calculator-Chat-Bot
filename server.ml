@@ -142,19 +142,20 @@ let webhook req =
     let handle_entry entry = (
       let webhook_event = List.nth (entry |> member "messaging" |> to_list) 0 in
       let sender_psid = webhook_event |> member "sender" |> member "id" |> to_string in
-      print_endline ("Message: " ^ (webhook_event |> member "message" |> Yojson.Basic.pretty_to_string));
-      let regex = Str.regexp "\\n" in
-      let command = webhook_event |> member "message" |> member "text" |> to_string |> Str.global_replace regex "\\\\n" in
+      print_endline ("Message: " ^ (webhook_event |> member "message" |> Yojson.Basic.to_string));
+      let regex = Str.regexp "\n" in
+      let command = webhook_event |> member "message" |> member "text" |> to_string in
       let (result, env') = (Eval.evaluate_line !env command) in
       (env := env';
-      let message = ("{\"text\": \"" ^ result ^ "\"}") in
+      let message = ("{\"text\": \"" ^ (result  |> Str.global_replace regex "\\n") ^ "\"}") in
       print_endline ("Result " ^ result);
       callSendAPI sender_psid message)
     ) in (
       List.map handle_entry entries;
       let res_body = "Processed request successfully" in
-        {headers; status; res_body};
-    )
+        {headers; status; res_body}
+    );
+    
   )
 
 

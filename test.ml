@@ -219,6 +219,18 @@ let comb_arith_tests = [
 ]
 
 let linear_arith_tests = [
+  (*scaling an int matrix*)
+  ("simpl_float_scale", "2. [[2., 3.], [5., 7.]] scale", "[\n[ 4. 6. ]\n[ 10. 14. ]\n]");
+  (*scaling an int matrix*)
+  ("simpl_int_scale", "2 [[2, 3], [5, 7]] scale", "[\n[ 4 6 ]\n[ 10 14 ]\n]");
+  (*simple int dot product*)
+  ("simple_int_dot_prod", "[[2], [5], [4]] [[5], [3], [1]] .", "29");
+  (*simple float dot product*)
+  ("simple_float_dot_prod", "[[2.], [7.], [4.]] [[3.], [3.], [1.5]] .", "33.");
+  (*simple cross product ints*)
+  ("simple_int_cross_prod", "[[1], [2], [4]] [[6], [2], [1]] #", "[\n[ -6 ]\n[ 23 ]\n[ -10 ]\n]");
+  (*simple cross product floatss*)
+  ("simple_float_cross_prod", "[[6.5], [3.5], [4.]] [[2.], [4.], [10.]] #", "[\n[ 19. ]\n[ -57. ]\n[ 19. ]\n]");
   (*simple adding of two matricies*)
   ("simple_add_matrix", "[[2., -3.], [-4., 5.]] [[7., 34.], [56., -19.]] +",
    "[\n[ 9. 31. ]\n[ 52. -14. ]\n]");
@@ -226,9 +238,13 @@ let linear_arith_tests = [
   ("simple_sub_matrix", "[[5., -3.], [-10., 5.], [5.6, 7.1]] [[7., 12.], [23., -19.], [13., 5.]] -",
    "[\n[ -2. -15. ]\n[ -33. 24. ]\n[ -7.4 2.1 ]\n]");
   (*simple row reduction*)
-  ("simple_esch",
+  ("simple_ech",
    "[[2., -3.], [-4., 5.]] echelon",
    "[\n[ 2. -3. ]\n[ 0. -1. ]\n]");
+  (*simple row reduction for a small integer matrix*)
+  ("simple_int_ech",
+   "[[2, -3], [4, 6]] echelon",
+   "[\n[ 2 -3 ]\n[ 0 12 ]\n]");
   (*simple row reduction with more row than col*)
   ("non_square_rr",
    "[[2., -3.], [-4., 5.], [8., 7.]] echelon",

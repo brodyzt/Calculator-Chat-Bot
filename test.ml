@@ -82,14 +82,14 @@ let mod_arith_tests = [
   ("simple_mod_sub", "9 4 2 -~", "1");
   (*tests the subtraction of the same number which would be 0 regardless of mod*)
   ("0_mod_sub", "7 7 20 -~", "0");
-  (*tests the subtraction of two numbers which is non zero, but is divisable
+  (*tests the subtraction of two numbers which are non zero, but is divisable
    * by the modulo*)
   ("no_div_mod_sub", "37 20 17 -~", "0");
   (*tests the subtraction of two larger numbers*)
   ("larger_mod_sub", "483275 34261 3 -~", "1");
   (*tests the subtraction of two numbers mod 0*)
   ("sub_mod_zero","4 5 0 -~","cannot take the remainder mod a non-positive number");
-  (*tests the subtraction of two numbers mod a negatice number*)
+  (*tests the subtraction of two numbers mod a negative number*)
   ("sub_mod_zero","4 5 -1 -~","cannot take the remainder mod a non-positive number");
   (*tests simple multiplication, which us not divisable by the modulo*)
   ("simple_mod_mult", "6 7 5 *~", "2");
@@ -209,10 +209,51 @@ let mod_arith_tests = [
   (*finds a totient of a composite*)
   ("composite_totient", "532501478 totient", "266250738");
   (*tests totient of zero*)
-  ("zero_totient", "0 totient", "totient undefined for 0");
-  (*test totient of 1*)
-  ("one_totient", "1 totient", "1")
-  (*glass box*)
+  ("zero_totient", "0 totient", "totient undefined for non_positive values");
+  (*tests totient of 1*)
+  ("one_totient", "1 totient", "1");
+  (*tests for negative totient*)
+  ("neg_totient","-12 totient","totient undefined for non_positive values");
+  (*tests bezouts for simple relatively prime numbers*)
+  ("bezout_simpl", "3 4 5 bezout", "(-5,5)");
+  (*tests bezouts for non-relatively prime numbers that doesn't have solution*)
+  ("bezout_simpl", "6 4 5 bezout", "gcd(a,b) does not divide c, so no solution exists");
+  (*tests bezouts for negative first number, with no solution*)
+  ("bezout_neg_fst", "-6 4 5 bezout", "gcd(a,b) does not divide c, so no solution exists");
+  (*tests bezouts for negative second number, with no solution*)
+  ("bezout_neg_snd", "6 -9 5 bezout", "gcd(a,b) does not divide c, so no solution exists");
+  (*tests bezouts for negative first number*)
+  ("bezout_neg_fst_soln", "-35 7 14 bezout","(0,2)");
+  (*tests bezouts for negative second number*)
+  ("bezout_neg_snd_soln", "12 -6 36 bezout","(0,-6)");
+  (*tests bezouts first number 0*)
+  ("bezout_fst_zero", "0 2 12 bezout","(0,6)");
+  (*tests bezouts second number 0*)
+  ("bezout_fst_zero", "1 0 17 bezout","(17,0)");
+  (*tests bezouts for both negative*)
+  ("bezout_both_neg","-12 -17 97 bezout","(679,-485)");
+  (*tests bezout for very large mutually prime numbers*)
+  ("bezout_large","429765647491 1029159179 827385723 bezout", "(73237333028758542,-30583111429080899181)");
+  (*tests if a square is a square mod a number*)
+  ("trivial_square","4 3 square","1");
+  (*tests if a non-square is a square mod a number*)
+  ("no_square","7 4 square","0");
+  (*tests if negative number is square mod a number*)
+  ("neg_square","-3 4 square","1");
+  (*tests if number is square mod 0*)
+  ("square_0","-3 0 square","cannot take the remainder mod a non-positive number");
+  (*tests if number is square mod a negative number*)
+  ("square_neg","3 -15 square","cannot take the remainder mod a non-positive number");
+  (*tests if 2 is a square mod a number congruent to 1 mod 8*)
+  ("square_2_true","2 9 square","1");
+  (*tests if 2 is a square mod a number congruent to 8 mod 8*)
+  ("square_2_true2","2 7 square","1");
+  (*tests if 2 is a square mod a number congruent to 3 mod 8*)
+  ("square_2_false","2 11 square","0");
+  (*tests if 2 is a square mod a number congruent to 5 mod 8*)
+  ("square_2_false2","2 13 square","0");
+  (*tests is_square for a large pair of numbers*)
+  ("square_large","428293582935 209409118403 square","1")
 
 ]
 

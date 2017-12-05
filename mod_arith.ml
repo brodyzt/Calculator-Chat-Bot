@@ -323,11 +323,12 @@ let rec totient_helper factors accum =
     let term2 = div_big_int term1 factor in
     let accum' = mult_big_int (sub_big_int term1 term2) accum in
     totient_helper t accum'
-(*[totient n] is E("totient undefined for 0") if n is less than or equal to
-  zero_big_int, otherwise it is N(I(u)) where u is the result
+(*[totient n] is E("totient undefined for non_positive values")
+  if n is less than or equal to zero_big_int,
+  otherwise it is N(I(u)) where u is the result
   of apply the euler totient function to n*)
 let totient n =
-  if (le_big_int n zero_big_int) then E("totient undefined for 0")
+  if (le_big_int n zero_big_int) then E("totient undefined for non_positive values")
   else let res = factor n in
   match res with
   | Fact factors -> N(I(totient_helper factors unit_big_int))
@@ -438,8 +439,7 @@ let is_square a p =
 
 (*[inv a n] is E("cannot take the remainder mod a non-positive number")
   if n <= 0, if n > 0, and there exists some b such that a*b = 1 (mod n), then
-  N(I(b)), otherwise, E("has no inerse mod this number")
-  *)
+  N(I(b)), otherwise, E("has no inerse mod this number") *)
 let inv a n =
   if (le_big_int n zero_big_int) then E("cannot take the remainder mod a non-positive number")
   else let result = bezout a n (big_int_of_int 1) in
@@ -447,14 +447,14 @@ let inv a n =
         | E _ -> E("has no inverse mod this number")
         | P (N(I(x)),_) -> N(I(mod_big_int x n))
         | _ -> failwith "Unimplemented"
+
 (*[divide a b n] if E("cannot take the remainder mod a non-positive number") if
   n <= 0, if n > 0 then if b has multiplicative inverse mod n, b^-1, and
   r = a*b^-1 (mod n) for 0 <= r < n, it is N(I(r)), otherwise
   E("second arguement is not relatively prime to divisor")*)
 let divide a b n =
   if (le_big_int n zero_big_int) then E("cannot take the remainder mod a non-positive number")
-  else
-  let result = inv b n in
+  else let result = inv b n in
   match result with
     | E _ -> E("second arguement is not relatively prime to divisor")
     | N(I(b_inv)) -> multiply a b_inv n

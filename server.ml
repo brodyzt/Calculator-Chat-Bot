@@ -88,6 +88,7 @@ let callSendAPI sender_psid response =
   "}" in
   ( print_endline request_body;
   Client.post 
+    ~headers:(Cohttp.Header.init_with "Content-Type" "application/json")
     ~body:(Cohttp_lwt.Body.of_string request_body)
     (Uri.of_string "https://graph.facebook.com/v2.6/me/messages?access_token=EAAEZBhqyWObQBAED8CndCr1WRaFMTjCwdF1qfLb78CXt3G15ZC6POeaaSjPzUiY8ve9by9PJk2OmJs7P8daeqFQz6Bj05MKhWNgmiJJFyyr8fzuZAh3G8gIZBzkvOO6UFXBio1Yf4oLZAoCuOLC3ZBMsEXqo94LOyhB0kl2wtzmDyFUSyZAj7nv")
     >>= fun (resp, body) ->

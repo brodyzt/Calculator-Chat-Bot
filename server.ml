@@ -87,9 +87,9 @@ let callSendAPI sender_psid response =
     \"message\":" ^ response ^
   "}" in
   ( print_endline request_body;
-   (Client.post 
+   Cohttp_lwt_unix.Client.post 
     ~headers:(Cohttp.Header.init_with "Content-Type" "application/json")
-    ~body:(Cohttp_lwt.Body.of_string request_body)
+    ~body:(Cohttp_lwt_body.body_of_string request_body)
     (* (Uri.of_string "https://graph.facebook.com/v2.6/me/messages?access_token=EAAEZBhqyWObQBAED8CndCr1WRaFMTjCwdF1qfLb78CXt3G15ZC6POeaaSjPzUiY8ve9by9PJk2OmJs7P8daeqFQz6Bj05MKhWNgmiJJFyyr8fzuZAh3G8gIZBzkvOO6UFXBio1Yf4oLZAoCuOLC3ZBMsEXqo94LOyhB0kl2wtzmDyFUSyZAj7nv") *)
        (Uri.of_string "localhost:5000")
     >>= fun (resp, body) ->
@@ -97,7 +97,7 @@ let callSendAPI sender_psid response =
     Printf.printf "Response code: %d\n" code;
     Printf.printf "Headers: %s\n" (resp |> Response.headers |> Header.to_string);
     body |> Cohttp_lwt.Body.to_string >|= fun body ->
-    Printf.printf "Body of length: %d\n" (String.length body));
+    Printf.printf "Body of length: %d\n" (String.length body);
     print_endline "Sent api request";
     body)
 (* 
@@ -123,7 +123,7 @@ let webhook req =
       let (result, env') = (Eval.evaluate_line !env command) in
       (env := env';
       let message = ("{\"text\": \"" ^ result ^ "\"}") in
-      print_endline ("Result" ^ result);
+      print_endline ("Result " ^ result);
       callSendAPI sender_psid message)
     ) in (
       List.map handle_entry entries;

@@ -95,15 +95,16 @@ let init_conn url =
 	Curl.set_url c url; r,c
 
 let post ?(content_type = "application/json") url data =
-    let r,c = init_conn url in
-    Curl.set_post c true;
-    Curl.set_httpheader c [ "Content-Type: " ^ content_type ];
-    Curl.set_postfields c data;
-    Curl.set_postfieldsize c (String.length data);
-    Curl.perform c;
-    let rc = Curl.get_responsecode c in
-    Curl.cleanup c;
-    rc, (Buffer.contents r)
+  print_endline ("Request body: " ^ data);  
+  let r,c = init_conn url in
+  Curl.set_post c true;
+  Curl.set_httpheader c [ "Content-Type: " ^ content_type ];
+  Curl.set_postfields c data;
+  Curl.set_postfieldsize c (String.length data);
+  Curl.perform c;
+  let rc = Curl.get_responsecode c in
+  Curl.cleanup c;
+  rc, (Buffer.contents r)
 
 let callSendAPI sender_psid response = 
   let request_body = "{
@@ -112,7 +113,7 @@ let callSendAPI sender_psid response =
     "\"},
     \"message\":" ^ response ^
   "}" in
-  ( print_endline ("Request body: " ^ request_body);
+  ( (*print_endline ("Request body: " ^ request_body);*)
     post "https://graph.facebook.com/v2.6/me/messages?access_token=EAAEZBhqyWObQBAED8CndCr1WRaFMTjCwdF1qfLb78CXt3G15ZC6POeaaSjPzUiY8ve9by9PJk2OmJs7P8daeqFQz6Bj05MKhWNgmiJJFyyr8fzuZAh3G8gIZBzkvOO6UFXBio1Yf4oLZAoCuOLC3ZBMsEXqo94LOyhB0kl2wtzmDyFUSyZAj7nv" request_body;
    Cohttp_lwt_unix.Client.post 
     ~headers:(Cohttp.Header.init_with "Content-Type" "application/json")

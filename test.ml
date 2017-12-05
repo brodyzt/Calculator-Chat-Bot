@@ -126,6 +126,8 @@ let mod_arith_tests = [
   ("pow_mod_zero", "3285 293 0 ^~", "cannot take the remainder mod a non-positive number");
   (*tests powers mod negative number*)
   ("pow_mod_neg", "0 23 -1 ^~", "cannot take the remainder mod a non-positive number");
+  (*tests powers to a negative number *)
+  ("pow_to_neg","5 -7 4 ^~","1");
   (*tests simple equality of two small numbers*)
   ("simple_mod_eq", "16 2 15 =~", "0");
   (*tests the modular equality with large numbers*)

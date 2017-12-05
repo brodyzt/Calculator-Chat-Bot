@@ -31,7 +31,7 @@ let truthy b =
 (*[add a b n] is a + b (mod n) expressed as N(I(r)) with 0 <= r < n or
   E("cannot take the remainder mod a non-positive number") is n <= 0*)
 let add a b n =
-  if ((compare_big_int n zero_big_int) <= 0) then E("cannot take the remainder mod a non-positive number")
+  if (le_big_int n zero_big_int) then E("cannot take the remainder mod a non-positive number")
   else N(I(mod_big_int (add_big_int a b) n))
 
 (*[subtract a b n] is a - b (mod n) expressed as N(I(r) with 0 <= r < n or
@@ -111,10 +111,10 @@ let rec factor_helper n d accum =
     then factor_helper n (add_big_int d (big_int_of_int 1)) accum
     else let n' = div_big_int n (power_big_int_positive_big_int d pow) in
       factor_helper n' d ((d,pow)::accum)
-
+(*[factor n] is Fact(p1,e1,...,pm,em) where the pi's are the prime factors
+  of n *)
 let factor n =
-  let one = big_int_of_int 1 in
-  if (((compare_big_int n zero_big_int)=0) || ((compare_big_int n one)=0))
+  if ((eq_big_int n zero_big_int) || (eq_big_int n unit_big_int))
   then Fact([])
   else Fact(List.rev (factor_helper n (big_int_of_int 2) []))
 

@@ -82,16 +82,7 @@ let cross_product m1 m2 =
         r.(1).(0) <-  sum2;
         r.(2).(0) <-  sum3;
         M(r)
-(*
-let multiply m1 m2 =
-  let l1 = Array.length m1 in
-  let l2 = Array.length m2 in
-  let w1 = Array.length m1.(0) in
-  let w2 = Array.length m2.(0) in
-  let r = Array.make_matrix l1 w2 (F(0.) ) in
-    if l2 <> w1 then E("matrix size issue") else
-      iterij (fun i j _ -> r.(i).(j) <- ) r
-*)
+
 let scale m n =
   M(Array.map
     (fun r -> Array.map
@@ -276,23 +267,38 @@ let rec prod_diag m i acc =
   let rows = Array.length m in
   let cols = Array.length (m.(0)) in
     if i < rows && i < cols then
-      match m.(i).(i), acc with
-      | F(f), F(a) -> prod_diag m (i+1) (F(a *. f))
-      | I(n), I(a) -> prod_diag m (i+1) (I (mult_big_int a n))
+      let N(prod) = Simpl_arith.multiply acc m.(i).(i) in
+        prod_diag m (i+1) (prod)
     else acc
 
+(*[unit v] gives a zero value which is of the same type as [v]*)
+let reg_unit v =
+  match v with
+  | I _ -> I(unit_big_int)
+  | F _ -> F(1.0)
+  | Q _ -> Q(unit_big_int, unit_big_int)
+
+(*[neg_unit v] gives a zero value which is of the same type as [v]*)
+let neg_unit v =
+  match v with
+  | I _ -> I(minus_big_int unit_big_int)
+  | F _ -> F(-1.0)
+  | Q _ -> Q(minus_big_int unit_big_int, unit_big_int)
 
 let determinant m =
   let M(rr),swap_count = red_row_down m 0 0 in
-    (*needs to work for ints too*)
-    N(prod_diag m 0 (F(if swap_count mod 2 = 1 then -1. else 1.)))
+    N(prod_diag m 0 (if swap_count mod 2 = 1 then neg_unit m.(0).(0) else reg_unit m.(0).(0)))
 
 
 let lin_ind m =
-  if determinant m = N(F(0.)) then N (I (Big_int.big_int_of_int 0)) else N (I (Big_int.big_int_of_int 1))
+  let N(d) = determinant m in
+    if not (non_zero (d)) then N (I (Big_int.big_int_of_int 0))
+    else N (I (Big_int.big_int_of_int 1))
 
 let lin_dep m =
-  if determinant m = N(F(0.)) then N (I (Big_int.big_int_of_int 1)) else N (I (Big_int.big_int_of_int 0))
+  let N(d) = determinant m in
+    if not (non_zero (d)) then N (I (Big_int.big_int_of_int 1))
+    else N (I (Big_int.big_int_of_int 0))
 
 
 (*[piv_col m f init] applys the function f to the col number of the pivot col
@@ -310,20 +316,25 @@ let piv_col m f g pinit ninit=
       else (pacc, nacc)
     in trav_diag 0 0 pinit ninit
 
+(*[negate v] negates the value [v]*)
 let negate v =
   match v with
   | I(i) -> I (minus_big_int i)
   | F(f) -> F(-1. *. f)
+  | Q(a, b) -> Q(minus_big_int a, b)
 
-
+(*[rem v l] revoves the value v from the matrix*)
 let rec rem v l =
   match l with
   | [] -> []
   | h::t -> if h = v then t else h::(rem v t)
 
+(*[from i n acc] makes a list with values from i to n*)
 let rec from i n acc =
   if i = n then acc else (from (i+1) n (i::acc) )
 
+(*[check_consitant m i] chacks that the matrix m is constitant in the
+ * row i and all those above*)
 let rec check_consitant m i =
   if i < 0 then true else
     let rows = Array.length m in
@@ -338,11 +349,7 @@ let rec check_consitant m i =
 let read_off_sol m =
   let cols = Array.length (m.(0)) in
   let (piv, non_piv) = piv_col m (fun i j acc -> (i,j)::acc) (fun _ j acc -> rem j acc ) [] (from 0 (cols) [])in
-  let z,o =
-        match m.(0).(0) with
-        | I _ -> (I (big_int_of_int 0)),(I (big_int_of_int 1))
-        | F _ -> (F 0.), F(1.)
-  in
+  let z,o = zero (m.(0).(0)), reg_unit (m.(0).(0)) in
   let result = Array.make_matrix (Array.length m.(0)-1) ((List.length non_piv)) z in
     print_string (string_of_matrix m);
     List.fold_right (fun (i,j) _ -> print_string "*"; print_int i; print_string ","; print_int j; print_string "*") piv ();
@@ -374,11 +381,7 @@ let rank m =
   N(I(big_int_of_int (fst(piv_col m (fun _ _ acc -> 1 + acc) (fun _ _ _ -> ()) 0 ()))))
 
 let null_space m =
-  let z =
-        match m.(0).(0) with
-        | I _ -> (I (big_int_of_int 0))
-        | F _ -> (F 0.)
-  in
+  let z = zero (m.(0).(0)) in
   let M(arr) = solve m (Array.make_matrix (Array.length m) (1) (z)) in
     if (Array.length arr.(0)) > 1 then
       M(init_matrix (Array.length arr)  (Array.length arr.(0)) (fun i j -> arr.(i).(j+1)))

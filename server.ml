@@ -106,7 +106,9 @@ let webhook req =
   let headers = Header.init_with "Content-Type" "application/json" in
   let j = Yojson.Basic.from_string req.req_body in
   (
-    print_endline (j |> to_string);
+    print_endline "here";
+    print_endline (j |> Yojson.Basic.pretty_to_string);
+    print_endline "next";
     let entries =  j |> member "entry" |> to_list in
     let status = `OK in
     let handle_entry entry = (
@@ -116,6 +118,7 @@ let webhook req =
       let (result, env') = (Eval.evaluate_line !env command) in
       (env := env';
       let message = ("\"text\": " ^ result) in
+      print_endline ("Result" ^ result);
       callSendAPI sender_psid message)
     ) in (
       List.map handle_entry entries;

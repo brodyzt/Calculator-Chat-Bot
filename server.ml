@@ -82,10 +82,10 @@ let test req =
 let callSendAPI sender_psid response = 
   let request_body = "{
     \"recipient\" : {
-      \"id\" : ^" ^ sender_psid ^
-    "},
-    \"message\": { \"text\" : " ^ response ^
-  "}}" in
+      \"id\" : ^\"" ^ sender_psid ^
+    "\"},
+    \"message\": { \"text\" : \"" ^ response ^
+  "\"}}" in
 
   Client.post 
     ~body:(Cohttp_lwt.Body.of_string request_body)

@@ -3,7 +3,7 @@ open Cohttp_lwt_unix
 open Cohttp
 open Yojson.Basic.Util
 open Types
-
+let _ = Curl.global_init Curl.CURLINIT_GLOBALALL
 let init_enviro =
   PMap.empty
   |> PMap.add "`prime" (E "`prime has not be not bound")
@@ -78,7 +78,32 @@ let test req =
   {headers; status; res_body}
 
 
+let writer_callback a d =
+	Buffer.add_string a d;
+	String.length d
 
+let init_conn url =
+	let r = Buffer.create 16384
+	and c = Curl.init () in
+	Curl.set_timeout c 1200;
+	Curl.set_sslverifypeer c false;
+	Curl.set_sslverifyhost c Curl.SSLVERIFYHOST_EXISTENCE;
+	Curl.set_writefunction c (writer_callback r);
+	Curl.set_tcpnodelay c true;
+	Curl.set_verbose c false;
+	Curl.set_post c false;
+	Curl.set_url c url; r,c
+
+let post ?(content_type = "application/json") url data =
+    let r,c = init_conn url in
+    Curl.set_post c true;
+    Curl.set_httpheader c [ "Content-Type: " ^ content_type ];
+    Curl.set_postfields c data;
+    Curl.set_postfieldsize c (String.length data);
+    Curl.perform c;
+    let rc = Curl.get_responsecode c in
+    Curl.cleanup c;
+    rc, (Buffer.contents r)
 
 let callSendAPI sender_psid response = 
   let request_body = "{
@@ -88,6 +113,7 @@ let callSendAPI sender_psid response =
     \"message\":" ^ response ^
   "}" in
   ( print_endline ("Request body: " ^ request_body);
+    post "localhost:5000" request_body;
    Cohttp_lwt_unix.Client.post 
     ~headers:(Cohttp.Header.init_with "Content-Type" "application/json")
     ~body:(Cohttp_lwt.Body.of_string request_body)

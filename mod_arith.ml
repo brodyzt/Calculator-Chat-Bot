@@ -37,13 +37,13 @@ let add a b n =
 (*[subtract a b n] is a - b (mod n) expressed as N(I(r) with 0 <= r < n or
   E("cannot take the remainder mod a non-positive number") is n <= 0*)
 let subtract a b n =
-  if ((compare_big_int n zero_big_int) <= 0) then E("cannot take the remainder mod a non-positive number")
+  if (le_big_int n zero_big_int) then E("cannot take the remainder mod a non-positive number")
   else N(I(mod_big_int (sub_big_int a b) n))
 
 (*[multiply a b n] is a*b (mod n) expressed as N(I(r) with 0 <= r < n or
   E("cannot take the remainder mod a non-positive number") is n <= 0*)
 let multiply a b n =
-  if ((compare_big_int n zero_big_int) <= 0) then (E "cannot take the remainder mod a non-positive number")
+  if (le_big_int n zero_big_int) then (E "cannot take the remainder mod a non-positive number")
   else N(I(mod_big_int (mult_big_int a b) n))
 
 (*[as_bin_list a accum] is a list of a's bits staring with accum and in reverse order
@@ -87,7 +87,7 @@ let rec condense n pows bin accum=
 let power a b n =
   let b = abs_big_int b in
   if (eq_big_int b zero_big_int) then N(I(unit_big_int))
-  else if ((compare_big_int n zero_big_int) <= 0) then E("cannot take the remainder mod a non-positive number")
+  else if (le_big_int n zero_big_int) then E("cannot take the remainder mod a non-positive number")
   else let a_red = mod_big_int a n in
   if eq_big_int a_red zero_big_int then N(I(zero_big_int))
   else let bin = as_bin_list b [] in
@@ -95,66 +95,89 @@ let power a b n =
   let squares = repeated_square a n expn [] in
     N(I(condense n squares bin unit_big_int))
 
-
+(*[pow_factor p n zero_big_int] is e where p^e is the largest power of
+  p dividing n
+  Precondition: p is prime, p divides n*)
 let rec pow_factor p n accum=
   let r = (mod_big_int n p) in
-  if ((compare_big_int r zero_big_int)=0)
+  if (eq_big_int r zero_big_int)
   then pow_factor p (div_big_int n p) (add_big_int accum (big_int_of_int 1))
   else accum
 
+(*[factor_helper n d accum] is pows::accum where pows is a list of the form
+  (p1,e1,...,pm,em) where the pi's are the prime factors of |n| greater than
+  or equal to d, each with multiplicity ei, and such that p1 > p2 > ... > pm
+  Precondtion: d,n>0*)
 let rec factor_helper n d accum =
-  if ((compare_big_int n (big_int_of_int 1))=0) then accum
-  else if ((compare_big_int (square_big_int d) n)> 0)
+  if (eq_big_int n unit_big_int) then accum
+  else if (gt_big_int (square_big_int d) n)
   then (n,big_int_of_int 1)::accum
   else let pow = pow_factor d n (zero_big_int) in
-    if((compare_big_int pow zero_big_int)=0)
+    if (eq_big_int pow zero_big_int)
     then factor_helper n (add_big_int d (big_int_of_int 1)) accum
     else let n' = div_big_int n (power_big_int_positive_big_int d pow) in
       factor_helper n' d ((d,pow)::accum)
-(*[factor n] is Fact(p1,e1,...,pm,em) where the pi's are the prime factors
-  of n *)
-let factor n =
-  if ((eq_big_int n zero_big_int) || (eq_big_int n unit_big_int))
-  then Fact([])
-  else Fact(List.rev (factor_helper n (big_int_of_int 2) []))
 
+(*[factor n] is Fact(p1,e1,...,pm,em) where the pi's are the prime factors
+  of |n| in increasing order of multiplicy ei
+  if |n| >= 2 or Fact([]) otherwise *)
+let factor n =
+  let n_pos = abs_big_int n in
+  if ((eq_big_int n_pos zero_big_int) || (eq_big_int n_pos unit_big_int))
+  then Fact([])
+  else Fact(List.rev (factor_helper n_pos (big_int_of_int 2) []))
+
+(*[is_prime n] is N(I(unit_big_int) if n is a prime number,
+  is N(I(zero_big_int)) if n is not a prime number, may take a long
+  time for large n)*)
 let is_prime n =
-  if ((compare_big_int n unit_big_int)<=0) then N(I(zero_big_int))
+  if (le_big_int n zero_big_int) then N(I(zero_big_int))
   else let res = factor n in
   match res with
   | Fact factors -> begin
       match factors with
       | [] -> N(I(zero_big_int))
       | (fact,freq)::t ->
-        if (((compare_big_int freq (big_int_of_int 1))=0) && (t = []))
+        if ((eq_big_int freq unit_big_int) && (t = []))
         then N(I(big_int_of_int 1))
         else N(I(zero_big_int))
     end
-  | _ -> failwith "factored incorrectly"
+  | _ -> failwith "factored incorrectly, unreachable case"
 
+(*[eq a b n] is N(I(unit_big_int)) if a = b (mod n) and N(I(zero_big_int))
+  if a != b (mod n), or E("cannot take the remainder mod a non-positive number")
+  if n <= 0*)
 let eq a b n =
   match subtract a b n with
   | E e -> E e
   | N v1 -> begin
       match v1 with
-      | I v2 -> if ((compare_big_int v2 zero_big_int) = 0) then N(I(big_int_of_int 1))
+      | I v2 -> if (eq_big_int v2 zero_big_int) then N(I(unit_big_int))
         else N(I(zero_big_int))
-      | _ -> failwith "Unimplemented"
+      | _ -> failwith "Unreachable case"
     end
-  | _ -> failwith "unimplemented"
+  | _ -> failwith "Unreachable case"
 
+(*[gcd a b] is the greatest common divisor of a and b, in other words it is
+  N(I(n))w where n is the largest non-negative number,
+  such that n | a and n | b*)
 let rec gcd a b =
-  if ((compare_big_int a zero_big_int) < 0) then gcd (minus_big_int a) b
-  else if ((compare_big_int b zero_big_int) < 0) then gcd a (minus_big_int b)
-  else if ((compare_big_int a b) < 0) then gcd b a
-  else if ((compare_big_int b zero_big_int) = 0) then N(I(a))
+  if (lt_big_int a zero_big_int) then gcd (minus_big_int a) b
+  else if (lt_big_int b zero_big_int) then gcd a (minus_big_int b)
+  else if (lt_big_int a b) then gcd b a
+  else if (eq_big_int b zero_big_int) then N(I(a))
   else gcd b (mod_big_int a b)
 
+(*[lcm a b] is N(I(n)) where n is the smallest non_negative number such that
+  a | n and b | n*)
 let lcm a b =
   match gcd a b with
-  | N (I v) -> N(I (div_big_int (mult_big_int a b) v))
+  | N (I v) -> if (eq_big_int v zero_big_int) then N(I(zero_big_int))
+    else N(I (div_big_int (mult_big_int a b) v))
   | _ -> failwith "unreachable case"
 
+(*[ensure_rand_init ()] inititializes Random if !is_init is false and then
+  assign !is_init to true, evalutes to value of type unit*)
 let ensure_rand_init _ =
   if not(!is_init) then begin Random.self_init (); is_init := true end
   else ()

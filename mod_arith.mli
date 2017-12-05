@@ -17,10 +17,10 @@ val inv: Types.integer -> Types.integer -> Types.value
 val add: Types.integer -> Types.integer -> Types.integer -> Types.value
 
 (*[subtract a b n] is the unique 0 <= r < n such that (a - b - r) divides n
-  if n <= 0 then the result will be an excpetion value*)
+  if n <= 0 then the result will be an exception value*)
 val subtract: Types.integer -> Types.integer -> Types.integer -> Types.value
 
-(*[eq a b n] is a non-zero a and b are congruent mod n the zero value if
+(*[eq a b n] is non-zero if a and b are congruent mod n or the zero value if
   a b are not congruent mod n, and if n <= 0 then the result will be an
   exception value *)
 val eq: Types.integer -> Types.integer -> Types.integer -> Types.value

@@ -253,8 +253,13 @@ let mod_arith_tests = [
   (*tests if 2 is a square mod a number congruent to 5 mod 8*)
   ("square_2_false2","2 13 square","0");
   (*tests is_square for a large pair of numbers*)
-  ("square_large","428293582935 209409118403 square","1")
-
+  ("square_large","428293582935 209409118403 square","1");
+  (*tests solve in simple case*)
+  ("crt_simpl","2 1 3 1 2 solve","(1,6)");
+  (*tests solve in a less simple case*)
+  ("crt_average","2 1 3 1 5 1 7 1 4 solve","(1,210)");
+  (*tests solution for complex case*)
+  ("crt_complicated","617 397 571 229 911 829 3 solve","(103607037,320951677)")
 ]
 
 let comb_arith_tests = [

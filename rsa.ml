@@ -83,19 +83,25 @@ let decode_big_int_as_string i =
 (*[encrypt (n,e) s] is the string result of encrypting
   [encode_string_as_big_int s] using RSA public key (n,e)
   Precondition: (n,e) is a valid RSA public key,
-  [encode_string_as_big_int s] < n and e [encode_string_as_big_int s] is
-  relatively prime to n*)
+  [encode_string_as_big_int s] < n, e [encode_string_as_big_int s] is
+  relatively prime to n and s contains only ascii characters*)
 let encrypt (n,e) s =
   let m = encode_string_as_big_int s in
   Mod_arith.power m e n
 
-
+(*[decrypt (d,p,q) c] is s such that [encrypt (p*q,d^-1) s] is c, where d^-1
+  is the multiplicative inverse of d (mod phi(p*q)), with phi, the euler phi function
+  Precondtion: (d,p,q) is a valid RSA private key and c is a valid result of
+  [encrypt (p*q,e) s], for some s*)
 let decrypt (d, p, q) c =
   let n = mult_big_int p q in
   let m = Mod_arith.as_big_int (Mod_arith.power c d n) in
   S(decode_big_int_as_string m)
 
-
+(*[crack (n,e) c] is s such that [encrypt (p*q,e) s] is c,
+  where n = p*q for primes p and q
+  Precondtion: (n,e) is a valid RSA public key and c is a valid result of
+  [encrypt (n,e) s], for some s*)
 let crack (n, e) c =
   let phi = Mod_arith.as_big_int (Mod_arith.totient n) in
   let d = Mod_arith.as_big_int (Mod_arith.inv e phi) in

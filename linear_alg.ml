@@ -370,7 +370,9 @@ let solve m1 m2 =
      E "matrix size issue"
 
 let rank m =
-  N(I(big_int_of_int (fst(piv_col m (fun _ _ acc -> 1 + acc) (fun _ _ _ -> ()) 0 ()))))
+  let M(rr) = row_echelon m in
+  let r = fst(piv_col rr (fun i j acc -> print_int i;print_int j; 1 + acc) (fun _ _ _ -> ()) 0 ()) in
+    N(I(big_int_of_int r))
 
 let lin_ind m =
   let N(I(r)) = rank m in

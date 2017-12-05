@@ -88,7 +88,7 @@ let callSendAPI sender_psid response =
     \"message\":" ^ response ^
   "}" in
   ( print_endline ("Request body: " ^ request_body);
-   Client.post 
+   Cohttp_lwt_unix.Client.post 
     ~headers:(Cohttp.Header.init_with "Content-Type" "application/json")
     ~body:(Cohttp_lwt.Body.of_string request_body)
     (* (Uri.of_string "https://graph.facebook.com/v2.6/me/messages?access_token=EAAEZBhqyWObQBAED8CndCr1WRaFMTjCwdF1qfLb78CXt3G15ZC6POeaaSjPzUiY8ve9by9PJk2OmJs7P8daeqFQz6Bj05MKhWNgmiJJFyyr8fzuZAh3G8gIZBzkvOO6UFXBio1Yf4oLZAoCuOLC3ZBMsEXqo94LOyhB0kl2wtzmDyFUSyZAj7nv") *)
@@ -101,10 +101,6 @@ let callSendAPI sender_psid response =
     Printf.printf "Body of length: %d\n" (String.length body);
     print_endline "Sent api request";
     body)
-(* 
-let handleMessage sender_psid (received_message: Yojson.Basic.json) = 
-  let text = received_message |> member "text" |> to_string in
-  callSendAPI sender_psid ("\"text\": " ^ text) *)
 
 let env = ref init_enviro
 let webhook req =

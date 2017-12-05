@@ -76,14 +76,16 @@ let rec string_of_value v =
  * evlauating a program will not change the enviroment, but the top element on
  * the stack will be converte to a string and paired with the enviroment*)
 let evaluate_line env s =
-  let lexbuf = Lexing.from_string s in
-    begin
-      (*adds the user defined function to the enviroment*)
-      if String.length s > 0 && String.get s 0 = '{'
-      then parse_macro env s else
-        (*parses a stack program, returning the string form of the top
-         * element on the resulting stack*)
-        let env' = Lexer.read env lexbuf in
-        if Stack.is_empty Lexer.stack then " ", env' else
-          (string_of_value (Stack.pop Lexer.stack), env')
-    end
+  try 
+    let lexbuf = Lexing.from_string s in
+      begin
+        (*adds the user defined function to the enviroment*)
+        if String.length s > 0 && String.get s 0 = '{'
+        then parse_macro env s else
+          (*parses a stack program, returning the string form of the top
+          * element on the resulting stack*)
+          let env' = Lexer.read env lexbuf in
+          if Stack.is_empty Lexer.stack then " ", env' else
+            (string_of_value (Stack.pop Lexer.stack), env')
+      end
+    with _ -> ("Exception", env)

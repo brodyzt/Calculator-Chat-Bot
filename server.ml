@@ -84,8 +84,8 @@ let callSendAPI sender_psid response =
     \"recipient\" : {
       \"id\" : ^" ^ sender_psid ^
     "},
-    \"message\":" ^ response ^
-  "}" in
+    \"message\": { \"text\" : " ^ response ^
+  "}}" in
 
   Client.post 
     ~body:(Cohttp_lwt.Body.of_string request_body)

@@ -6,7 +6,7 @@
 val row: Types.matrix -> Types.integer -> Types.value
 
 (* [col a x] returns the column of [a] at index [x]
- * Pif [x] is not an index of a column in [a], this
+ * if [x] is not an index of a column in [a], this
  * evaluates to an exeption value*)
 val col: Types.matrix -> Types.integer -> Types.value
 

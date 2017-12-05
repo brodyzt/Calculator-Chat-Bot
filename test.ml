@@ -75,9 +75,8 @@ let mod_arith_tests = [
   ("non_div_mod_add", "5 6 11 +~", "0");
   (*test the addition two numbers mod 0*)
   ("add_mod_zero","4 5 0 +~","cannot take the remainder mod a non-positive number");
-  (**test the addition two numbers mod 0 a negative number*)
+  (**test the addition two numbers mod a negative number*)
   ("add_mod_neg","4 0 -63 +~","cannot take the remainder mod a non-positive number");
-
   (*tests the simple modular subtraction of 2 numbers which is not divisable by
    * the modulo*)
   ("simple_mod_sub", "9 4 2 -~", "1");
@@ -90,7 +89,7 @@ let mod_arith_tests = [
   ("larger_mod_sub", "483275 34261 3 -~", "1");
   (*tests the subtraction of two numbers mod 0*)
   ("sub_mod_zero","4 5 0 -~","cannot take the remainder mod a non-positive number");
-  (*tests the subtraction of two numbers mod a non-zero number*)
+  (*tests the subtraction of two numbers mod a negatice number*)
   ("sub_mod_zero","4 5 -1 -~","cannot take the remainder mod a non-positive number");
   (*tests simple multiplication, which us not divisable by the modulo*)
   ("simple_mod_mult", "6 7 5 *~", "2");
@@ -127,6 +126,8 @@ let mod_arith_tests = [
   ("pow_mod_zero", "3285 293 0 ^~", "cannot take the remainder mod a non-positive number");
   (*tests powers mod negative number*)
   ("pow_mod_neg", "0 23 -1 ^~", "cannot take the remainder mod a non-positive number");
+  (*tests powers to a negative number *)
+  ("pow_to_neg","5 -7 4 ^~","1");
   (*tests simple equality of two small numbers*)
   ("simple_mod_eq", "16 2 15 =~", "0");
   (*tests the modular equality with large numbers*)
@@ -219,6 +220,18 @@ let comb_arith_tests = [
 
 ]
 
+let xempty = "[]"
+let a11 = "[[1.]]"
+let b11 = "[[-7.]]"
+let a12 = "[[2.],[4.]]"
+let a21 = "[[2., -3.]]"
+let b21 = "[[7., 34.]]"
+let a22 = "[[2., -3.], [-4., 5.]]"
+let b22 = "[[7., 34.], [56., -19.]]"
+let a13 = "[[1., 2., 3.]]"
+let b13 = "[[4., 5., 6.]]"
+let a33 = "[[6., 3., 5.], [6., 2., 9.], [0., -5., 1.]]"
+let b33 = "[[5., 1., -7.], [0., -2., 6.], [2., 2., 8.]]"
 let linear_arith_tests = [
   (*scaling an int matrix*)
   ("simpl_float_scale", "2. [[2., 3.], [5., 7.]] scale", "[\n[ 4. 6. ]\n[ 10. 14. ]\n]");
@@ -233,11 +246,49 @@ let linear_arith_tests = [
   (*simple cross product floatss*)
   ("simple_float_cross_prod", "[[6.5], [3.5], [4.]] [[2.], [4.], [10.]] #", "[\n[ 19. ]\n[ -57. ]\n[ 19. ]\n]");
   (*simple adding of two matricies*)
-  ("simple_add_matrix", "[[2., -3.], [-4., 5.]] [[7., 34.], [56., -19.]] +",
+  ("simple_add_1x1", a11 ^ " " ^ b11 ^ " +",
+   "[\n[ -6. ]\n]");
+  ("simple_add_2x1", a21 ^ " " ^ b21 ^ " +",
+   "[\n[ 9. 31. ]\n]");
+  ("simple_add_2x2", a22 ^ " " ^ b22 ^ " +",
    "[\n[ 9. 31. ]\n[ 52. -14. ]\n]");
-  (*simple subtraction of two matracies*)
+  ("simple_add_3x3", a33 ^ " " ^ b33 ^ " +",
+   "[\n[ 11. 4. -2. ]\n[ 6. 0. 15. ]\n[ 2. -3. 9. ]\n]");
+
+  (*-------- - --------*)
+  (*simple subtraction of two matricies*)
   ("simple_sub_matrix", "[[5., -3.], [-10., 5.], [5.6, 7.1]] [[7., 12.], [23., -19.], [13., 5.]] -",
    "[\n[ -2. -15. ]\n[ -33. 24. ]\n[ -7.4 2.1 ]\n]");
+
+  (*-------- . --------*)
+  ("simple_dot_1x1", a11 ^ " " ^ b11 ^ " .",
+   "-7.");
+  ("simple_dot_2x1", a21 ^ " " ^ b21 ^ " .",
+   "-88");
+  ("simple_dot_2x2", a22 ^ " " ^ b22 ^ " .",
+   "-407");
+  ("simple_dot_3x3", a33 ^ " " ^ b33 ^ " .",
+   "46");
+
+  (*-------- # --------*)
+  ("cross_3x1", a13 ^ " " ^ b13 ^ " #",
+   "[\n[ -3. 6. -3. ]\n]");
+
+  (*-------- = --------*)
+  (*-------- row --------*)
+  (*-------- col --------*)
+  (*-------- matrix_solve --------*)
+  (*tests solving a siple system of eqn*)
+  ("simple_solve",
+   "[[2., -3.], [-4., 5.]] [[1.], [1.]] matrix_solve",
+   "[\n[ -4. ]\n[ -3. ]\n]");
+
+  (*-------- inv --------*)
+  ("inv_2x2", a22 ^ " inv",
+   "46");
+
+  (*-------- transpose --------*)
+  (*-------- echelon --------*)
   (*simple row reduction*)
   ("simple_ech",
    "[[2., -3.], [-4., 5.]] echelon",
@@ -259,6 +310,7 @@ let linear_arith_tests = [
    "[[2., -4., 9.], [-4., 8., 14.], [8., -16., -3.]] echelon",
    "[\n[ 2. -4. 9. ]\n[ 0. 0. 32. ]\n[ 0. 0. 0. ]\n]");
 
+  (*-------- reduce --------*)
   (*simple row reduction to reduced form*)
   ("simple_row_red",
    "[[2., -3.], [-4., 5.]] reduce",
@@ -275,17 +327,27 @@ let linear_arith_tests = [
   ("lin_dep_red",
    "[[2., -4., 9.], [-4., 8., 14.], [8., -16., -3.]] reduce",
    "[\n[ 1. -2. 0. ]\n[ 0. 0. 1. ]\n[ 0. 0. 0. ]\n]");
-  (*tests solving a siple system of eqn*)
-  ("simple_solve",
-   "[[2., -3.], [-4., 5.]] [[1.], [1.]] matrix_solve",
-   "[\n[ -4. ]\n[ -3. ]\n]");
 
+  (*-------- det --------*)
+  (*-------- indep --------*)
+  (*-------- rank --------*)
+  (*-------- nullspace --------*)
+  (*-------- colspace --------*)
 ]
 
 
 let rsa_arith_tests = [
-
-
+  (*tests generating public key from a private key computed beforehand*)
+  ("gen_public_key","828508379315564229059901503743195890152288255550180775166444773564370495849 46823044180172892277581086552993376467 49226809994174581742439410872943569091 public_key", "n: 2304949099206212918857206153784356881859586917658227064795189032785987981497 e: 1613767402931803709848268727346680063096854248011089402527081469813588614409");
+  (*test cracking a message encrypted with a small public key*)
+  ("crack_small_key", "436127747 600282101 183129281 crack", "hi!");
+  (*tests decrypting message in small public key coresponding to the
+    given private key*)
+  ("decrypt_small_key", "436127747 332532521 24631 24371 decrypt", "hi!");
+  (*Descripts "Hello World!" when using a larger key*)
+  ("decrypt_large_key","36811825527290006912528373474500742165121558710088755054352605829758001844521 49865981988111168073411299457568574845326435683397292992624028577888245241871 217732754162686778772189526558422014371 271814926074039197007457045329062122427 decrypt","Hello World!");
+  (*Decripts A string ao ascii characters that are not all characters*)
+  ("decrypt_strange","4681768394463021453743047398362594156618121502944021046860601989734498485 311296661144438380085479553025783322441168863090489376579001194531304074481 71131826786915666159699380046190925721 43255453359216288668744181576802303777 decrypt","{}!  #$)*")
 ]
 
 

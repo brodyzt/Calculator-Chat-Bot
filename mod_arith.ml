@@ -182,6 +182,11 @@ let ensure_rand_init _ =
   if not(!is_init) then begin Random.self_init (); is_init := true end
   else ()
 
+(*[gen_rand_bits_helper num_bits accum] is a list of bits::accum where
+  bits is a list of length numb_bits that contains elements sampled uniformly
+  at random from {zero_big_int,unit_big_int} as a side effect
+  Random is initialized if it were not already
+  Precondtion: n > 1*)
 let rec gen_rand_bits_helper num_bits accum =
   ensure_rand_init ();
   if eq_big_int num_bits zero_big_int then accum
@@ -190,8 +195,16 @@ let rec gen_rand_bits_helper num_bits accum =
     then gen_rand_bits_helper (pred_big_int num_bits) (unit_big_int::accum)
     else gen_rand_bits_helper (pred_big_int num_bits) (zero_big_int::accum)
 
+(*[gen_rand_bits num_bits] is a list of num_bits elements which are sampled
+  uniformly at random from {zero_big_int,unit_big_int} Random is initialized
+  if it were not already
+  Precdition: num_bits >= 0*)
 let rec gen_rand_bits num_bits = gen_rand_bits_helper num_bits []
 
+(*[big_int_of_bit_list_helper bits pow accum] is the big_int a such that
+  the elements of bits, read from head to tail, form the binary representation
+  of a times 2^pow
+  Precondtion: pow >= 0, bits is a list with elements in {zero_big_int,unit_big_int}*)
 let rec big_int_of_bit_list_helper bits pow accum =
   match bits with
   | [] -> accum
@@ -201,22 +214,40 @@ let rec big_int_of_bit_list_helper bits pow accum =
       big_int_of_bit_list_helper t (succ_big_int pow) (add_big_int accum pow_two)
     else big_int_of_bit_list_helper t (succ_big_int pow) accum
 
+(*[big_int_of_bit_list] is the big_int a such that, when read from head to tail,
+  the elements of bits form the binary representation for a*)
 let big_int_of_bit_list bits =
   big_int_of_bit_list_helper bits zero_big_int zero_big_int
 
+(*[gen_rand_big_int n] is a big_int sampled uniformly at random from the
+  set of big_int's representable as an unsigned binary integer with n bits
+  Precondtion: n > 0*)
 let gen_rand_big_int n = big_int_of_bit_list (gen_rand_bits n)
 
+(*[gen_num_bits_helper n accum] is the minimal number of bits that can be
+  used to represent n as an unsigned binary integer times 2^accum
+  Precondtion: n >= 0*)
 let rec get_num_bits_helper n accum =
   if eq_big_int zero_big_int n then accum
   else get_num_bits_helper (div_big_int n (big_int_of_int 2)) (succ_big_int accum)
 
+(*[gen_num_bits n] is the minimal number of bits that can be
+  used to represent n as an unsigned binary integer
+  Precondtion: n >= 0*)
 let get_num_bits n = get_num_bits_helper n zero_big_int
 
+
+(*[fermats_little a n] is true if a^(n-1) = a (mod n), false otherwise
+  Precondtion: n > 0*)
 let fermats_little a n =
   let result = power a (pred_big_int n) n in
   if (eq_big_int (as_big_int result) unit_big_int) then true
   else false
 
+(*[is_prime_k_tests_helper n k num_bits] is true iff [fermats_little a n] is
+  not false for any of k randomly sampled numbers, a, representable as unsinged
+  integers with num_bits bits
+  Precondtion: num_bits >= 1, n > 0, k >= 0*)
 let rec is_prime_k_tests_helper n k num_bits =
   if (eq_big_int k zero_big_int) then true
   else let a = gen_rand_big_int num_bits in
@@ -224,6 +255,10 @@ let rec is_prime_k_tests_helper n k num_bits =
     then is_prime_k_tests_helper n (pred_big_int k) num_bits
     else false
 
+(*[is_prime_k_test n k] is true iff [fermats_little a n] is
+  not false for any of k randomly sampled numbers, a, whose are representable
+  as unsigned binary integers with at most n-1 bits
+  Precondtion: k >= 0*)
 let rec is_prime_k_tests n k =
   (*hardcoded for now*)
   if lt_big_int n (big_int_of_int 1000000) then
@@ -231,30 +266,51 @@ let rec is_prime_k_tests n k =
   else let bits = get_num_bits n in
     is_prime_k_tests_helper n k bits
 
+(*[is_prime_likely n] is N(I(unit_big_int) if n is exceedingly* likely to be
+  prime, or N(I(zero_big_int) if n is certainly composite
+  *Note exceedingly likely means with probability roughly 1/2^100 of being
+  neither a Carmichael number (psuedoprime) or prime. Where the density of
+  psueodprimes decreases rapidly as n increases
+  *)
 let is_prime_likely n =
-  (*hardcoded for now*)
   let prob_prime = is_prime_k_tests n (big_int_of_int 100) in
   if prob_prime then N(I(unit_big_int))
   else N(I(zero_big_int))
 
+(*[gen_prime_helper n] is p which is exceedingly* likely to be a prime which is
+  representable with at most n bits
+  Precondtion: n >= 2
+  *exceedingly likely to be prime defined above*)
 let rec gen_prime_helper n =
   let p = gen_rand_big_int n in
   if truthy (is_prime_likely p) then p
   else gen_prime_helper n
 
+(*[gen_prime l] is N(I(p)) where p is represnetable with at most l bits
+  and is exceedingly* likely to be a prime if n > 1,
+  or if n <= 1, is E("no primes this small")
+  *exceedinly likely to be prime defined above*)
 let gen_prime l =
-  if ((compare_big_int l unit_big_int)<=0) then E("no primes this small")
+  if (le_big_int l unit_big_int) then E("no primes this small")
   else N(I(gen_prime_helper l))
 
+(*[gen_unit n bits] is a number 0 <= a < n such that there exists a number
+  0 <= b < n and if r = a*b (mod n), then r = 1 (mod n) and a can be represented
+  as an unsigned interger with at most bits number of bits
+  Precondtion: n > 1 (in other words Z/nZ has a unit)**)
 let rec gen_unit_helper n bits =
   let u = gen_rand_big_int bits in
   if eq_big_int (as_big_int (gcd u n)) unit_big_int then u
   else gen_unit_helper n bits
 
+(*[gen_unit n] is a number 0 <= a < n such that there exists a number
+  0 <= b < n and if r = a*b (mod n), then r = 1 (mod n)
+  Precondtion: n > 1 (in other words Z/nZ has a unit)*)
 let gen_unit n =
   let num_bits = get_num_bits n in
   gen_unit_helper n (pred_big_int num_bits)
 
+(**)
 let rec totient_helper factors accum =
   match factors with
   | [] -> accum
@@ -265,7 +321,7 @@ let rec totient_helper factors accum =
     totient_helper t accum'
 
 let totient n =
-  if ((compare_big_int n zero_big_int)<=0) then E("totient undefined for 0")
+  if (le_big_int n zero_big_int) then E("totient undefined for 0")
   else let res = factor n in
   match res with
   | Fact factors -> N(I(totient_helper factors (big_int_of_int 1)))
@@ -355,7 +411,7 @@ let is_square a p =
     else N(I(unit_big_int))
 
 let inv a n =
-  if ((compare_big_int n zero_big_int) <= 0) then E("cannot take the remainder mod a non-positive number")
+  if (le_big_int n zero_big_int) then E("cannot take the remainder mod a non-positive number")
   else let result = bezout a n (big_int_of_int 1) in
       match result with
         | E _ -> E("has no inverse mod this number")
@@ -363,7 +419,7 @@ let inv a n =
         | _ -> failwith "Unimplemented"
 
 let divide a b n =
-  if ((compare_big_int n zero_big_int)<=0) then E("cannot take the remainder mod a non-positive number")
+  if (le_big_int n zero_big_int) then E("cannot take the remainder mod a non-positive number")
   else
   let result = inv b n in
   match result with

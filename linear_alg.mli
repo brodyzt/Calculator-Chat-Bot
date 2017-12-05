@@ -61,10 +61,12 @@ val determinant: Types.matrix -> Types.value
 (*[rank m] calculates the rank of the matrix [m]*)
 val rank: Types.matrix -> Types.value
 
-(* [lind_ind a] is whether [a] is linearly independent or not *)
+(* [lind_ind a] returns a non zero value if [a] is independent and
+ * a zero value if it is not *)
 val lin_ind: Types.matrix -> Types.value
 
-(* [lind_dep a] is whether [a] is linearly dependent or not *)
+(* [lind_dep a] returns a non zero value if [a] is dependent and
+ * a zero value if it is not *)
 val lin_dep: Types.matrix -> Types.value
 
 (* [null_space a] is the matrix containing the basis for the null space of [a] *)

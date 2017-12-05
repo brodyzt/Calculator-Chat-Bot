@@ -129,9 +129,15 @@ let mod_arith_tests = [
   (*tests powers to a negative number *)
   ("pow_to_neg","5 -7 4 ^~","1");
   (*tests simple equality of two small numbers*)
-  ("simple_mod_eq", "16 2 15 =~", "0");
+  ("simple_mod_eq", "17 2 15 =~", "1");
   (*tests the modular equality with large numbers*)
-  ("large_mod_eq", "726476239857380 52 358893 =~", "0");
+  ("large_mod_eq", "726476239857380 89771 358893 =~", "1");
+  (*tests modular inequality of two numbesr*)
+  ("mod_ineq","892735 8927350 97=~","0");
+  (*tests equality mod 0*)
+  ("mod_eq_zero","892735 8927350 0 =~","cannot take the remainder mod a non-positive number");
+  (*tests equality mod -1*)
+  ("mod_eq_zero","-12 0 -1 =~","cannot take the remainder mod a non-positive number");
   (*tests the gcd of two small numbers which have a common division above 1*)
   ("simple_gcd", "68 51 gcd", "17");
   (*tests the gcd of two large rel prime numbers*)
@@ -154,6 +160,8 @@ let mod_arith_tests = [
   ("large_lcm_neg", "-1624956750 -14873852 lcm", "326613056836500");
   (*tests the lcm with one number 0*)
   ("lcm_0", "0 12 lcm", "0");
+  (*tests lcm with both numbers 0*)
+  ("lcm_0_0","0 0 lcm", "0");
   (*tests factoring a small number*)
   ("simple_factor", "876 factor", "(2,2) (3,1) (73,1) ");
   (*tests factoring of a large number*)
@@ -166,10 +174,20 @@ let mod_arith_tests = [
   ("zero_factor","0 factor", "");
   (*tests factor for 1*)
   ("one_factor","1 factor", "");
+  (*tests factor of negative number*)
+  ("neg_factor", "-24 factor","(2,3) (3,1) ");
+  (*test factor for -1*)
+  ("neg_unit_factor", "-1 factor","");
+  (*tests that a negative nubmer is not prime*)
+  ("neg_not_prime","-7 is_prime","0");
   (*tests that a small composite is not prime*)
   ("small_composite_is_prime", "48 is_prime", "0");
   (*tests that a number is composite*)
   ("composite_is_prime", "387153510 is_prime", "0");
+  (*tests small prime is prime*)
+  ("is_prime_small","7 is_prime","1");
+  (*tests large prime is prime*)
+  ("is_prime_larger", "1008667313 is_prime", "1");
   (*test an is prime prob for a small number that should clearly be not prime*)
   ("small_composite_is_prime_likely", "56 is_prime_prob", "0");
   (*tests that a larger clearly composite number is not prime*)

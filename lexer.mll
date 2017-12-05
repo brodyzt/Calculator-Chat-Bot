@@ -309,16 +309,16 @@ rule read env = parse
     read env lexbuf
   }
   | op {
-      let s = Lexing.lexeme lexbuf in
+    let s = Lexing.lexeme lexbuf in
       if (PMap.mem s env) then
         match PMap.find s env with
-        | Func (env, args, fun_string) -> begin
+        | Func (env', args, fun_string) -> begin
           if Stack.length stack < List.length args then
             (Stack.push (E "wrong number of arguments") stack; read env lexbuf)
           else
             let vals = List.rev (get_n (List.length args)) in
               (read
-                (List.fold_left2 (fun m n v -> PMap.add n v m) env args vals)
+                (List.fold_left2 (fun m n v -> PMap.add n v m) env' args vals)
                 (Lexing.from_string fun_string);
               read env lexbuf)
          end

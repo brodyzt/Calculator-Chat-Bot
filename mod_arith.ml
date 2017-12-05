@@ -334,7 +334,6 @@ let totient n =
   | Fact factors -> N(I(totient_helper factors unit_big_int))
   | _ -> failwith "n must be factorable"
 
-
 (*[gen_bezout_ceofs a b coefs] is a list of (v,(x',a'),(b') such that
   v = x'*a' + b', for each of the values a',b' that occur when recursively
   applying the euclidian gcd function to a and b*)
@@ -344,30 +343,33 @@ let rec gen_bezout_coefs a b coefs =
     let coefs' = (a,(q,b),r)::coefs in
     gen_bezout_coefs b r coefs'
 
-(*ADD this
-
-
-
-
-
-!!!!!
-*)
+(*[merg_coefs ((x,b),(y,r),r') ((a),(q,b),r)] is the result of using the
+  back-substitution on the pair of equations x*b = y*r + r' and a = q*b + r
+  to generate a new, valid solution of the form ((x',a),(y',b),r')*)
 let merge_coefs ((x,b),(y,r),r') ((a),(q,b),r) =
   let x' = minus_big_int y in
   let y' = minus_big_int (add_big_int x (mult_big_int y q)) in
   ((x',a),(y',b),r')
 
+(*[construct_min_bezout_sol eqn coef] is the solution with minimal coeficients
+  to the equation a*x+b*y = gcd(a,b) where coefs are the coeficients generated
+  from applying the recursive euclidian gcd algorithm to a,b.
+  Precondtion: coefs is empty, or has valid coeficients*)
 let rec construct_min_bezout_sol eqn coefs =
   match coefs with
   | [] -> eqn
   | h::t -> construct_min_bezout_sol (merge_coefs eqn h) t
 
+(*[get_x_y_gcd coefs] is (x,y,gcd) where coefs are the coeficients
+  generated from  applying the recursive euclidian gcd algorithm to a,b and
+  a*x + b*y = gcd(a,b) = gcd
+  Precondtion:coefs is not empty and has valid coeficients*)
 let get_x_y_gcd coefs =
   match coefs with
   | [] -> failwith "error cannot have no coefficients"
   | ((a),(q,b),r)::t ->
     let ((x,_),(neg_y,_),res) =
-      construct_min_bezout_sol ((big_int_of_int 1,a),(q,b),r) t in
+      construct_min_bezout_sol ((unit_big_int,a),(q,b),r) t in
     (x,minus_big_int neg_y, res)
 
 (*[bezout a b c] is a pair (x, y) where x*a + y*b = c, or an exception value

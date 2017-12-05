@@ -101,6 +101,7 @@ let callSendAPI sender_psid response =
     Printf.printf "Body of length: %d\n" (String.length body);
     print_endline "Sent api request";
     body)
+    |> Lwt.return
 
 let env = ref init_enviro
 let webhook req =

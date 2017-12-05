@@ -1,2 +1,2 @@
-true: package(oUnit), package(str), use_nums
+true: package(oUnit), package(str), package(Lwt), package(Cohttp), package(Cohttp.lwt), package(Yojson), use_nums
 

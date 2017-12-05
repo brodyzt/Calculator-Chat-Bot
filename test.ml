@@ -301,7 +301,7 @@ let linear_arith_tests = [
   ("row_1x1_out_of_bounds", a11 ^ " " ^ "1" ^ " row",
    "index out of bounds");
   ("row_1x2", a12 ^ " " ^ "0" ^ " row",
-  "[\n[ 2. 3. ]\n]");
+  "[\n[ 2. -3. ]\n]");
   ("row_2x1", a21 ^ " " ^ "0" ^ " row",
   "[\n[ 2. ]\n]");
   ("row_2x2", a22 ^ " " ^ "1" ^ " row",

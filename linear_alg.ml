@@ -29,18 +29,20 @@ let zero v =
 let row m n =
   try
     let i = int_of_big_int n in
-      if i < 0 || i >= Array.length m.(0) then M(Array.make_matrix 0 0 (F(0.)) )
+      if i < 0 || i >= Array.length m then E("index out of bounds")
       else
-        M(init_matrix 1 (Array.length m) (fun _ j -> m.(i).(j)))
-  with Failure _ -> (E "n is to large")
+        M(init_matrix 1 (Array.length m.(0)) (fun _ j -> m.(i).(j)))
+  with Failure _ -> (E "index is to large")
+
 
 let col m n =
   try
     let i = int_of_big_int n in
-      if i < 0 || i >= Array.length m then M(Array.make_matrix 0 0 (F(0.)) )
+      if i < 0 || i >= Array.length m.(0) then E("index out of bounds")
       else
         M(init_matrix (Array.length m) 1 (fun i' _ -> m.(i').(i)))
-  with Failure _ -> E("n is too large")
+  with Failure _ -> E("index is too large")
+
 
 
 let dot_product m1 m2 =
@@ -80,8 +82,16 @@ let cross_product m1 m2 =
         r.(1).(0) <-  sum2;
         r.(2).(0) <-  sum3;
         M(r)
-
-
+(*
+let multiply m1 m2 =
+  let l1 = Array.length m1 in
+  let l2 = Array.length m2 in
+  let w1 = Array.length m1.(0) in
+  let w2 = Array.length m2.(0) in
+  let r = Array.make_matrix l1 w2 (F(0.) ) in
+    if l2 <> w1 then E("matrix size issue") else
+      iterij (fun i j _ -> r.(i).(j) <- ) r
+*)
 let scale m n =
   M(Array.map
     (fun r -> Array.map

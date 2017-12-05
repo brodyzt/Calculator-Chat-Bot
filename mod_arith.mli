@@ -13,7 +13,7 @@ val gen_unit: Types.integer ->  Types.integer
 val inv: Types.integer -> Types.integer -> Types.value
 
 (*[add a b n] is the unique 0 <=r < n such that (a + b - r) divides n
-  if n <= 0 then the result will be an excpetion value*)
+  if n <= 0 then the result will be an exception value*)
 val add: Types.integer -> Types.integer -> Types.integer -> Types.value
 
 (*[subtract a b n] is the unique 0 <= r < n such that (a - b - r) divides n

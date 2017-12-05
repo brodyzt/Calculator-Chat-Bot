@@ -75,9 +75,8 @@ let mod_arith_tests = [
   ("non_div_mod_add", "5 6 11 +~", "0");
   (*test the addition two numbers mod 0*)
   ("add_mod_zero","4 5 0 +~","cannot take the remainder mod a non-positive number");
-  (**test the addition two numbers mod 0 a negative number*)
+  (**test the addition two numbers mod a negative number*)
   ("add_mod_neg","4 0 -63 +~","cannot take the remainder mod a non-positive number");
-
   (*tests the simple modular subtraction of 2 numbers which is not divisable by
    * the modulo*)
   ("simple_mod_sub", "9 4 2 -~", "1");
@@ -90,7 +89,7 @@ let mod_arith_tests = [
   ("larger_mod_sub", "483275 34261 3 -~", "1");
   (*tests the subtraction of two numbers mod 0*)
   ("sub_mod_zero","4 5 0 -~","cannot take the remainder mod a non-positive number");
-  (*tests the subtraction of two numbers mod a non-zero number*)
+  (*tests the subtraction of two numbers mod a negatice number*)
   ("sub_mod_zero","4 5 -1 -~","cannot take the remainder mod a non-positive number");
   (*tests simple multiplication, which us not divisable by the modulo*)
   ("simple_mod_mult", "6 7 5 *~", "2");
@@ -279,7 +278,7 @@ let rsa_arith_tests = [
   ("decrypt_large_key","36811825527290006912528373474500742165121558710088755054352605829758001844521 49865981988111168073411299457568574845326435683397292992624028577888245241871 217732754162686778772189526558422014371 271814926074039197007457045329062122427 decrypt","Hello World!");
   (*Decripts A string ao ascii characters that are not all characters*)
   ("decrypt_strange","4681768394463021453743047398362594156618121502944021046860601989734498485 311296661144438380085479553025783322441168863090489376579001194531304074481 71131826786915666159699380046190925721 43255453359216288668744181576802303777 decrypt","{}!  #$)*")
-] 
+]
 
 
 let tests = [

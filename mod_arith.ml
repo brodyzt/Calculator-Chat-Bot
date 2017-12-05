@@ -2,42 +2,61 @@ open Types
 open Big_int
 include Random
 
+(*is_init representes the truth of the statement, the Randomizer has been
+  initialized with a random seed
+  RI: is_init is true iff the randomizer has been initialized*)
 let is_init = ref false
 
+(*[as_big_int i] is the big integer value of x, where i is Types.N(I(x))
+  Precondtion: i is of the form Types.N(I(x))*)
 let as_big_int i =
   match i with
   | N(I(x)) -> x
   | _ -> failwith "precondition violated"
+
+(*[as_big_int_pair p] is (x,y) where p takes the form Types.P(N(I(x),N(I(y)))
+  Precondition: p is of the form Types.P(N(I(x)),N(I(y)))*)
 let as_big_int_pair p =
   match p with
   | P(N(I(x)),N(I(y))) -> (x,y)
   | _ -> failwith "precondition violated"
+
+(*[truthy b] is true if b = N(I(x)) and x is not zero_big_int else false
+  Precondition: b is of the form N(I(x))*)
 let truthy b =
   match b with
   | N(I(x)) -> if eq_big_int x zero_big_int then false else true
   | _ -> failwith "precondition violated"
+
+(*[add a b n] is a + b (mod n) expressed as N(I(r)) with 0 <= r < n or
+  E("cannot take the remainder mod a non-positive number") is n <= 0*)
 let add a b n =
   if ((compare_big_int n zero_big_int) <= 0) then E("cannot take the remainder mod a non-positive number")
   else N(I(mod_big_int (add_big_int a b) n))
 
+(*[subtract a b n] is a - b (mod n) expressed as N(I(r) with 0 <= r < n or
+  E("cannot take the remainder mod a non-positive number") is n <= 0*)
 let subtract a b n =
   if ((compare_big_int n zero_big_int) <= 0) then E("cannot take the remainder mod a non-positive number")
   else N(I(mod_big_int (sub_big_int a b) n))
 
+(*[multiply a b n] is a*b (mod n) expressed as N(I(r) with 0 <= r < n or
+  E("cannot take the remainder mod a non-positive number") is n <= 0*)
 let multiply a b n =
   if ((compare_big_int n zero_big_int) <= 0) then (E "cannot take the remainder mod a non-positive number")
   else N(I(mod_big_int (mult_big_int a b) n))
 
-
-
-(*only works for positive nums*)
-
+(*[as_bin_list a accum] is a list of a's bits staring with accum and in reverse order
+  Precondition: a >= 0*)
 let rec as_bin_list a accum =
   if eq_big_int a zero_big_int then accum
   else let (q,r) = quomod_big_int a (big_int_of_int 2) in
     if eq_big_int r zero_big_int then as_bin_list q (zero_big_int::accum)
     else as_bin_list q (unit_big_int::accum)
 
+(*[repeated_square a n exp accum] is a list squares::accum where
+  squares = (a^2^0 mod n,a^2^1 mod n,..., a^2^exp mod n)
+  Precondtion: n > 0 and exp >= 0*)
 let rec repeated_square a n exp accum =
   match accum with
   | [] -> repeated_square a n exp ((mod_big_int a n)::accum)
@@ -46,6 +65,12 @@ let rec repeated_square a n exp accum =
     if eq_big_int exp zero_big_int then accum
     else repeated_square a n (pred_big_int exp) (x_sqr::h::t)
 
+(*[condense n pows bin accum] is N(I(r)) where 0 <= r < n and r is congruent
+  to a (mod n) for some a such that pows is
+  (a^2^0(mod n),a^2^1(mod n)),...,a^2^m(mod n)) and bin is a list of length m+1:
+  (b0,b1,...,bm) where each b0, b1 is either 1 or 0 and a is congruent mod n
+  to a^2^0*b0 + a^2^1+b1 +...+ a^2^m*bm
+  Precondition: pows and bin must be the same length, n > 0*)
 let rec condense n pows bin accum=
   match pows,bin with
   | [],[] -> accum
@@ -53,8 +78,12 @@ let rec condense n pows bin accum=
     if (eq_big_int h2 zero_big_int)
     then condense n t1 t2 accum
     else condense n t1 t2 (as_big_int (multiply h1 accum n))
-  | _,_ -> failwith "pows and bin must be the same lenth"
+  | _,_ -> failwith "precondition violated"
 
+(*[power a b n] is E("cannot take the remainder mod a non-positive number")
+  if n <= 0, else if b < 0 let r = a ^ -b (mod n), else if b = 0 let r = 1
+  else a ^ b (mod n), and give as result N(I(x)) where x = r (mod n) and
+  0 <= x < n*)
 let power a b n =
   let b = abs_big_int b in
   if (eq_big_int b zero_big_int) then N(I(unit_big_int))
@@ -179,7 +208,6 @@ let rec is_prime_k_tests n k =
   else let bits = get_num_bits n in
     is_prime_k_tests_helper n k bits
 
-
 let is_prime_likely n =
   (*hardcoded for now*)
   let prob_prime = is_prime_k_tests n (big_int_of_int 100) in
@@ -239,8 +267,7 @@ let rec construct_min_bezout_sol eqn coefs =
   match coefs with
   | [] -> eqn
   | h::t -> construct_min_bezout_sol (merge_coefs eqn h) t
-(*[bezout a b c] is a pair (x, y) where x*a + y*b = c, or an exception value
-  if no such pair exists*)
+
 let get_x_y_gcd coefs =
   match coefs with
   | [] -> failwith "error cannot have no coefficients"
@@ -249,6 +276,8 @@ let get_x_y_gcd coefs =
       construct_min_bezout_sol ((big_int_of_int 1,a),(q,b),r) t in
     (x,minus_big_int neg_y, res)
 
+(*[bezout a b c] is a pair (x, y) where x*a + y*b = c, or an exception value
+  if no such pair exists*)
 let bezout a b c =
   let coefs = gen_bezout_coefs a b [] in
   let (x,y,res) = get_x_y_gcd coefs in
@@ -275,6 +304,7 @@ let rec crt_helper lst1 lst2 accum =
     let accum' = join_congruence_pair bi mi b m in
     crt_helper t1 t2 accum'
   | _,_ -> E("lists are not the same length")
+
 (*[crt lst1 lst2] is a pair (a,M) such that any integer n congruent to a mod M
   satisfies n = bi (mod mi) for any 0 <= bi <= j ,
   where lst1 = [b0,b1,...,bj] and lst2 = [m0,m1,...,mj].

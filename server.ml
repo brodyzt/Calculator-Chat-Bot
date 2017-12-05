@@ -4,16 +4,44 @@ open Cohttp
 open Yojson.Basic.Util
 open Types
 let _ = Curl.global_init Curl.CURLINIT_GLOBALALL
-let init_enviro =
-  PMap.empty
+let user_environments = Hashtbl.create 10
+  (* PMap.empty
   |> PMap.add "`prime" (E "`prime has not be not bound")
   |> PMap.add "`p" (E "`p has not be not bound")
   |> PMap.add "`q" (E "`q has not be not bound")
   |> PMap.add "`n" (E "`n has not be not bound")
   |> PMap.add "`d" (E "`d has not be not bound")
   |> PMap.add "`e" (E "`e has not be not bound")
-  |> PMap.add "`prime_prob" (E "`prime_prob has not be not bound")
+  |> PMap.add "`prime_prob" (E "`prime_prob has not be not bound") *)
+(* 
+let update_env sender_psid env' = 
+  match Hashtbl.mem user_environments sender_psid with
+  | true -> Hashtbl.replace user_environments sender_psid env'
+  | false -> Hashtbl.add user_environments sender_psid (
+    PMap.empty
+    |> PMap.add "`prime" (E "`prime has not be not bound")
+    |> PMap.add "`p" (E "`p has not be not bound")
+    |> PMap.add "`q" (E "`q has not be not bound")
+    |> PMap.add "`n" (E "`n has not be not bound")
+    |> PMap.add "`d" (E "`d has not be not bound")
+    |> PMap.add "`e" (E "`e has not be not bound")
+    |> PMap.add "`prime_prob" (E "`prime_prob has not be not bound")
+  ) *)
 
+let get_env sender_psid : Types.value Types.PMap.t = 
+  match Hashtbl.find_opt user_environments sender_psid with
+  | Some env -> env
+  | None -> Hashtbl.add user_environments sender_psid (
+    PMap.empty
+    |> PMap.add "`prime" (E "`prime has not be not bound")
+    |> PMap.add "`p" (E "`p has not be not bound")
+    |> PMap.add "`q" (E "`q has not be not bound")
+    |> PMap.add "`n" (E "`n has not be not bound")
+    |> PMap.add "`d" (E "`d has not be not bound")
+    |> PMap.add "`e" (E "`e has not be not bound")
+    |> PMap.add "`prime_prob" (E "`prime_prob has not be not bound")
+  );
+  Hashtbl.find user_environments sender_psid
 
 type meth = Code.meth
 type uri = Uri.t
@@ -129,7 +157,6 @@ let callSendAPI sender_psid response =
     print_endline "Sent api request";
     body)
 
-let env = ref init_enviro
 let webhook req =
   let headers = Header.init_with "Content-Type" "application/json" in
   let j = Yojson.Basic.from_string req.req_body in
@@ -145,8 +172,8 @@ let webhook req =
       print_endline ("Message: " ^ (webhook_event |> member "message" |> Yojson.Basic.to_string));
       let regex = Str.regexp "\n" in
       let command = webhook_event |> member "message" |> member "text" |> to_string in
-      let (result, env') = (Eval.evaluate_line !env command) in
-      (env := env';
+      let (result, env') = (Eval.evaluate_line (get_env sender_psid) command) in
+      (Hashtbl.replace user_environments sender_psid env';
       let message = ("{\"text\": \"" ^ (result  |> Str.global_replace regex "\\n") ^ "\"}") in
       print_endline ("Result " ^ result);
       callSendAPI sender_psid message)

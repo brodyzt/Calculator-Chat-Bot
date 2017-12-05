@@ -92,7 +92,7 @@ let callSendAPI sender_psid response =
     ~headers:(Cohttp.Header.init_with "Content-Type" "application/json")
     ~body:(Cohttp_lwt.Body.of_string request_body)
     (* (Uri.of_string "https://graph.facebook.com/v2.6/me/messages?access_token=EAAEZBhqyWObQBAED8CndCr1WRaFMTjCwdF1qfLb78CXt3G15ZC6POeaaSjPzUiY8ve9by9PJk2OmJs7P8daeqFQz6Bj05MKhWNgmiJJFyyr8fzuZAh3G8gIZBzkvOO6UFXBio1Yf4oLZAoCuOLC3ZBMsEXqo94LOyhB0kl2wtzmDyFUSyZAj7nv") *)
-       (Uri.of_string "localhost:5000")
+       (Uri.of_string "google.com")
     >>= fun (resp, body) ->
     let code = resp |> Response.status |> Code.code_of_status in
     Printf.printf "Response code: %d\n" code;
@@ -101,7 +101,6 @@ let callSendAPI sender_psid response =
     Printf.printf "Body of length: %d\n" (String.length body);
     print_endline "Sent api request";
     body)
-    |> Lwt.return
 
 let env = ref init_enviro
 let webhook req =

@@ -241,32 +241,25 @@ let comb_arith_tests = [
 let xempty = "[]"
 let a11 = "[[1.]]"
 let b11 = "[[-7.]]"
-let a12 = "[[2.],[4.]]"
-let a21 = "[[2., -3.]]"
-let b21 = "[[7., 34.]]"
+let a21 = "[[2.], [4.]]"
+let a12 = "[[2., -3.]]"
+let b12 = "[[7., 34.]]"
+let i22 = "[[1., 0.], [0., 1.]]"
 let a22 = "[[2., -3.], [-4., 5.]]"
 let b22 = "[[7., 34.], [56., -19.]]"
+let c22 = "[[4., 3.], [3., 2.]]"
+let i33 = "[[1., 0., 0.], [0., 1., 0.], [0., 0., 1.]]"
 let a13 = "[[1., 2., 3.]]"
 let b13 = "[[4., 5., 6.]]"
 let a33 = "[[6., 3., 5.], [6., 2., 9.], [0., -5., 1.]]"
 let b33 = "[[5., 1., -7.], [0., -2., 6.], [2., 2., 8.]]"
+let c33 = "[[1., 2., 3.], [0., 1., 4.], [5., 6., 0.]]"
 let linear_arith_tests = [
-  (*scaling an int matrix*)
-  ("simpl_float_scale", "2. [[2., 3.], [5., 7.]] scale", "[\n[ 4. 6. ]\n[ 10. 14. ]\n]");
-  (*scaling an int matrix*)
-  ("simpl_int_scale", "2 [[2, 3], [5, 7]] scale", "[\n[ 4 6 ]\n[ 10 14 ]\n]");
-  (*simple int dot product*)
-  ("simple_int_dot_prod", "[[2], [5], [4]] [[5], [3], [1]] .", "29");
-  (*simple float dot product*)
-  ("simple_float_dot_prod", "[[2.], [7.], [4.]] [[3.], [3.], [1.5]] .", "33.");
-  (*simple cross product ints*)
-  ("simple_int_cross_prod", "[[1], [2], [4]] [[6], [2], [1]] #", "[\n[ -6 ]\n[ 23 ]\n[ -10 ]\n]");
-  (*simple cross product floatss*)
-  ("simple_float_cross_prod", "[[6.5], [3.5], [4.]] [[2.], [4.], [10.]] #", "[\n[ 19. ]\n[ -57. ]\n[ 19. ]\n]");
+  (*-------- + --------*)
   (*simple adding of two matricies*)
   ("simple_add_1x1", a11 ^ " " ^ b11 ^ " +",
    "[\n[ -6. ]\n]");
-  ("simple_add_2x1", a21 ^ " " ^ b21 ^ " +",
+  ("simple_add_1x2", a12 ^ " " ^ b12 ^ " +",
    "[\n[ 9. 31. ]\n]");
   ("simple_add_2x2", a22 ^ " " ^ b22 ^ " +",
    "[\n[ 9. 31. ]\n[ 52. -14. ]\n]");
@@ -278,23 +271,62 @@ let linear_arith_tests = [
   ("simple_sub_matrix", "[[5., -3.], [-10., 5.], [5.6, 7.1]] [[7., 12.], [23., -19.], [13., 5.]] -",
    "[\n[ -2. -15. ]\n[ -33. 24. ]\n[ -7.4 2.1 ]\n]");
 
+  (*-------- scale --------*)
+  (*scaling an int matrix*)
+  ("simpl_float_scale", "2. [[2., 3.], [5., 7.]] scale", "[\n[ 4. 6. ]\n[ 10. 14. ]\n]");
+  (*scaling an int matrix*)
+  ("simpl_int_scale", "2 [[2, 3], [5, 7]] scale", "[\n[ 4 6 ]\n[ 10 14 ]\n]");
+
   (*-------- . --------*)
   ("simple_dot_1x1", a11 ^ " " ^ b11 ^ " .",
    "-7.");
-  ("simple_dot_2x1", a21 ^ " " ^ b21 ^ " .",
-   "-88");
-  ("simple_dot_2x2", a22 ^ " " ^ b22 ^ " .",
-   "-407");
-  ("simple_dot_3x3", a33 ^ " " ^ b33 ^ " .",
-   "46");
+  (*simple int dot product*)
+  ("simple_int_dot_prod", "[[2], [5], [4]] [[5], [3], [1]] .", "29");
+  (*simple float dot product*)
+  ("simple_float_dot_prod", "[[2.], [7.], [4.]] [[3.], [3.], [1.5]] .", "33.");
 
   (*-------- # --------*)
-  ("cross_3x1", a13 ^ " " ^ b13 ^ " #",
-   "[\n[ -3. 6. -3. ]\n]");
+  (*simple cross product ints*)
+  ("simple_int_cross_prod", "[[1], [2], [4]] [[6], [2], [1]] #", "[\n[ -6 ]\n[ 23 ]\n[ -10 ]\n]");
+  (*simple cross product floatss*)
+  ("simple_float_cross_prod", "[[6.5], [3.5], [4.]] [[2.], [4.], [10.]] #", "[\n[ 19. ]\n[ -57. ]\n[ 19. ]\n]");
 
   (*-------- = --------*)
+  ("equal_1x3", a13 ^ " " ^ a13 ^ " =",
+   "1");
+
   (*-------- row --------*)
+  ("row_1x1", a11 ^ " " ^ "0" ^ " row",
+   "[\n[ 1. ]\n]");
+  ("row_1x1_out_of_bounds", a11 ^ " " ^ "1" ^ " row",
+   "index out of bounds");
+  ("row_1x2", a12 ^ " " ^ "0" ^ " row",
+  "[\n[ 2. 3. ]\n]");
+  ("row_2x1", a21 ^ " " ^ "0" ^ " row",
+  "[\n[ 2. ]\n]");
+  ("row_2x2", a22 ^ " " ^ "1" ^ " row",
+  "[\n[ -4. 5. ]\n]");
+  ("row_3x3", a33 ^ " " ^ "2" ^ " row",
+  "[\n[ 0. -5. 1. ]\n]");
+  ("row_3x3_out_of_bounds", a33 ^ " " ^ "3" ^ " row",
+  "index out of bounds");
+
   (*-------- col --------*)
+  ("col_1x1", a11 ^ " " ^ "0" ^ " col",
+   "[\n[ 1. ]\n]");
+  ("col_1x1_out_of_bounds", a11 ^ " " ^ "1" ^ " col",
+   "index out of bounds");
+  ("col_1x2", a12 ^ " " ^ "0" ^ " col",
+  "[\n[ 2. ]\n]");
+  ("col_2x1", a21 ^ " " ^ "0" ^ " col",
+  "[\n[ 2. ]\n[ 4. ]\n]");
+  ("col_2x2", a22 ^ " " ^ "1" ^ " col",
+  "[\n[ -3. ]\n[ 5. ]\n]");
+  ("col_3x3", a33 ^ " " ^ "2" ^ " col",
+  "[\n[ 5. ]\n[ 9. ]\n[ 1. ]\n]");
+  ("col_3x3_out_of_bounds", a33 ^ " " ^ "3" ^ " col",
+  "index out of bounds");
+
   (*-------- matrix_solve --------*)
   (*tests solving a siple system of eqn*)
   ("simple_solve",
@@ -302,10 +334,29 @@ let linear_arith_tests = [
    "[\n[ -4. ]\n[ -3. ]\n]");
 
   (*-------- inv --------*)
-  ("inv_2x2", a22 ^ " inv",
-   "46");
+  ("inv_1x1", a11 ^ " inv",
+   "[\n[ 1. ]\n]");
+  ("inv_2x2", c22 ^ " inv",
+   "[\n[ -2. 3. ]\n[ 3. -4. ]\n]");
+  ("inv_invalid_2x1", a21 ^ " inv",
+   "matrix size error");
+  ("inv_invalid_1x2", a12 ^ " inv",
+   "matrix size error");
+  ("inv_3x3", c33 ^ " inv",
+   "[\n[ -24. 18. 5. ]\n[ 20. -15. -4. ]\n[ -5. 4. 1. ]\n]");
 
   (*-------- transpose --------*)
+  ("transpose_1x1", a11 ^ " transpose",
+   "[\n[ 1. ]\n]");
+  ("transpose_2x2", a22 ^ " transpose",
+   "[\n[ 2. -4. ]\n[ -3. 5. ]\n]");
+  ("transpose_2x1", a21 ^ " transpose",
+   "[\n[ 2. 4. ]\n]");
+  ("transpose_1x2", a12 ^ " transpose",
+   "[\n[ 2. ]\n[ -3. ]\n]");
+  ("transpose_3x3", a33 ^ " transpose",
+   "[\n[ 6. 6. 0. ]\n[ 3. 2. -5. ]\n[ 5. 9. 1. ]\n]");
+
   (*-------- echelon --------*)
   (*simple row reduction*)
   ("simple_ech",
@@ -347,6 +398,9 @@ let linear_arith_tests = [
    "[\n[ 1. -2. 0. ]\n[ 0. 0. 1. ]\n[ 0. 0. 0. ]\n]");
 
   (*-------- det --------*)
+  ("det_1x1", a11 ^ " det",
+   "1.");
+
   (*-------- indep --------*)
   (*-------- rank --------*)
   (*-------- nullspace --------*)

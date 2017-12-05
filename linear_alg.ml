@@ -133,7 +133,6 @@ let string_of_matrix m =
  * col)*)
 let clear_col j i1 i2 =
   let N(p) = (Simpl_arith.divide  i2.(j) i1.(j) ) in
-    print_string (string_of_number p);
     Array.mapi
     (fun i v ->
        let N(mul) = (Simpl_arith.multiply i1.(i) p ) in
@@ -191,8 +190,7 @@ let rec red_row_down m i j =
         (Array.iteri
           (fun ind row ->
             if ind > i then
-              (print_string (string_of_matrix m);
-              m.(ind) <- (clear_col j ( m.(i) ) row ))
+              (m.(ind) <- (clear_col j ( m.(i) ) row ))
             else ()
           ) m;
           red_row_down m (i+1) (j+1))
@@ -218,9 +216,7 @@ let rec red_row_up m i=
     let j = find_pivot m i in
       if j = -1 then red_row_up m (i-1) else
         let piv_val = m.(i).(j) in
-          (print_string (string_of_int i);
-           Array.iteri (fun j' v ->
-            print_int j';
+          (Array.iteri (fun j' v ->
             let N(n) = Simpl_arith.divide v (piv_val) in
               m.(i).(j') <- n
           ) m.(i);
@@ -351,7 +347,6 @@ let read_off_sol m =
   let (piv, non_piv) = piv_col m (fun i j acc -> (i,j)::acc) (fun _ j acc -> rem j acc ) [] (from 0 (cols) [])in
   let z,o = zero (m.(0).(0)), reg_unit (m.(0).(0)) in
   let result = Array.make_matrix (Array.length m.(0)-1) ((List.length non_piv)) z in
-    print_string (string_of_matrix m);
     List.fold_right (fun (i,j) _ -> print_string "*"; print_int i; print_string ","; print_int j; print_string "*") piv ();
     List.fold_right (fun j _ -> print_string "$"; print_int j; print_string "$") non_piv ();
     List.iter

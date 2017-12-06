@@ -4,24 +4,33 @@ open Cohttp
 open Yojson.Basic.Util
 open Types
 let _ = Curl.global_init Curl.CURLINIT_GLOBALALL
+
+(* [user_environment] is the environments for all users 
+ * containing any defintions that the user has created *)
 let user_environments = Hashtbl.create 10
 
-(* [get_env sender_psid] gets the environment for user with id [sender_psid].
- * The environment contains any defintions that the user has created *)
-let get_env sender_psid : Types.value Types.PMap.t = 
+(* [get_env sender_psid] gets the environment for user with id [sender_psid] *)
+ let get_env sender_psid : Types.value Types.PMap.t =
   match Hashtbl.find_opt user_environments sender_psid with
   | Some env -> env
   | None -> Hashtbl.add user_environments sender_psid (
     PMap.empty
-    |> PMap.add "`prime" (E "`prime has not be not bound")
-    |> PMap.add "`p" (E "`p has not be not bound")
-    |> PMap.add "`q" (E "`q has not be not bound")
-    |> PMap.add "`n" (E "`n has not be not bound")
-    |> PMap.add "`d" (E "`d has not be not bound")
-    |> PMap.add "`e" (E "`e has not be not bound")
-    |> PMap.add "`prime_prob" (E "`prime_prob has not be not bound")
+    |> PMap.add "'prime" (E "'prime has not be not bound")
+    |> PMap.add "'p" (E "'p has not be not bound")
+    |> PMap.add "'q" (E "'q has not be not bound")
+    |> PMap.add "'n" (E "'n has not be not bound")
+    |> PMap.add "'d" (E "'d has not be not bound")
+    |> PMap.add "'e" (E "'e has not be not bound")
+    |> PMap.add "'prime_prob" (E "'prime_prob has not be not bound")
   );
   Hashtbl.find user_environments sender_psid
+
+(**************************************************************************
+ * Following code found on https://github.com/RamV13/ohttp
+ * Used for creating API endpoints called by Facebook when message is sent
+ * to the chat bot
+***************************************************************************)
+
 
 type meth = Code.meth
 type uri = Uri.t
@@ -76,15 +85,13 @@ let callback _ req body =
         end
   with Not_found -> Server.respond_string ~status:`Not_found ~body:"" ()
 
-
-(* [test req] responds with a "Hello <name>!" given the request [req] containing
- * a plain string representing <name> *)
-let test req =
-  let headers = Header.init_with "Content-Type" "text/plain" in
-  let status = `OK in
-  let res_body = "Hello " ^ req.req_body ^ "!" in
-  {headers; status; res_body}
-
+(**************************************************************************
+ * Following code found on https://gist.github.com/zbroyar/1432555
+ * Originally tried to also use OHttp developed by Ram for POST requests but it
+ * wouldn't work no documentation could be found online for Cohttp. 
+ * This was the only code available that could succesfully make 
+ * a POST request to Facebook.
+***************************************************************************)
 
 let writer_callback a d =
 	Buffer.add_string a d;
@@ -103,7 +110,7 @@ let init_conn url =
 	Curl.set_url c url; r,c
 
 let post ?(content_type = "application/json") url data =
-  print_endline ("Request body: " ^ data);  
+  print_endline ("Request body: " ^ data);
   let r,c = init_conn url in
   Curl.set_post c true;
   Curl.set_httpheader c [ "Content-Type: " ^ content_type ];
@@ -114,34 +121,34 @@ let post ?(content_type = "application/json") url data =
   Curl.cleanup c;
   rc, (Buffer.contents r)
 
-let callSendAPI sender_psid response = 
-  let request_body = "{
+(**************************************************************************)
+
+
+(* helper function to create body of Facebook API request *)
+let formulate_body sender_psid response = 
+  "{
     \"recipient\" : {
       \"id\" : \"" ^ sender_psid ^
     "\"},
     \"message\":" ^ response ^
-  "}" in
-  ( (*print_endline ("Request body: " ^ request_body);*)
-    post "https://graph.facebook.com/v2.6/me/messages?access_token=EAAEZBhqyWObQBAED8CndCr1WRaFMTjCwdF1qfLb78CXt3G15ZC6POeaaSjPzUiY8ve9by9PJk2OmJs7P8daeqFQz6Bj05MKhWNgmiJJFyyr8fzuZAh3G8gIZBzkvOO6UFXBio1Yf4oLZAoCuOLC3ZBMsEXqo94LOyhB0kl2wtzmDyFUSyZAj7nv" request_body;
-   Cohttp_lwt_unix.Client.post 
-    ~headers:(Cohttp.Header.init_with "Content-Type" "application/json")
-    ~body:(Cohttp_lwt.Body.of_string request_body)
-    (* (Uri.of_string "https://graph.facebook.com/v2.6/me/messages?access_token=EAAEZBhqyWObQBAED8CndCr1WRaFMTjCwdF1qfLb78CXt3G15ZC6POeaaSjPzUiY8ve9by9PJk2OmJs7P8daeqFQz6Bj05MKhWNgmiJJFyyr8fzuZAh3G8gIZBzkvOO6UFXBio1Yf4oLZAoCuOLC3ZBMsEXqo94LOyhB0kl2wtzmDyFUSyZAj7nv") *)
-       (Uri.of_string "google.com")
-    >>= fun (resp, body) ->
-    let code = resp |> Response.status |> Code.code_of_status in
-    Printf.printf "Response code: %d\n" code;
-    Printf.printf "Headers: %s\n" (resp |> Response.headers |> Header.to_string);
-    body |> Cohttp_lwt.Body.to_string >|= fun body ->
-    Printf.printf "Body of length: %d\n" (String.length body);
-    print_endline "Sent api request";
-    body)
+  "}"
+
+let callSendAPI sender_psid response =
+
+
+  let request_body = formulate_body sender_psid response in
+  let post_url = "https://graph.facebook.com/v2.6/me/messages?access_token=EAAEZBhqyWObQBAED8CndCr1WRaFMTjCwdF1qfLb78CXt3G15ZC6POeaaSjPzUiY8ve9by9PJk2OmJs7P8daeqFQz6Bj05MKhWNgmiJJFyyr8fzuZAh3G8gIZBzkvOO6UFXBio1Yf4oLZAoCuOLC3ZBMsEXqo94LOyhB0kl2wtzmDyFUSyZAj7nv" in
+
+  (* calls post request helper function with formatted data *)
+  post post_url request_body
 
 (* [webhook req] is called by Facebook 
  * messenger when a message is sent to Calculator bot. *)
 let webhook req =
   let headers = Header.init_with "Content-Type" "application/json" in
   let j = Yojson.Basic.from_string req.req_body in
+
+  (* [entries] is the list of messages sent by facebook to process by calculator *)
   let entries =  j |> member "entry" |> to_list in
   let status = `OK in
 
@@ -155,7 +162,7 @@ let webhook req =
 
     (* gets command from request body *)
     let command = webhook_event |> member "message" |> member "text" |> to_string in
-    let lower_command = command |> String.lowercase_ascii
+    let lower_command = command |> String.lowercase_ascii in
 
     (* determines response to command and updates in hash table
      * to environment produced by running said command *)
@@ -217,8 +224,6 @@ let run ?(port=8000) _ =
   |> ignore
 
 let _ =
-  add_route (`POST, "/test") test;
-  add_route (`GET, "/test/get") test;
   add_route (`POST, "/webhook") webhook;
   add_route (`GET, "/webhook") webhook_verif;
   run ~port:1337 ()

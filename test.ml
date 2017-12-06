@@ -3,7 +3,6 @@ open Types
 
 
 let simple_lang_tests = [
-  (*black box lang tests*)
   (*tests basic integer*)
   ("simple_int", "4", "4");
   (*tests a negative integer*)
@@ -27,12 +26,10 @@ let simple_lang_tests = [
   (*tests a simple if, if the value if the first one is a true (non 0) value*)
   ("simple_if_true", "1 2 3 ?", "2");
 
-  (*glass box lang tests*)
 
 ]
 
 let simpl_arith_tests = [
-  (*blackbox test*)
   (*tests a simple addition of integers*)
   ("simple_integer_add", "2 3 +", "5");
   (*tests addition of simple floating point numbers*)
@@ -60,7 +57,6 @@ let simpl_arith_tests = [
   (*tests the equality of floating point numbers*)
   ("simple_float_=", "15.2 15.3 =", "0");
 
-  (*glass box*)
 
 ]
 
@@ -299,6 +295,8 @@ let a22 = "[[2., -3.], [-4., 5.]]"
 let a23 = "[[6., 2., 3.], [-2., -5., 0.]]"
 let a231 = "[[1., 1., 1.], [1., 1., 1.]]"
 let a220 = "[[0., 0.], [0., 0.]]"
+let a210 = "[[0.], [0.]]"
+let a310 = "[[0.], [0.], [0.]]"
 let a221 = "[[1., 1.], [1., 1.]]"
 let b22 = "[[7., 34.], [56., -19.]]"
 let c22 = "[[4., 3.], [3., 2.]]"
@@ -331,27 +329,106 @@ let linear_arith_tests = [
   ("simpl_float_scale", "2. [[2., 3.], [5., 7.]] scale", "[\n[ 4. 6. ]\n[ 10. 14. ]\n]");
   (*scaling an int matrix*)
   ("simpl_int_scale", "2 [[2, 3], [5, 7]] scale", "[\n[ 4 6 ]\n[ 10 14 ]\n]");
+  ("simple_scale_1x10", "0." ^ " " ^ a110 ^ " scale",
+   "[\n[ 0. ]\n]");
+   ("simple_scale_1x1_0_scalebynonzero", "5." ^ " " ^ a110 ^ " scale",
+   "[\n[ 0. ]\n]");
+  ("simple_scale_2x31", "3." ^ " " ^ a231 ^ " scale",
+   "[\n[ 3. 3. 3. ]\n[ 3. 3. 3. ]\n]");
 
   (*-------- . --------*)
   ("simple_dot_1x1", a11 ^ " " ^ b11 ^ " .",
    "-7.");
+  ("simple_dot_1x2", "[[1.], [2.]] [[3.], [4.]] .",
+   "11.");
+  ("simple_dot_1x3", a13 ^ " transpose " ^ b13 ^ " transpose .",
+  "32.");
+  ("simple_dot_1x3_reverse", b13 ^ " transpose " ^ a13 ^ " transpose .",
+  "32.");
   (*simple int dot product*)
   ("simple_int_dot_prod", "[[2], [5], [4]] [[5], [3], [1]] .", "29");
   (*simple float dot product*)
   ("simple_float_dot_prod", "[[2.], [7.], [4.]] [[3.], [3.], [1.5]] .", "33.");
 
   (*-------- # --------*)
+  ("simple_cross_3x1", "[[4., 5., 6.]] transpose [[7., 2., 3.]] transpose #",
+  "[\n[ 3. ]\n[ 30. ]\n[ -27. ]\n]");
+  ("simple_cross_3x1_reverse", "[[7., 2., 3.]] transpose [[4., 5., 6.]] transpose #",
+  "[\n[ -3. ]\n[ -30. ]\n[ 27. ]\n]");
   (*simple cross product ints*)
   ("simple_int_cross_prod", "[[1], [2], [4]] [[6], [2], [1]] #", "[\n[ -6 ]\n[ 23 ]\n[ -10 ]\n]");
   (*simple cross product floatss*)
   ("simple_float_cross_prod", "[[6.5], [3.5], [4.]] [[2.], [4.], [10.]] #", "[\n[ 19. ]\n[ -57. ]\n[ 19. ]\n]");
 
   (*-------- = --------*)
-  ("equal_1x1_0", a110 ^ " " ^ a110 ^ " =",
+  ("equal_a11", a11 ^ " " ^ a11 ^ " =",
    "1");
-  ("equal_1x3", a13 ^ " " ^ a13 ^ " =",
+   ("equal_a21", a21 ^ " " ^ a21 ^ " =",
    "1");
-  
+   ("equal_a12", a12 ^ " " ^ a12 ^ " =",
+   "1");
+   ("equal_a22", a22 ^ " " ^ a22 ^ " =",
+   "1");
+   ("equal_b11", b11 ^ " " ^ b11 ^ " =",
+   "1");
+   ("equal_b22", b22 ^  " " ^ b22 ^ " =",
+   "1");
+   ("equal_c22", c22 ^  " " ^ c22 ^ " =",
+   "1");
+   ("equal_a13", a13 ^ " " ^ a13 ^ " =",
+   "1");
+   ("equal_b13", b13 ^ " " ^ b13 ^ " =",
+   "1");
+   ("equal_b12", b12 ^ " " ^ b12 ^ " =",
+   "1");
+   ("equal_i22", i22 ^ " " ^ i22 ^ " =",
+   "1");
+   ("equal_i33", i33 ^ " " ^ i33 ^ " =",
+   "1");
+   ("equal_a110", a110 ^ " " ^ a110 ^ " =",
+   "1");
+   ("equal_a220", a220 ^ " " ^ a220 ^ " =",
+   "1");
+   ("equal_a330", a330 ^ " " ^ a330 ^ " =",
+   "1");
+   ("equal_a231", a231 ^ " " ^ a231 ^ " =",
+   "1");
+   ("equal_a23", a23 ^ " " ^ a23 ^ " =",
+   "1");
+
+  ("equal_not_a11", a11 ^ " " ^ a22 ^ " =",
+   "0");
+   ("equal_not_a21", a21 ^ " " ^ a22 ^ " =",
+   "0");
+   ("equal_not_a12", a12 ^ " " ^ a22 ^ " =",
+   "0");
+   ("equal_not_b11", b11 ^ " " ^ a22 ^ " =",
+   "0");
+   ("equal_not_b22", b22 ^  " " ^ a22 ^ " =",
+   "0");
+   ("equal_not_c22", c22 ^  " " ^ a22 ^ " =",
+   "0");
+   ("equal_not_a13", a13 ^ " " ^ a22 ^ " =",
+   "0");
+   ("equal_not_b13", b13 ^ " " ^ a22 ^ " =",
+   "0");
+   ("equal_not_b12", b12 ^ " " ^ a22 ^ " =",
+   "0");
+   ("equal_not_i22", i22 ^ " " ^ a22 ^ " =",
+   "0");
+   ("equal_not_i33", i33 ^ " " ^ a22 ^ " =",
+   "0");
+   ("equal_not_a110", a110 ^ " " ^ a22 ^ " =",
+   "0");
+   ("equal_not_a220", a220 ^ " " ^ a22 ^ " =",
+   "0");
+   ("equal_not_a330", a330 ^ " " ^ a22 ^ " =",
+   "0");
+   ("equal_not_a231", a231 ^ " " ^ a22 ^ " =",
+   "0");
+   ("equal_not_a23", a23 ^ " " ^ a22 ^ " =",
+   "0");
+
 
   (*-------- row --------*)
   ("row_1x1", a11 ^ " " ^ "0" ^ " row",
@@ -386,10 +463,35 @@ let linear_arith_tests = [
   "index out of bounds");
 
   (*-------- matrix_solve --------*)
-  (*tests solving a siple system of eqn*)
+  (*tests solving a simple system of eqn*)
   ("simple_solve",
    "[[2., -3.], [-4., 5.]] [[1.], [1.]] matrix_solve",
    "[\n[ -4. ]\n[ -3. ]\n]");
+  ("solve_2x2_valid", i22 ^ " " ^ a21 ^ " matrix_solve",
+  "[\n[ 2. ]\n[ 4. ]\n]");
+  ("solve_2x2_invalid_reverse", a21 ^ " " ^ i22 ^ " matrix_solve",
+  "this system is not consitent");
+  ("solve_2x2_valid_zero", i22 ^ " " ^ a210 ^ " matrix_solve",
+  "[\n[ 0. ]\n[ 0. ]\n]");
+  ("solve_2x2_wrong_height", i22 ^ " " ^ a31 ^ " matrix_solve",
+  "matrix size issue");
+  ("solve_3x3_valid", i33 ^ " " ^ a31 ^ " matrix_solve",
+  "[\n[ 2. ]\n[ 4. ]\n[ 8. ]\n]");
+  ("solve_3x3_valid_invalid_reverse", a31 ^ " " ^ i33 ^ " matrix_solve",
+  "this system is not consistent");
+  ("solve_3x3_valid_zero", i33 ^ " " ^ a310 ^ " matrix_solve",
+  "[\n[ 0. ]\n[ 0. ]\n[ 0. ]\n]");
+  ("solve_3x3_wrong_height", i33 ^ " " ^ a21 ^ " matrix_solve",
+  "matrix size issue");
+  ("solve_2x3_wrong_size", a23 ^ " " ^ a12 ^ " matrix_solve",
+  "matrix size issue");
+  ("solve_1x1_valid", a11 ^ " " ^ b11 ^ " matrix_solve",
+  "[\n[ -7. ]\n]");
+  ("solve_1x1_valid_zero", a11 ^ " " ^ a110 ^ " matrix_solve",
+  "[\n[ 0. ]\n]");
+  ("solve_1x1_invalid_reverse", b11 ^ " " ^ a11 ^ " matrix_solve",
+  "this system is not consitent");
+
 
   (*-------- inv --------*)
   ("inv_1x1", a11 ^ " inv",
@@ -591,7 +693,7 @@ let linear_arith_tests = [
   ("nullspace_a11", a11 ^ " nullspace",
    "[\n[ 0. ]\n]");
    ("nullspace_a21", a21 ^ " nullspace",
-   "[\n[ 1. ]\n[ 0. ]\n]");
+   "[\n[ 0. ]\n]");
    ("nullspace_a12", a12 ^ " nullspace",
    "[\n[ 1.5 ]\n[ 1. ]\n]");
    ("nullspace_a22", a22 ^ " nullspace",
@@ -603,11 +705,11 @@ let linear_arith_tests = [
    ("nullspace_c22", c22 ^ " nullspace",
    "[\n[ 0. ]\n[ 0. ]\n]");
    ("nullspace_a13", a13 ^ " nullspace",
-   "[\n[ -2.0 -3.0 ]\n[ 1. 0. ]\n[ 0. 1. ]\n]");
+   "[\n[ -2. -3. ]\n[ 1. 0. ]\n[ 0. 1. ]\n]");
    ("nullspace_b13", b13 ^ " nullspace",
    "[\n[ -1.25 -1.5 ]\n[ 1. 0. ]\n[ 0. 1. ]\n]");
    ("nullspace_b12", b12 ^ " nullspace",
-   "[\n[ -0.428571428571 -0.571428571429 ]\n[ 1. 0. ]\n[ 0. 1. ]\n]");
+   "[\n[ -4.85714285714 ]\n[ 1. ]\n]");
    ("nullspace_i22", i22 ^ " nullspace",
    "[\n[ 0. ]\n[ 0. ]\n]");
    ("nullspace_i33", i33 ^ " nullspace",
@@ -624,6 +726,40 @@ let linear_arith_tests = [
    "[\n[ -0.576923076923 ]\n[ 0.230769230769 ]\n[ 1. ]\n]");
 
   (*-------- colspace --------*)
+  ("colspace_a11", a11 ^ " colspace",
+   "[\n[ 1. ]\n]");
+   ("colspace_a21", a21 ^ " colspace",
+   "[\n[ 2. ]\n[ 4. ]\n]");
+   ("colspace_a12", a12 ^ " colspace",
+   "[\n[ 2. ]\n]");
+   ("colspace_a22", a22 ^ " colspace",
+   "[\n[ 2. -3. ]\n[ -4. 5. ]\n]");
+   ("colspace_b11", b11 ^ " colspace",
+   "[\n[ -7. ]\n]");
+   ("colspace_b22", b22 ^ " colspace",
+   "[\n[ 7. 34. ]\n[ 56. -19. ]\n]");
+   ("colspace_c22", c22 ^ " colspace",
+   "[\n[ 4. 3. ]\n[ 3. 2. ]\n]");
+   ("colspace_a13", a13 ^ " colspace",
+   "[\n[ 1. ]\n]");
+   ("colspace_b13", b13 ^ " colspace",
+   "[\n[ 4. ]\n]");
+   ("colspace_b12", b12 ^ " colspace",
+   "[\n[ 7. ]\n]");
+   ("colspace_i22", i22 ^ " colspace",
+   "[\n[ 1. 0. ]\n[ 0. 1. ]\n]");
+   ("colspace_i33", i33 ^ " colspace",
+   "[\n[ 1. 0. 0. ]\n[ 0. 1. 0. ]\n[ 0. 0. 1. ]\n]");
+   ("colspace_a110", a110 ^ " colspace",
+   "[\n[ ]\n]");
+   ("colspace_a220", a220 ^ " colspace",
+   "[\n[ ]\n[ ]\n]");
+   ("colspace_a330", a330 ^ " colspace",
+   "[\n[ ]\n[ ]\n[ ]\n]");
+   ("colspace_a231", a231 ^ " colspace",
+   "[\n[ 1. ]\n[ 1. ]\n]");
+   ("colspace_a23", a23 ^ " colspace",
+   "[\n[ 6. 2. ]\n[ -2. -5. ]\n]");
 ]
 
 

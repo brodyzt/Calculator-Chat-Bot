@@ -21,13 +21,13 @@ let rec loop env =
 
 let init_enviro =
   PMap.empty
-  |> PMap.add "`prime" (E "`prime has not be not bound")
-  |> PMap.add "`p" (E "`p has not be not bound")
-  |> PMap.add "`q" (E "`q has not be not bound")
-  |> PMap.add "`n" (E "`n has not be not bound")
-  |> PMap.add "`d" (E "`d has not be not bound")
-  |> PMap.add "`e" (E "`e has not be not bound")
-  |> PMap.add "`prime_prob" (E "`prime_prob has not be not bound")
+  |> PMap.add "'prime" (E "'prime has not be not bound")
+  |> PMap.add "'p" (E "'p has not be not bound")
+  |> PMap.add "'q" (E "'q has not be not bound")
+  |> PMap.add "'n" (E "'n has not be not bound")
+  |> PMap.add "'d" (E "'d has not be not bound")
+  |> PMap.add "'e" (E "'e has not be not bound")
+  |> PMap.add "'prime_prob" (E "'prime_prob has not be not bound")
 
 
 (* [main ()] begins the repl which will continuously promt the user to input

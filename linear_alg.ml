@@ -318,34 +318,46 @@ let negate v =
   | F(f) -> F(-1. *. f)
   | Q(a, b) -> Q(minus_big_int a, b)
 
-(*[rem v l] revoves the value v from the matrix*)
+(*[rem v l] revoves the value v from the [l]*)
 let rec rem v l =
   match l with
   | [] -> []
   | h::t -> if h = v then t else h::(rem v t)
 
 (*[from i n acc] makes a list with values from i to n*)
-let rec from i n acc =
-  if i = n then acc else (from (i+1) n (i::acc) )
+let rec from n acc =
+  if n < 0 then acc else (from (n-1) (n::acc))
 
-(*[check_consitant m i] chacks that the matrix m is constitant in the
+(*[check_consistent m i] chacks that the matrix m is consistent in the
  * row i and all those above*)
-let rec check_consitant m i =
+let rec check_consistent m i =
   if i < 0 then true else
-    let rows = Array.length m in
-      if (non_zero m.(i).(rows-1)) then check_consitant m (i -1)
-      else
-        if Array.exists (non_zero) (m.(i)) then check_consitant m (i-1)
+    let cols = Array.length m.(0) in
+      (* if the value on the RHS of the augmented matrix is non zero then there
+       * must be a non zero value in the rest of the row, otherwise the system
+       * is inconsistent*)
+      if (non_zero m.(i).(cols-1)) then
+        if Array.exists (non_zero) (m.(i)) then check_consistent m (i-1)
         else false
+      else
+        check_consistent m (i-1)
+
 
 
 (*[read_off_sol m] for a matrix that is in augmented form and has one singular
  * solution this reads off the solution*)
 let read_off_sol m =
   let cols = Array.length (m.(0)) in
-  let (piv, non_piv) = piv_col m (fun i j acc -> (i,j)::acc) (fun _ j acc -> rem j acc ) [] (from 0 (cols) [])in
+  (*gives a list of piv positions and and non piv cols*)
+  let (piv, non_piv) = piv_col m (fun i j acc -> (i,j)::acc)
+                      (fun _ j acc -> rem j acc ) [] (from (cols-1) [])in
   let z,o = zero (m.(0).(0)), reg_unit (m.(0).(0)) in
-  let result = Array.make_matrix (Array.length m.(0)-1) ((List.length non_piv)) z in
+  (*the result vecotrs have the same length as the number of col in the
+   * original matrix and there are as many of them as there are free variable
+   * also the same as the number of non_pivot cols*)
+  let result = Array.make_matrix (cols-1) ((List.length non_piv)) z in
+    (*for each pivot place the values for the coefficent for the free variables
+     * in the solution matrix*)
     List.iter
       (fun (i,j) -> List.iteri
         (fun n ( j') ->
@@ -353,25 +365,36 @@ let read_off_sol m =
           else result.(j).(n) <- negate (m.(i).(j'))
         ) non_piv
       ) piv;
-    List.iteri (fun i (j) -> if j = cols-1 then () else result.(i).(j) <- o) non_piv;
+    (*for each of the free variables the row and col coresponging to a free
+     *variable should have a one*)
+    List.iteri
+      (fun i (j) -> if j = cols-1 then () else result.(j).(i) <- o) non_piv;
     result
 
 let solve m1 m2 =
+  let z = zero (m1.(0).(0)) in
   let rows1 = Array.length m1 in
   let rows2 = Array.length m2 in
-    if rows1 = 0 || Array.length m1.(0) = 0 || rows1 = rows2 then
-      let aug = Array.make_matrix rows1 ((Array.length m1.(0)) +1) (F 0.) in
-        Array.iteri (fun i row -> Array.iteri (fun j (F v) -> aug.(i).(j) <- m1.(i).(j)) row) m1;
-        Array.iteri (fun i row -> aug.(i).(Array.length m1.(0)) <- row.(0)) m2;
-          let M(sol) = red_row_echelon aug in
-            if check_consitant sol ((Array.length sol) -1) then M(read_off_sol sol)
-            else E("this system is not consitiant")
+  let cols1 = Array.length m1.(0) in
+  let cols2 = Array.length m2.(0) in
+    if rows1 <> 0 && cols1 <> 0 && cols2 <> 0 &&  rows1 = rows2 then
+        let aug = Array.make_matrix rows1 (cols1+1) (F 0.) in
+          Array.iteri (fun i row -> Array.iteri (fun j v ->
+            aug.(i).(j) <- v
+          ) row) m1;
+          Array.iteri (fun i row -> aug.(i).(cols1) <- row.(0)) m2;
+            let M(sol) = red_row_echelon aug in
+              if check_consistent sol (rows1 -1)
+              then M(read_off_sol sol)
+              else E("this system is not consistent")
     else
-     E "matrix size issue"
+      E ("matrix size issue")
 
 let rank m =
   let M(rr) = row_echelon m in
-  let r = fst(piv_col rr (fun i j acc -> print_int i;print_int j; 1 + acc) (fun _ _ _ -> ()) 0 ()) in
+  (*counts the number of pivots*)
+  let (r,_) = piv_col rr (fun i j acc -> 1 + acc)
+                         (fun _ _ _ -> ()) 0 () in
     N(I(big_int_of_int r))
 
 let lin_ind m =
@@ -388,15 +411,32 @@ let lin_dep m =
 
 let null_space m =
   let z = zero (m.(0).(0)) in
-  let M(arr) = solve m (Array.make_matrix (Array.length m) (1) (z)) in
+  (*solves the linear system with the right side of the augmented matrix being
+   *all zeros (matrix with the same number of rows and i col)*)
+  match solve m (Array.make_matrix (Array.length m) (1) (z)) with
+  | M(arr) -> begin
+    (*if the null space has more than one vector then the last vector will be
+     * a zero vector since the right side of the augmented matrix started at all
+     * zeros*)
     if (Array.length arr.(0)) > 1 then
-      M(init_matrix (Array.length arr)  (Array.length arr.(0)) (fun i j -> arr.(i).(j+1)))
+      (*removes the last col*)
+      M(init_matrix
+        (Array.length arr)
+        ((Array.length arr.(0)) - 1)
+        (fun i j -> arr.(i).(j)))
     else
       M(arr)
+  end
+  (*an inconsistent system should only contain the zero vector*)
+  | E(msg) when (msg = "this system is not consistent") ->
+      M(Array.make_matrix (Array.length m.(0)) (1) (z))
+  | x -> x
 
 let col_space m =
   let M(rr) = row_echelon m in
-  let piv = Array.of_list (fst (piv_col m (fun _ j acc -> j::acc) (fun _ _ _ -> ()) [] () )) in
+  let piv_list = fst (piv_col rr (fun _ j acc -> j::acc) (fun _ _ _ -> ()) [] () ) in
+
+  let piv = Array.of_list (List.rev piv_list) in
     M(init_matrix (Array.length rr) (Array.length piv) (fun i j -> m.(i).(piv.(j))))
 
 let eq m1 m2 =

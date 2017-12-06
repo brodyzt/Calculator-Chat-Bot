@@ -50,8 +50,8 @@ val red_row_echelon: Types.matrix -> Types.value
 (* [solve a b] is the matrix containing the solution to the equation [A]x=[b]
  * where [a] is the coefficients for a system of equations
  * and b is a vector containing constants
- * if [a] does not have same height as [b] or the system is inconsistant, or
-* there are infinitly many soltions this evaluates to an exception value *)
+ * if [a] does not have same height as [b] or the system is inconsistent, or
+* there are infinitely many solutions this evaluates to an exception value *)
 val solve: Types.matrix -> Types.matrix -> Types.value
 
 (* [determinant a] is the determinant of matrix [a]

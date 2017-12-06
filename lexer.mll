@@ -17,15 +17,15 @@ let no_op env op =
   | "generate_private_key" -> begin
     let PrivKey(d, p, q) = Rsa.gen_private_key () in
       (PrivKey(d, p, q),
-       env |> PMap.add "`p" (N (I p)) |> PMap.add "`q" (N (I q)) |> PMap.add "`d" (N (I  d)) )
+       env |> PMap.add "'p" (N (I p)) |> PMap.add "'q" (N (I q)) |> PMap.add "'d" (N (I  d)) )
   end
-  | "`prime" -> PMap.find "`prime" env, env
-  | "`p" -> PMap.find "`p" env, env
-  | "`q" -> PMap.find "`q" env, env
-  | "`n" -> PMap.find "`n" env, env
-  | "`d" -> PMap.find "`d" env, env
-  | "`e" -> PMap.find "`e" env, env
-  | "`prime_prob" -> PMap.find "`prime_prob" env, env
+  | "'prime"
+  | "'p"
+  | "'q"
+  | "'n"
+  | "'d"
+  | "'e"
+  | "'prime_prob" -> PMap.find op env, env
   | _ -> E("not a defined operator"), env
 
 (*[un_op op] matches the [op] with the unerary operators, and the top element
@@ -54,19 +54,19 @@ let un_op env op =
       | "factor", N(I(i)) -> Mod_arith.factor i, env
       | "gen_prime", N(I(i)) -> begin
          let prime = Mod_arith.gen_prime i in
-           (prime, env |> PMap.add "`prime" prime)
+           (prime, env |> PMap.add "'prime" prime)
       end
       | "is_prime", N(I(i)) -> Mod_arith.is_prime i, env
       | "is_prime_prob", N(I(i)) -> begin
         let is_prime = Mod_arith.is_prime_likely i in
-          (is_prime, env |> PMap.add "`prime_prob" is_prime)
+          (is_prime, env |> PMap.add "'prime_prob" is_prime)
       end
       | "totient", N(I(i)) -> Mod_arith.totient i, env
       (*these operators are not actually un_ops, but they need to be able to
        * take the results of corresponding methods*)
       | "public_key", PrivKey(d, p, q) -> begin
           let PubKey(n, e) = Rsa.get_public_key (d,p,q) in
-            (PubKey(n,e), env |> PMap.add "`n" (N (I n)) |> PMap.add "`e" (N(I e)) )
+            (PubKey(n,e), env |> PMap.add "'n" (N (I n)) |> PMap.add "'e" (N(I e)) )
         end
       | _, E(e) -> E(e), env
       | _ -> E("not a defined operator"), env
@@ -147,7 +147,7 @@ let tri_op env op =
         | "crack",  N(I(e)), N((I n)), N(I(c)) -> Rsa.crack (n,e) c, env
         | "public_key", N(I(q)), N(I(p)), N(I(d)) -> begin
           let PubKey(n, e) = Rsa.get_public_key (d,p,q) in
-            (PubKey(n,e), env |> PMap.add "`n" (N(I n)) |> PMap.add "`e" (N(I e)) )
+            (PubKey(n,e), env |> PMap.add "'n" (N(I n)) |> PMap.add "'e" (N(I e)) )
         end
         | "encrypt", N(I(e)), N(I(n)), S(s) -> Rsa.encrypt (n,e) s, env
         | _, _,_,E(e) -> E(e), env
@@ -248,6 +248,13 @@ let rec make_rows s f =
       (((row_to_list (String.sub s (b+1) (e-b-1)) f))::
       (make_rows (String.sub s (e+1) (len-e-1)) f))
 
+
+let check_row_len m =
+  let len = Array.length m.(0) in
+  if Array.fold_left (fun acc row -> acc && (Array.length row = len)) true m
+  then M(m)
+  else E("jaggad matricies are not allowed")
+
 (*[make_matrix s f] gives the matrix in an array which is col major from
  * the string [s] using the function [f] to convert the string to an number type
  *)
@@ -261,7 +268,7 @@ let make_matrix s f =
     (F(0.))
   in
     (*fills the rows of the matrix with the values*)
-    List.iteri (fun i l -> m.(i) <- (Array.of_list l)) list_m; m
+    List.iteri (fun i l -> m.(i) <- (Array.of_list l)) list_m; check_row_len m
 
 
 }
@@ -286,8 +293,8 @@ let id = (letter ) (letter | digit | "_")*
 let nop = "generate_private_key"
 let uop = "inv" | "transpose" | "echelon" | "reduce" | "det" | "indep" | "dep"
           | "nullspace" | "colspace" | "!" | "factor" | "gen_prime"
-          | "is_prime" | "is_prime_prob" | "totient" | "`prime" | "`p"
-          | "`q" | "`n" | "`d" | "`e" | "`prime_prob" | "rank"
+          | "is_prime" | "is_prime_prob" | "totient" | "'prime" | "'p"
+          | "'q" | "'n" | "'d" | "'e" | "'prime_prob" | "rank"
 let bop = "+" | "-" | "*" | "/" | "^" | "%" | "=" | "gcd" | "lcm" | "square"
           | "choose" | "perm" | "part" | "." | "#" | "matrix_solve" | "row" |
            "col" | "scale"
@@ -337,18 +344,18 @@ rule read env = parse
     read env lexbuf
   }
   | int_matrix {
-    Stack.push (M(
+    Stack.push (
       make_matrix
         (Lexing.lexeme lexbuf)
-        (fun i -> (I(big_int_of_string i))) )
+        (fun i -> (I(big_int_of_string i)))
     ) stack;
     read env lexbuf
   }
   | matrix {
-    Stack.push (M(
+    Stack.push (
       make_matrix
         (Lexing.lexeme lexbuf)
-        (fun f -> (F(float_of_string f))))
+        (fun f -> (F(float_of_string f)))
      ) stack;
     read env lexbuf
   }

@@ -10,8 +10,12 @@ $(NAME).byte: $(OBJS)
 		$(OFIND) -c $<i
 		$(OFIND) -c $<
 
+install:
+	opam install yojson lwt cohttp_lwt_unix cohttp ocurl ounit
+
 test:
 	ocamlbuild -use-ocamlfind test.byte && ./test.byte
+	
 clean:
 	ocamlbuild -clean
 	rm -f *.cm*

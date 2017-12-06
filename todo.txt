@@ -1,7 +1,7 @@
 MAKE :
- _ change make so that grader does not need to install everything to run
- _ install script
- _ make server sperate command?
+ -> change make so that grader does not need to install everything to run
+ -> install script
+ -> make server sperate command?
 
 DESIGN_DOC
  _ add work break down section

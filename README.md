@@ -236,12 +236,14 @@ space of `m` where `m` is a matrix
 Defining a New Operator
 -----------------------
 
-`{<name of function>: <param₁> … <paramn> -> <stack program for method>}`
+A function defintion must be entered in its own message to the calculator and be 
+in the following form
+`{<name of function>: <param₁> … <paramn> -> <stack program for method>}`   
 Then to execute the function the user can list the arguments and then place the
 function name after the arguments listed in order
 * ex. ```
       { add1 : x -> x 1 + }  
-      ```
+      ```   
       ```
        3 add1
        ```
@@ -250,7 +252,7 @@ to define a variable they could create a constant function that will always
 evaluate to some value.
     * ex. ```
           {x :-> 5}
-          ```
+          ```   
           ```
            x
            ```

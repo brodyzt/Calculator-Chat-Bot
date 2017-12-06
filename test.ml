@@ -3,7 +3,6 @@ open Types
 
 
 let simple_lang_tests = [
-  (*black box lang tests*)
   (*tests basic integer*)
   ("simple_int", "4", "4");
   (*tests a negative integer*)
@@ -27,12 +26,10 @@ let simple_lang_tests = [
   (*tests a simple if, if the value if the first one is a true (non 0) value*)
   ("simple_if_true", "1 2 3 ?", "2");
 
-  (*glass box lang tests*)
 
 ]
 
 let simpl_arith_tests = [
-  (*blackbox test*)
   (*tests a simple addition of integers*)
   ("simple_integer_add", "2 3 +", "5");
   (*tests addition of simple floating point numbers*)
@@ -60,7 +57,6 @@ let simpl_arith_tests = [
   (*tests the equality of floating point numbers*)
   ("simple_float_=", "15.2 15.3 =", "0");
 
-  (*glass box*)
 
 ]
 
@@ -336,27 +332,27 @@ let linear_arith_tests = [
    ("simple_scale_1x1_0_scalebynonzero", "5." ^ " " ^ a110 ^ " scale",
    "[\n[ 0. ]\n]");
   ("simple_scale_2x31", "3." ^ " " ^ a231 ^ " scale",
-   "[\n[ 3. 3. 3. ]\n[ 3. 3. 3. ]\n[ 3. 3. 3. ]\n]");
+   "[\n[ 3. 3. 3. ]\n[ 3. 3. 3. ]\n]");
 
   (*-------- . --------*)
   ("simple_dot_1x1", a11 ^ " " ^ b11 ^ " .",
    "-7.");
-  ("simple_dot_1x2", "[[1. 2.]] [[3., 4.]] .",
+  ("simple_dot_1x2", "[[1.], [2.]] [[3.], [4.]] .",
    "11.");
-  ("simple_dot_1x3", a13 ^ " " ^ b13 ^ " .",
-  "32");
-  ("simple_dot_1x3_reverse", b13 ^ " " ^ a13 ^ " .",
-  "32");
+  ("simple_dot_1x3", a13 ^ " transpose " ^ b13 ^ " transpose .",
+  "32.");
+  ("simple_dot_1x3_reverse", b13 ^ " transpose " ^ a13 ^ " transpose .",
+  "32.");
   (*simple int dot product*)
   ("simple_int_dot_prod", "[[2], [5], [4]] [[5], [3], [1]] .", "29");
   (*simple float dot product*)
   ("simple_float_dot_prod", "[[2.], [7.], [4.]] [[3.], [3.], [1.5]] .", "33.");
 
   (*-------- # --------*)
-  ("simple_dot_3x1", "[[4., 5., 6.]] [[7., 2., 3.]] #",
-  "[\n[ 3. 30. -27. ]\n]");
-  ("simple_dot_3x1_reverse", "[[7., 2., 3.]] [[4., 5., 6.]] #",
-  "[\n[ 3. -30. 27. ]\n]");
+  ("simple_cross_3x1", "[[4., 5., 6.]] transpose [[7., 2., 3.]] transpose #",
+  "[\n[ 3. ]\n[ 30. ]\n[ -27. ]\n]");
+  ("simple_cross_3x1_reverse", "[[7., 2., 3.]] transpose [[4., 5., 6.]] transpose #",
+  "[\n[ -3. ]\n[ -30. ]\n[ 27. ]\n]");
   (*simple cross product ints*)
   ("simple_int_cross_prod", "[[1], [2], [4]] [[6], [2], [1]] #", "[\n[ -6 ]\n[ 23 ]\n[ -10 ]\n]");
   (*simple cross product floatss*)
@@ -734,9 +730,9 @@ let linear_arith_tests = [
    ("colspace_a330", a330 ^ " colspace",
    "[\n[ ]\n[ ]\n[ ]\n]");
    ("colspace_a231", a231 ^ " colspace",
-   "[\n[ 1. ]\n[ 1. ]\n");
+   "[\n[ 1. ]\n[ 1. ]\n]");
    ("colspace_a23", a23 ^ " colspace",
-   "[\n[ 6 2 ]\n[ -2 -5 \n]");
+   "[\n[ 6. 2. ]\n[ -2. -5. ]\n]");
 ]
 
 

@@ -442,8 +442,10 @@ let null_space m =
 
 let col_space m =
   let M(rr) = row_echelon m in
-  let piv = Array.of_list (fst (piv_col m (fun _ j acc -> j::acc) (fun _ _ _ -> ()) [] () )) in
-    M(init_matrix (Array.length rr) (Array.length piv) (fun i j -> m.(i).(piv.(j))))
+  let piv_list = fst (piv_col rr (fun _ j acc -> j::acc) (fun _ _ _ -> ()) [] () ) in
+  (List.fold_left (fun _ (j) -> print_int j;) () piv_list;
+  let piv = Array.of_list (List.rev piv_list) in
+    M(init_matrix (Array.length rr) (Array.length piv) (fun i j -> m.(i).(piv.(j)))))
 
 let eq m1 m2 =
   let r1 = Array.length m1 in

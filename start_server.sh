@@ -1,12 +1,8 @@
 #!/bin/bash
 
 
-sudo su <<EOF
 make clean
 eval $(opam config env)
-make server
-EOF
+make server 
 
-
-echo 2
 exit 0

@@ -2,8 +2,8 @@
 
 
 sudo su <<EOF
-eval $(opam config env)
 make clean
+eval $(opam config env)
 make server
 EOF
 

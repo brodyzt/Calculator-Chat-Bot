@@ -328,19 +328,19 @@ let rec rem v l =
 let rec from n acc =
   if n < 0 then acc else (from (n-1) (n::acc))
 
-(*[check_consitant m i] chacks that the matrix m is constitant in the
+(*[check_consistent m i] chacks that the matrix m is consistent in the
  * row i and all those above*)
-let rec check_consitant m i =
+let rec check_consistent m i =
   if i < 0 then true else
     let cols = Array.length m.(0) in
       (* if the value on the RHS of the augmented matrix is non zero then there
        * must be a non zero value in the rest of the row, otherwise the system
-       * is inconsitant*)
+       * is inconsistent*)
       if (non_zero m.(i).(cols-1)) then
-        if Array.exists (non_zero) (m.(i)) then check_consitant m (i-1)
+        if Array.exists (non_zero) (m.(i)) then check_consistent m (i-1)
         else false
       else
-        check_consitant m (i-1)
+        check_consistent m (i-1)
 
 
 
@@ -384,11 +384,11 @@ let solve m1 m2 =
           ) row) m1;
           Array.iteri (fun i row -> aug.(i).(cols1) <- row.(0)) m2;
             let M(sol) = red_row_echelon aug in
-              if check_consitant sol (rows1 -1)
+              if check_consistent sol (rows1 -1)
               then M(read_off_sol sol)
-              else E("this system is not consitiant")
+              else E("this system is not consistent")
     else
-      E "matrix size issue"
+      E ("matrix size issue")
 
 let rank m =
   let M(rr) = row_echelon m in
@@ -427,8 +427,8 @@ let null_space m =
     else
       M(arr)
   end
-  (*an inconsitant system should only contain the zero vector*)
-  | E(msg) when (msg = "this system is not consitiant") ->
+  (*an inconsistent system should only contain the zero vector*)
+  | E(msg) when (msg = "this system is not consistent") ->
       M(Array.make_matrix (Array.length m.(0)) (1) (z))
   | x -> x
 

@@ -16,7 +16,7 @@ let iterij f =
 let non_zero v =
   match v with
   | I(i) -> not (eq_big_int i zero_big_int)
-  | F(f) -> f <> 0.
+  | F(f) -> not (f = 0.)
   | Q(a,b) -> not (eq_big_int a zero_big_int)
 
 (*[zero v] gives a zero value which is of the same type as [v]*)
@@ -328,6 +328,13 @@ let rec rem v l =
 let rec from n acc =
   if n < 0 then acc else (from (n-1) (n::acc))
 
+
+let rec exists_non_zero n m =
+  if n < 0 then false
+  else if non_zero (m.(n)) then true
+  else exists_non_zero (n-1) m
+
+
 (*[check_consistent m i] chacks that the matrix m is consistent in the
  * row i and all those above*)
 let rec check_consistent m i =
@@ -337,7 +344,7 @@ let rec check_consistent m i =
        * must be a non zero value in the rest of the row, otherwise the system
        * is inconsistent*)
       if (non_zero m.(i).(cols-1)) then
-        if Array.exists (non_zero) (m.(i)) then check_consistent m (i-1)
+        if exists_non_zero (cols-2) (m.(i)) then check_consistent m (i-1)
         else false
       else
         check_consistent m (i-1)

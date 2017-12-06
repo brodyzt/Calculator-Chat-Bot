@@ -79,7 +79,7 @@ let rec string_of_value v =
  * evlauating a program will not change the enviroment, but the top element on
  * the stack will be converte to a string and paired with the enviroment*)
 let evaluate_line env s =
-  try 
+  try
     let lexbuf = Lexing.from_string s in
       begin
         (*adds the user defined function to the enviroment*)
@@ -92,6 +92,5 @@ let evaluate_line env s =
             (string_of_value (Stack.pop Lexer.stack), env')
       end
     with _ -> (
-      print_endline "Exception thrown";
-      ("Exception", env)
+      ("I do not understand", env)
     )

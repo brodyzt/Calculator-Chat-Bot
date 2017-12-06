@@ -357,17 +357,18 @@ let read_off_sol m =
     result
 
 let solve m1 m2 =
+  let z = zero (m1.(0).(0)) in
   let rows1 = Array.length m1 in
   let rows2 = Array.length m2 in
-    if rows1 = 0 || Array.length m1.(0) = 0 || rows1 = rows2 then
-      let aug = Array.make_matrix rows1 ((Array.length m1.(0)) +1) (F 0.) in
-        Array.iteri (fun i row -> Array.iteri (fun j (F v) -> aug.(i).(j) <- m1.(i).(j)) row) m1;
-        Array.iteri (fun i row -> aug.(i).(Array.length m1.(0)) <- row.(0)) m2;
-          let M(sol) = red_row_echelon aug in
-            if check_consitant sol ((Array.length sol) -1) then M(read_off_sol sol)
-            else E("this system is not consitiant")
-    else
-     E "matrix size issue"
+    if rows1 <> 0 || Array.length m1.(0) <> 0 || rows1 = rows2 then
+        let aug = Array.make_matrix rows1 ((Array.length m1.(0)) +1) (F 0.) in
+          Array.iteri (fun i row -> Array.iteri (fun j (F v) -> aug.(i).(j) <- m1.(i).(j)) row) m1;
+          Array.iteri (fun i row -> aug.(i).(Array.length m1.(0)) <- row.(0)) m2;
+            let M(sol) = red_row_echelon aug in
+              if check_consitant sol ((Array.length sol) -1) then M(read_off_sol sol)
+              else E("this system is not consitiant")
+      else
+       E "matrix size issue"
 
 let rank m =
   let M(rr) = row_echelon m in
@@ -388,11 +389,15 @@ let lin_dep m =
 
 let null_space m =
   let z = zero (m.(0).(0)) in
-  let M(arr) = solve m (Array.make_matrix (Array.length m) (1) (z)) in
+  match solve m (Array.make_matrix (Array.length m) (1) (z)) with
+  | M(arr) -> begin
     if (Array.length arr.(0)) > 1 then
-      M(init_matrix (Array.length arr)  (Array.length arr.(0)) (fun i j -> arr.(i).(j+1)))
+      M(init_matrix (Array.length arr) ((Array.length arr.(0)) - 1) (fun i j -> arr.(i).(j+1)))
     else
       M(arr)
+  end
+  | E(msg) when (msg = "this system is not consitiant") -> M(Array.make_matrix (Array.length m.(0)) (1) (z))
+  | x -> x
 
 let col_space m =
   let M(rr) = row_echelon m in

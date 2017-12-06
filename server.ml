@@ -13,8 +13,8 @@ let user_environments = Hashtbl.create 10
   |> PMap.add "`d" (E "`d has not be not bound")
   |> PMap.add "`e" (E "`e has not be not bound")
   |> PMap.add "`prime_prob" (E "`prime_prob has not be not bound") *)
-(* 
-let update_env sender_psid env' = 
+(*
+let update_env sender_psid env' =
   match Hashtbl.mem user_environments sender_psid with
   | true -> Hashtbl.replace user_environments sender_psid env'
   | false -> Hashtbl.add user_environments sender_psid (
@@ -28,18 +28,18 @@ let update_env sender_psid env' =
     |> PMap.add "`prime_prob" (E "`prime_prob has not be not bound")
   ) *)
 
-let get_env sender_psid : Types.value Types.PMap.t = 
+let get_env sender_psid : Types.value Types.PMap.t =
   match Hashtbl.find_opt user_environments sender_psid with
   | Some env -> env
   | None -> Hashtbl.add user_environments sender_psid (
     PMap.empty
-    |> PMap.add "`prime" (E "`prime has not be not bound")
-    |> PMap.add "`p" (E "`p has not be not bound")
-    |> PMap.add "`q" (E "`q has not be not bound")
-    |> PMap.add "`n" (E "`n has not be not bound")
-    |> PMap.add "`d" (E "`d has not be not bound")
-    |> PMap.add "`e" (E "`e has not be not bound")
-    |> PMap.add "`prime_prob" (E "`prime_prob has not be not bound")
+    |> PMap.add "'prime" (E "'prime has not be not bound")
+    |> PMap.add "'p" (E "'p has not be not bound")
+    |> PMap.add "'q" (E "'q has not be not bound")
+    |> PMap.add "'n" (E "'n has not be not bound")
+    |> PMap.add "'d" (E "'d has not be not bound")
+    |> PMap.add "'e" (E "'e has not be not bound")
+    |> PMap.add "'prime_prob" (E "'prime_prob has not be not bound")
   );
   Hashtbl.find user_environments sender_psid
 
@@ -123,7 +123,7 @@ let init_conn url =
 	Curl.set_url c url; r,c
 
 let post ?(content_type = "application/json") url data =
-  print_endline ("Request body: " ^ data);  
+  print_endline ("Request body: " ^ data);
   let r,c = init_conn url in
   Curl.set_post c true;
   Curl.set_httpheader c [ "Content-Type: " ^ content_type ];
@@ -134,7 +134,7 @@ let post ?(content_type = "application/json") url data =
   Curl.cleanup c;
   rc, (Buffer.contents r)
 
-let callSendAPI sender_psid response = 
+let callSendAPI sender_psid response =
   let request_body = "{
     \"recipient\" : {
       \"id\" : \"" ^ sender_psid ^
@@ -143,7 +143,7 @@ let callSendAPI sender_psid response =
   "}" in
   ( (*print_endline ("Request body: " ^ request_body);*)
     post "https://graph.facebook.com/v2.6/me/messages?access_token=EAAEZBhqyWObQBAED8CndCr1WRaFMTjCwdF1qfLb78CXt3G15ZC6POeaaSjPzUiY8ve9by9PJk2OmJs7P8daeqFQz6Bj05MKhWNgmiJJFyyr8fzuZAh3G8gIZBzkvOO6UFXBio1Yf4oLZAoCuOLC3ZBMsEXqo94LOyhB0kl2wtzmDyFUSyZAj7nv" request_body;
-   Cohttp_lwt_unix.Client.post 
+   Cohttp_lwt_unix.Client.post
     ~headers:(Cohttp.Header.init_with "Content-Type" "application/json")
     ~body:(Cohttp_lwt.Body.of_string request_body)
     (* (Uri.of_string "https://graph.facebook.com/v2.6/me/messages?access_token=EAAEZBhqyWObQBAED8CndCr1WRaFMTjCwdF1qfLb78CXt3G15ZC6POeaaSjPzUiY8ve9by9PJk2OmJs7P8daeqFQz6Bj05MKhWNgmiJJFyyr8fzuZAh3G8gIZBzkvOO6UFXBio1Yf4oLZAoCuOLC3ZBMsEXqo94LOyhB0kl2wtzmDyFUSyZAj7nv") *)
@@ -182,7 +182,7 @@ let webhook req =
       let res_body = "Processed request successfully" in
         {headers; status; res_body}
     );
-    
+
   )
 
 

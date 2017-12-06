@@ -48,10 +48,20 @@ Instructions for set up
   1. The only the packages used with the terminal version are oUint, and nums
   so you should not need to install anything to run the command line version
   2. There is a make file to make running the code simpler
+    - required packages are oUnit(see #1 for install command) and Nums(does not require install)
     - `make test` will run the test suite
     - `make repl` will compile and run the 
     - `make clean` will clean up the files built
 + Running the server
+    - This will require installing some extra packages the required packages are
+       * oUnit, YoJson, cohttp lwt
+       steps for installation on a mac are: 
+         1. `opam install ounit`
+         2. `opam install yojson` 
+         3. `opam install cohttp cohttp cohttp-lwt-unix`
+         4. `opan update`
+         5. `opam upgrade` (this will delete and reinstall everything)
+         6. `opam install ocurl`
     - `make compile` will compile the code
     - ./sever.ml will run the server
 

@@ -11,11 +11,11 @@ $(NAME).byte: $(OBJS)
 		$(OFIND) -c $<
 
 install:
-	opam install yojson lwt cohttp_lwt_unix cohttp ocurl ounit
+	opam install -y yojson lwt cohttp-lwt-unix cohttp ocurl ounit
 
 test:
 	ocamlbuild -use-ocamlfind test.byte && ./test.byte
-	
+
 clean:
 	ocamlbuild -clean
 	rm -f *.cm*
@@ -29,7 +29,18 @@ zip:
 	zip finalsrc.zip *.ml*
 
 compile:
-	ocamlbuild -use-ocamlfind lexer.byte eval.cmo comb_eval.cmo mod_arith.cmo linear_alg.cmo rsa.cmo simpl_arith.cmo repl.byte server.byte
+	ocamlbuild -use-ocamlfind lexer.byte eval.cmo comb_eval.cmo mod_arith.cmo linear_alg.cmo rsa.cmo simpl_arith.cmo repl.byte
 
 server:
-	ocamlbuild -use-ocamlfind server.byte && ./server.byte
+	# ocamlfind ocamlc -thread \
+	# -package cohttp.lwt,lwt.ppx,yojson,curl \
+	# -linkpkg types.cmo types.ml lexer.cmo eval.cmo eval.ml server.cmo server.ml && \
+	# ./server.byte
+	ocamlbuild -use-ocamlfind -cflags '-package cohttp',\
+	-package,cohttp.lwt,\
+	-package,lwt.ppx,\
+	-package,yojson,\
+	-package,curl,\
+	-linkpkg server.cmo server.ml server.byte && \
+	./server.byte
+

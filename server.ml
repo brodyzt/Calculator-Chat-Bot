@@ -4,31 +4,13 @@ open Cohttp
 open Yojson.Basic.Util
 open Types
 let _ = Curl.global_init Curl.CURLINIT_GLOBALALL
-let user_environments = Hashtbl.create 10
-  (* PMap.empty
-  |> PMap.add "`prime" (E "`prime has not be not bound")
-  |> PMap.add "`p" (E "`p has not be not bound")
-  |> PMap.add "`q" (E "`q has not be not bound")
-  |> PMap.add "`n" (E "`n has not be not bound")
-  |> PMap.add "`d" (E "`d has not be not bound")
-  |> PMap.add "`e" (E "`e has not be not bound")
-  |> PMap.add "`prime_prob" (E "`prime_prob has not be not bound") *)
-(*
-let update_env sender_psid env' =
-  match Hashtbl.mem user_environments sender_psid with
-  | true -> Hashtbl.replace user_environments sender_psid env'
-  | false -> Hashtbl.add user_environments sender_psid (
-    PMap.empty
-    |> PMap.add "`prime" (E "`prime has not be not bound")
-    |> PMap.add "`p" (E "`p has not be not bound")
-    |> PMap.add "`q" (E "`q has not be not bound")
-    |> PMap.add "`n" (E "`n has not be not bound")
-    |> PMap.add "`d" (E "`d has not be not bound")
-    |> PMap.add "`e" (E "`e has not be not bound")
-    |> PMap.add "`prime_prob" (E "`prime_prob has not be not bound")
-  ) *)
 
-let get_env sender_psid : Types.value Types.PMap.t =
+(* [user_environment] is the environments for all users 
+ * containing any defintions that the user has created *)
+let user_environments = Hashtbl.create 10
+
+(* [get_env sender_psid] gets the environment for user with id [sender_psid] *)
+ let get_env sender_psid : Types.value Types.PMap.t =
   match Hashtbl.find_opt user_environments sender_psid with
   | Some env -> env
   | None -> Hashtbl.add user_environments sender_psid (
@@ -42,6 +24,13 @@ let get_env sender_psid : Types.value Types.PMap.t =
     |> PMap.add "'prime_prob" (E "'prime_prob has not be not bound")
   );
   Hashtbl.find user_environments sender_psid
+
+(**************************************************************************
+ * Following code found on https://github.com/RamV13/ohttp
+ * Used for creating API endpoints called by Facebook when message is sent
+ * to the chat bot
+***************************************************************************)
+
 
 type meth = Code.meth
 type uri = Uri.t
@@ -96,15 +85,13 @@ let callback _ req body =
         end
   with Not_found -> Server.respond_string ~status:`Not_found ~body:"" ()
 
-
-(* [test req] responds with a "Hello <name>!" given the request [req] containing
- * a plain string representing <name> *)
-let test req =
-  let headers = Header.init_with "Content-Type" "text/plain" in
-  let status = `OK in
-  let res_body = "Hello " ^ req.req_body ^ "!" in
-  {headers; status; res_body}
-
+(**************************************************************************
+ * Following code found on https://gist.github.com/zbroyar/1432555
+ * Originally tried to also use OHttp developed by Ram for POST requests but it
+ * wouldn't work no documentation could be found online for Cohttp. 
+ * This was the only code available that could succesfully make 
+ * a POST request to Facebook.
+***************************************************************************)
 
 let writer_callback a d =
 	Buffer.add_string a d;
@@ -134,59 +121,77 @@ let post ?(content_type = "application/json") url data =
   Curl.cleanup c;
   rc, (Buffer.contents r)
 
-let callSendAPI sender_psid response =
-  let request_body = "{
+(**************************************************************************)
+
+
+(* helper function to create body of Facebook API request *)
+let formulate_body sender_psid response = 
+  "{
     \"recipient\" : {
       \"id\" : \"" ^ sender_psid ^
     "\"},
     \"message\":" ^ response ^
-  "}" in
-  ( (*print_endline ("Request body: " ^ request_body);*)
-    post "https://graph.facebook.com/v2.6/me/messages?access_token=EAAEZBhqyWObQBAED8CndCr1WRaFMTjCwdF1qfLb78CXt3G15ZC6POeaaSjPzUiY8ve9by9PJk2OmJs7P8daeqFQz6Bj05MKhWNgmiJJFyyr8fzuZAh3G8gIZBzkvOO6UFXBio1Yf4oLZAoCuOLC3ZBMsEXqo94LOyhB0kl2wtzmDyFUSyZAj7nv" request_body;
-   Cohttp_lwt_unix.Client.post
-    ~headers:(Cohttp.Header.init_with "Content-Type" "application/json")
-    ~body:(Cohttp_lwt.Body.of_string request_body)
-    (* (Uri.of_string "https://graph.facebook.com/v2.6/me/messages?access_token=EAAEZBhqyWObQBAED8CndCr1WRaFMTjCwdF1qfLb78CXt3G15ZC6POeaaSjPzUiY8ve9by9PJk2OmJs7P8daeqFQz6Bj05MKhWNgmiJJFyyr8fzuZAh3G8gIZBzkvOO6UFXBio1Yf4oLZAoCuOLC3ZBMsEXqo94LOyhB0kl2wtzmDyFUSyZAj7nv") *)
-       (Uri.of_string "google.com")
-    >>= fun (resp, body) ->
-    let code = resp |> Response.status |> Code.code_of_status in
-    Printf.printf "Response code: %d\n" code;
-    Printf.printf "Headers: %s\n" (resp |> Response.headers |> Header.to_string);
-    body |> Cohttp_lwt.Body.to_string >|= fun body ->
-    Printf.printf "Body of length: %d\n" (String.length body);
-    print_endline "Sent api request";
-    body)
+  "}"
 
+let callSendAPI sender_psid response =
+
+
+  let request_body = formulate_body sender_psid response in
+  let post_url = "https://graph.facebook.com/v2.6/me/messages?access_token=EAAEZBhqyWObQBAED8CndCr1WRaFMTjCwdF1qfLb78CXt3G15ZC6POeaaSjPzUiY8ve9by9PJk2OmJs7P8daeqFQz6Bj05MKhWNgmiJJFyyr8fzuZAh3G8gIZBzkvOO6UFXBio1Yf4oLZAoCuOLC3ZBMsEXqo94LOyhB0kl2wtzmDyFUSyZAj7nv" in
+
+  (* calls post request helper function with formatted data *)
+  post post_url request_body
+
+(* [webhook req] is called by Facebook 
+ * messenger when a message is sent to Calculator bot. *)
 let webhook req =
   let headers = Header.init_with "Content-Type" "application/json" in
   let j = Yojson.Basic.from_string req.req_body in
-  (
-    print_endline "here";
-    print_endline (j |> Yojson.Basic.pretty_to_string);
-    print_endline "next";
-    let entries =  j |> member "entry" |> to_list in
-    let status = `OK in
-    let handle_entry entry = (
-      let webhook_event = List.nth (entry |> member "messaging" |> to_list) 0 in
-      let sender_psid = webhook_event |> member "sender" |> member "id" |> to_string in
-      print_endline ("Message: " ^ (webhook_event |> member "message" |> Yojson.Basic.to_string));
-      let regex = Str.regexp "\n" in
-      let command = webhook_event |> member "message" |> member "text" |> to_string |> String.lowercase_ascii in
-      let (result, env') = (Eval.evaluate_line (get_env sender_psid) command) in
-      (Hashtbl.replace user_environments sender_psid env';
-      let message = ("{\"text\": \"" ^ (result  |> Str.global_replace regex "\\n") ^ "\"}") in
-      print_endline ("Result " ^ result);
-      callSendAPI sender_psid message)
-    ) in (
-      List.map handle_entry entries;
-      let res_body = "Processed request successfully" in
-        {headers; status; res_body}
-    );
 
-  )
+  (* [entries] is the list of messages sent by facebook to process by calculator *)
+  let entries =  j |> member "entry" |> to_list in
+  let status = `OK in
+
+  (* [handle entry] handles and then responds to entry, a single message sent by user to chat bot *)
+  let handle_entry entry = (
+    let webhook_event = List.nth (entry |> member "messaging" |> to_list) 0 in
+    let sender_psid = webhook_event |> member "sender" |> member "id" |> to_string in
+
+    (* logs message sent by user for server debugging *)
+    print_endline ("Message: " ^ (webhook_event |> member "message" |> Yojson.Basic.to_string));
+
+    (* gets command from request body *)
+    let command = webhook_event |> member "message" |> member "text" |> to_string in
+    let lower_command = command |> String.lowercase_ascii in
+
+    (* determines response to command and updates in hash table
+     * to environment produced by running said command *)
+    let (result, env') = (Eval.evaluate_line (get_env sender_psid) command) in
+    (Hashtbl.replace user_environments sender_psid env';
 
 
+    (* formats new line characters for post request body *)
+    let regex = Str.regexp "\n" in
+    let escaped = (result  |> Str.global_replace regex "\\n") in
 
+    (* builds json to match Facebook API schema*)
+    let message = ("{\"text\": \"" ^ escaped ^ "\"}") in
+
+    (* send calculator response to Facebook for printing in messenger*)
+    callSendAPI sender_psid message)
+  ) in 
+    
+  (* uses to List.map to handle each message contained in [entries]*)
+  List.map handle_entry entries;
+
+  (* formulates reponse to api request made by Facebook *)
+  let res_body = "Processed request successfully" in
+    {headers; status; res_body}
+    
+    
+  
+
+(* endpoint used to verify webhook is running *)
 let webhook_verif req =
   let headers = Header.init_with "Content-Type" "text/plain" in
   let verify_token = "sdfkjsflkgjassodofiwpoeirhskxmcnbmdfsldjf" in
@@ -219,8 +224,6 @@ let run ?(port=8000) _ =
   |> ignore
 
 let _ =
-  add_route (`POST, "/test") test;
-  add_route (`GET, "/test/get") test;
   add_route (`POST, "/webhook") webhook;
   add_route (`GET, "/webhook") webhook_verif;
   run ~port:1337 ()

@@ -531,7 +531,7 @@ let linear_arith_tests = [
   ("solve_1x1_valid_zero", a11 ^ " " ^ a110 ^ " matrix_solve",
   "[\n[ 0. ]\n]");
   ("solve_1x1_invalid_reverse", a110 ^ " " ^ a11 ^ " matrix_solve",
-  "[\n[ ]\n]");
+  "this system is not consistent");
   ("solve_2x2_inconsistent", "[[2., -3.], [4., -6.]] [[1.], [1.]] matrix_solve",
   "this system is not consistent");
 

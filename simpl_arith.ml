@@ -45,13 +45,15 @@ let multiply a b =
   | _ -> E("Incorrect Types")
 
 let divide a b =
-  match a, b with
-  | I(a), I(b) -> N(I(div_big_int a b))
-  | F(a), F(b) -> N(F(a/.b))
-  | Q(a, b), I(c) -> N(reduce (a,(mult_big_int b c)))
-  | I(a), Q(b, c) -> N(reduce ((mult_big_int a c),b))
-  | a, Q(c, d) ->  multiply a (Q (d, c))
-  | _ -> E("Incorrect Types")
+  try
+    match a, b with
+    | I(a), I(b) -> N(I(div_big_int a b))
+    | F(a), F(b) -> N(F(a/.b))
+    | Q(a, b), I(c) -> N(reduce (a,(mult_big_int b c)))
+    | I(a), Q(b, c) -> N(reduce ((mult_big_int a c),b))
+    | a, Q(c, d) ->  multiply a (Q (d, c))
+    | _ -> E("Incorrect Types")
+  with Division_by_zero -> E("division by 0")
 
 let modulus a b = N(I(mod_big_int a b))
 

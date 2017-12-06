@@ -351,7 +351,6 @@ let read_off_sol m =
   (*gives a list of piv positions and and non piv cols*)
   let (piv, non_piv) = piv_col m (fun i j acc -> (i,j)::acc)
                       (fun _ j acc -> rem j acc ) [] (from (cols-1) [])in
-  List.iter (fun v -> print_int v) non_piv;
   let z,o = zero (m.(0).(0)), reg_unit (m.(0).(0)) in
   (*the result vecotrs have the same length as the number of col in the
    * original matrix and there are as many of them as there are free variable
@@ -366,12 +365,10 @@ let read_off_sol m =
           else result.(j).(n) <- negate (m.(i).(j'))
         ) non_piv
       ) piv;
-    print_string (string_of_matrix result);
     (*for each of the free variables the row and col coresponging to a free
      *variable should have a one*)
     List.iteri
       (fun i (j) -> if j = cols-1 then () else result.(j).(i) <- o) non_piv;
-    print_string (string_of_matrix result);
     result
 
 let solve m1 m2 =
@@ -382,15 +379,11 @@ let solve m1 m2 =
   let cols2 = Array.length m2.(0) in
     if rows1 <> 0 && cols1 <> 0 && cols2 <> 0 &&  rows1 = rows2 then
         let aug = Array.make_matrix rows1 (cols1+1) (F 0.) in
-          print_string (string_of_matrix aug);
           Array.iteri (fun i row -> Array.iteri (fun j v ->
             aug.(i).(j) <- v
           ) row) m1;
-          print_string (string_of_matrix aug);
           Array.iteri (fun i row -> aug.(i).(cols1) <- row.(0)) m2;
-          print_string (string_of_matrix aug);
             let M(sol) = red_row_echelon aug in
-              print_string (string_of_matrix sol);
               if check_consitant sol (rows1 -1)
               then M(read_off_sol sol)
               else E("this system is not consitiant")
@@ -400,7 +393,7 @@ let solve m1 m2 =
 let rank m =
   let M(rr) = row_echelon m in
   (*counts the number of pivots*)
-  let (r,_) = piv_col rr (fun i j acc -> print_int i;print_int j; 1 + acc)
+  let (r,_) = piv_col rr (fun i j acc -> 1 + acc)
                          (fun _ _ _ -> ()) 0 () in
     N(I(big_int_of_int r))
 
@@ -422,7 +415,6 @@ let null_space m =
    *all zeros (matrix with the same number of rows and i col)*)
   match solve m (Array.make_matrix (Array.length m) (1) (z)) with
   | M(arr) -> begin
-    (*print_string (string_of_matrix arr);*)
     (*if the null space has more than one vector then the last vector will be
      * a zero vector since the right side of the augmented matrix started at all
      * zeros*)
@@ -443,9 +435,9 @@ let null_space m =
 let col_space m =
   let M(rr) = row_echelon m in
   let piv_list = fst (piv_col rr (fun _ j acc -> j::acc) (fun _ _ _ -> ()) [] () ) in
-  (List.fold_left (fun _ (j) -> print_int j;) () piv_list;
+
   let piv = Array.of_list (List.rev piv_list) in
-    M(init_matrix (Array.length rr) (Array.length piv) (fun i j -> m.(i).(piv.(j)))))
+    M(init_matrix (Array.length rr) (Array.length piv) (fun i j -> m.(i).(piv.(j))))
 
 let eq m1 m2 =
   let r1 = Array.length m1 in

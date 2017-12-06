@@ -21,11 +21,20 @@ TEST:
  _ add more comb tests
 
 LIN_ALG:
- _ fix nullspace and solve for matricies with less rows than cols
+ x fix nullspace and solve for matricies with less rows than cols
+
+EVAL:
+ _ try catch so we dont see any errors
+
+LEXER:
+ _ make matrix non jagad arrays
 
 REPL:
  _ make sure things are printing nicely
- _ try catch so we dont see any errors
+
+
+BOT:
+ _ have really long qyeries time out for the bot
 
 ALL FILES:
  _ helper method documentation

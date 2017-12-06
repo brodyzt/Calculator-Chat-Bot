@@ -42,9 +42,22 @@ Our programming language is a small mathematical stack based language written
 in postfix (RPN) notation. The calculator comes with many built in operators
 for all of the above outlined topics, and allow the user to write their own operators
 
+Dependencies
+============
+The full project depends on the folowing packages, but not all parts of the
+project will require all of them to run
+* oUnit
+* str
+* nums
+* yojson
+* cohttp
+* lwt
+* ocurl
+
 Instructions for set up
 ========================
 + Running the Calculator in the terminal
+  - commands will be case sensitive
   1. The only the packages used with the command line version are oUint, and nums
   so you should not need to install anything to run the command line version
   2. There is a make file to make running the code simpler
@@ -53,8 +66,9 @@ Instructions for set up
     - `make repl` will compile and run the repl, (control-c will quit)
     - `make clean` will clean up the files built
 + Running the server
+    - this server is partially adapted from [ohttp](https://github.com/RamV13/ohttp/blob/master/README.md)
     - This will require installing some extra packages the required packages are
-       * oUnit, Yojson, cohttp, lwt, ocurl
+       * oUnit, str, nums, yojson, cohttp, lwt, ocurl
        steps for installation on a mac are:
          1. `opam install ounit`
          2. `opam install yojson`
@@ -68,6 +82,7 @@ Instructions for set up
 
 + Using the messanger bot
     - you can message "Ocaml Calculator" or CLICK THIS LINK to message the the bot
+    - these commands will be case insensitive
 
 Using the calculator
 ================

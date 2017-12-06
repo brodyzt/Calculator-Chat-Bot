@@ -261,7 +261,8 @@ let mod_arith_tests = [
 ]
 
 let comb_arith_tests = [
-  (*black box*)
+  (*-------- ! --------*)
+  ("negative_fact", "-3 !", "Negative values are not allowed");
   (*tests that zero factorial is 1*)
   ("zero_fact", "0 !", "1");
   (*tests that a 1 factorial is 1*)
@@ -270,16 +271,46 @@ let comb_arith_tests = [
   ("small_fact", "6 !", "720");
   (*tests a larger factorial*)
   ("large_fact", "30 !", "265252859812191058636308480000000");
+  ("inception_fact", "3 ! !", "720");
+
+  (*-------- choose --------*)
+  ("first_negative_choose", "-13 5 choose", "Negative values are not allowed");
+  ("second_negative_choose", "13 -5 choose", "Negative values are not allowed");
+  ("both_negative_choose", "-13 -5 choose", "Negative values are not allowed");
+  ("0_0_choose", "0 0 choose", "1");
+  ("1_1_choose", "1 1 choose", "1");
+  ("1_5_choose", "1 5 choose", "Invalid inputs");
+  ("5_1_choose", "5 1 choose", "5");
   (*computes a small combination*)
   ("small_choose", "13 5 choose", "1287");
   (*computes a large choose*)
   ("large_choose", "217 43 choose", "5601414076770489401221861478881318576914682800");
+  
+  (*-------- perm --------*)
+  ("first_negative_perm", "-13 5 perm", "Negative values are not allowed");
+  ("second_negative_perm", "13 -5 perm", "Negative values are not allowed");
+  ("both_negative_perm", "-13 -5 perm", "Negative values are not allowed");
+  ("0_0_perm", "0 0 perm", "1");
+  ("1_1_perm", "1 1 perm", "1");
+  ("1_5_perm", "1 5 perm", "Invalid inputs");
+  ("5_1_perm", "5 1 perm", "5");
   (*computes a small permutation*)
   ("small_perm", "10 4 perm", "5040");
   (*computes a large perm*)
   ("large_perm", "49 25 perm", "980390734080409707851586040233984000000");
-  (*need partition tests*)
 
+  (*-------- part --------*)
+  ("first_negative_part", "-18 6 part", "Negative values are not allowed");
+  ("second_negative_part", "18 -4 part", "Negative values are not allowed");
+  ("both_negative_part", "-8 -4 part", "Negative values are not allowed");
+  ("0_0_part", "0 1 part", "1");
+  ("1_1_part", "0 2 part", "1");
+  ("1_5_part", "-4 6 part", "Invalid inputs");
+  ("5_1_part", "4 2 part", "5");
+  (*computes a small partutation*)
+  ("small_part", "10 4 part", "286");
+  (*computes a large part*)
+  ("large_part", "49 25 part", "11844267374132633700");
 ]
 
 let xempty = "[]"
@@ -339,12 +370,22 @@ let linear_arith_tests = [
   (*-------- . --------*)
   ("simple_dot_1x1", a11 ^ " " ^ b11 ^ " .",
    "-7.");
+  ("simple_dot_1x1_reverse", b11 ^ " " ^ a11 ^ " .",
+   "-7.");
+  ("simple_dot_1x1_size_error", a11 ^ " " ^ a21 ^ " .",
+   "matrix size issue");
+  ("simple_dot_1x1_size_reverse_error", a21 ^ " " ^ a11 ^ " .",
+   "matrix size issue");
   ("simple_dot_1x2", "[[1.], [2.]] [[3.], [4.]] .",
+   "11.");
+   ("simple_dot_1x2_reverse", "[[3.], [4.]] [[1.], [2.]] .",
    "11.");
   ("simple_dot_1x3", a13 ^ " transpose " ^ b13 ^ " transpose .",
   "32.");
   ("simple_dot_1x3_reverse", b13 ^ " transpose " ^ a13 ^ " transpose .",
   "32.");
+  ("simple_dot_3x3_size_error", a33 ^ " " ^ i33 ^ " .",
+   "matrix size issue");
   (*simple int dot product*)
   ("simple_int_dot_prod", "[[2], [5], [4]] [[5], [3], [1]] .", "29");
   (*simple float dot product*)

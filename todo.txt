@@ -16,9 +16,9 @@ README:
  _ update how to use the bot
 
 TEST:
- _ add more solve tests
+ ✅ add more solve tests
  _ add more simple arith tests
- _ add more comb tests
+ ✅ add more comb tests
 
 LIN_ALG:
  x fix nullspace and solve for matricies with less rows than cols

@@ -30,34 +30,115 @@ let simple_lang_tests = [
 ]
 
 let simpl_arith_tests = [
+  (*-------- + --------*)
   (*tests a simple addition of integers*)
   ("simple_integer_add", "2 3 +", "5");
+  ("simple_integer_commutative_add", "3 2 +", "5");
+  ("simple_integer_zero_add", "0 0 +", "0");
+  ("simple_integer_zero_and_other1_add", "0 1 +", "1");
+  ("simple_integer_zero_and_other2_add", "1 0 +", "1");
+  ("simple_integer_zero_and_other3_add", "0 -1 +", "-1");
+  ("simple_integer_zero_and_other4_add", "0 -5 +", "-5");
+  ("simple_integer_zero_and_other5_add", "0 5 +", "5");
+
   (*tests addition of simple floating point numbers*)
   ("simple_float_add", "2. 3. +", "5.");
+  ("simple_float_communtative_add", "3. 2. +", "5.");
+  ("simple_float_zero_add", "0. 0. +", "0.");
+  ("simple_float_zero_and_other1_add", "0. 1. +", "1.");
+  ("simple_float_zero_and_other2_add", "1. 0. +", "1.");
+  ("simple_float_zero_and_other3_add", "0. -1. +", "-1.");
+  ("simple_float_zero_and_other4_add", "0. -5. +", "-5.");
+  ("simple_float_zero_and_other5_add", "0. 5. +", "5.");
+
+  (*-------- - --------*)
   (*tests simple subtraction of integers which results in a negative integer*)
   ("simple_integer_subt", "2 3 -", "-1");
   (*tests simple subtraction of floating point numbers*)
   ("simple_float_subt", "10. 3. -", "7.");
+  ("simple_float_zero_sub", "0. 0. +", "0.");
+  ("simple_float_zero_and_other1_sub", "0. 1. -", "-1.");
+  ("simple_float_zero_and_other2_sub", "1. 0. -", "1.");
+  ("simple_float_zero_and_other3_sub", "0. -1. -", "1.");
+  ("simple_float_zero_and_other4_sub", "0. -5. -", "5.");
+  ("simple_float_zero_and_other5_sub", "0. 5. -", "-5.");
+
+  (*-------- * --------*)
   (*tests simple multiplication of integer values*)
   ("simple_integer_mult", "9 5 *", "45");
+  ("simple_integer_zero_and_other1_mult", "0 1 *", "0");
+  ("simple_integer_zero_and_other2_mult", "1 0 *", "0");
+  ("simple_integer_zero_and_other3_mult", "0 -1 *", "0");
+  ("simple_integer_zero_and_other4_mult", "0 -5 *", "0");
+  ("simple_integer_zero_and_other5_mult", "0 5 *", "0");
   (*tests multiplication of floating point numbers*)
   ("simple_float_mult", "2.5 7. *", "17.5");
+  ("simple_float_zero_and_other1_mult", "0. 1. *", "0.");
+  ("simple_float_zero_and_other2_mult", "1. 0. *", "0.");
+  ("simple_float_zero_and_other3_mult", "0. -1. *", "0.");
+  ("simple_float_zero_and_other4_mult", "0. -5. *", "0.");
+  ("simple_float_zero_and_other5_mult", "0. 5. *", "0.");
+
+  (*-------- / --------*)
   (*tests simple integer division*)
   ("simple_integer_div", "8 2 /", "4");
+  ("simple_integer_zero_and_other1_div", "0 1 /", "0");
+  ("simple_integer_zero_and_other2_div", "1 0 /", "division by 0");
+  ("simple_integer_zero_and_other3_div", "0 -1 /", "0");
+  ("simple_integer_zero_and_other4_div", "0 -5 /", "0");
+  ("simple_integer_zero_and_other5_div", "0 5 /", "0");
   (*tests simple floating point division*)
   ("simple_float_div", "27. 5. /", "5.4");
-  (*tests modulus for integers*)
-  ("simple_integer_mod", "100 3 %", "1");
-  (*tests taking powers of two relativly small integers*)
-  ("simple_integer_pow", "2 10 ^", "1024");
+  ("simple_float_zero_and_other1_div", "0. 1. /", "0.");
+  ("simple_float_zero_and_other2_div", "1. 0. /", "division by 0");
+  ("simple_float_zero_and_other3_div", "0. -1. /", "0.");
+  ("simple_float_zero_and_other4_div", "0. -5. /", "0.");
+  ("simple_float_zero_and_other5_div", "0. 5. /", "0.");
+
+  (*-------- ^ --------*)
   (*tests powers of the small floating point numbers*)
   ("simple_float_pow", "10. 3. ^", "1000.");
+  ("simple_float_pow_0._0.", "0. 0. ^", "Undefined");
+  ("simple_float_pow_sqrt", "25. 0.5 ^", "5.");
+  ("simple_float_pow_inverse", "10. -1. ^", "0.1");
+  (*tests powers of the large floating point numbers*)
+  ("big_simple_float_pow", "1000. 3. ^", "1000000000.");
+  ("big_simple_float_pow_sqrt", "25000. 0.5 ^", "158.113883008");
+  ("big_simple_float_pow_inverse", "10000000. -1. ^", "1e-07");
+
+  (*tests powers of the small integer numbers*)
+  ("simple_integer_pow", "10 3 ^", "1000");
+  ("simple_integer_pow_0._0.", "0 0 ^", "Undefined");
+  ("simple_integer_pow_inverse", "10 -1 ^", "I do not understand");
+  (*tests powers of the large integer numbers*)
+  ("big_simple_float_pow", "1000 3 ^", "1000000000");
+  ("big_simple_float_pow_sqrt", "25000 0.5 ^", "Incorrect Types");
+  ("big_simple_float_pow_inverse", "10000000 -1 ^", "I do not understand");
+
+
+  (*-------- % --------*)
+  (*tests modulus for integers*)
+  ("simple_integer_mod", "100 3 %", "1");
+  ("simple_integer_mod1", "100 0 %", "I do not understand");
+  ("simple_integer_mod2", "0 0 %", "I do not understand");
+  ("simple_integer_mod3", "0 100 %", "0");
+  ("simple_integer_mod4", "-5 -4 %", "-1");
+  ("simple_integer_mod4", "-1 -1 %", "0");
+  
+
+  (*-------- = --------*)
   (*tests the equality of two numbers*)
   ("simple_integer_=", "18 17 =", "0");
+  ("simple_integer_reverse_=", "17 18 =", "0");
+  ("simple_integer_=_1", "0 0 =", "1");
+  ("simple_integer_=_2", "0 1 =", "0");
+  ("simple_integer_=_3", "4 0 =", "0");
   (*tests the equality of floating point numbers*)
   ("simple_float_=", "15.2 15.3 =", "0");
-
-
+  ("simple_integer_reverse_=", "15.3 15.2 =", "0");
+  ("simple_integer_=_1.", "0. 0. =", "1");
+  ("simple_integer_=_2", "0. 1. =", "0");
+  ("simple_integer_=_3", "4. 0. =", "0");
 ]
 
 let mod_arith_tests = [

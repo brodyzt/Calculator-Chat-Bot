@@ -248,6 +248,13 @@ let rec make_rows s f =
       (((row_to_list (String.sub s (b+1) (e-b-1)) f))::
       (make_rows (String.sub s (e+1) (len-e-1)) f))
 
+
+let check_row_len m =
+  let len = Array.length m.(0) in
+  if Array.fold_left (fun acc row -> acc && (Array.length row = len)) true m
+  then M(m)
+  else E("jaggad matricies are not allowed")
+
 (*[make_matrix s f] gives the matrix in an array which is col major from
  * the string [s] using the function [f] to convert the string to an number type
  *)
@@ -261,7 +268,7 @@ let make_matrix s f =
     (F(0.))
   in
     (*fills the rows of the matrix with the values*)
-    List.iteri (fun i l -> m.(i) <- (Array.of_list l)) list_m; m
+    List.iteri (fun i l -> m.(i) <- (Array.of_list l)) list_m; check_row_len m
 
 
 }
@@ -337,18 +344,18 @@ rule read env = parse
     read env lexbuf
   }
   | int_matrix {
-    Stack.push (M(
+    Stack.push (
       make_matrix
         (Lexing.lexeme lexbuf)
-        (fun i -> (I(big_int_of_string i))) )
+        (fun i -> (I(big_int_of_string i)))
     ) stack;
     read env lexbuf
   }
   | matrix {
-    Stack.push (M(
+    Stack.push (
       make_matrix
         (Lexing.lexeme lexbuf)
-        (fun f -> (F(float_of_string f))))
+        (fun f -> (F(float_of_string f)))
      ) stack;
     read env lexbuf
   }

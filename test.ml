@@ -674,7 +674,7 @@ let linear_arith_tests = [
   ("nullspace_a11", a11 ^ " nullspace",
    "[\n[ 0. ]\n]");
    ("nullspace_a21", a21 ^ " nullspace",
-   "[\n[ 1. ]\n[ 0. ]\n]");
+   "[\n[ 0. ]\n]");
    ("nullspace_a12", a12 ^ " nullspace",
    "[\n[ 1.5 ]\n[ 1. ]\n]");
    ("nullspace_a22", a22 ^ " nullspace",
@@ -686,11 +686,11 @@ let linear_arith_tests = [
    ("nullspace_c22", c22 ^ " nullspace",
    "[\n[ 0. ]\n[ 0. ]\n]");
    ("nullspace_a13", a13 ^ " nullspace",
-   "[\n[ -2.0 -3.0 ]\n[ 1. 0. ]\n[ 0. 1. ]\n]");
+   "[\n[ -2. -3. ]\n[ 1. 0. ]\n[ 0. 1. ]\n]");
    ("nullspace_b13", b13 ^ " nullspace",
    "[\n[ -1.25 -1.5 ]\n[ 1. 0. ]\n[ 0. 1. ]\n]");
    ("nullspace_b12", b12 ^ " nullspace",
-   "[\n[ -0.428571428571 -0.571428571429 ]\n[ 1. 0. ]\n[ 0. 1. ]\n]");
+   "[\n[ -4.85714285714 ]\n[ 1. ]\n]");
    ("nullspace_i22", i22 ^ " nullspace",
    "[\n[ 0. ]\n[ 0. ]\n]");
    ("nullspace_i33", i33 ^ " nullspace",

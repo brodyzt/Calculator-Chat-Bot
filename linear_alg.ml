@@ -377,7 +377,7 @@ let solve m1 m2 =
   let rows2 = Array.length m2 in
   let cols1 = Array.length m1.(0) in
   let cols2 = Array.length m2.(0) in
-    if rows1 <> 0 && cols1 <> 0 && cols2 <> 0 &&  rows1 = rows2 then
+    if rows1 <> 0 && cols1 <> 0 && cols2 = 1 &&  rows1 = rows2 then
         let aug = Array.make_matrix rows1 (cols1+1) (F 0.) in
           Array.iteri (fun i row -> Array.iteri (fun j v ->
             aug.(i).(j) <- v

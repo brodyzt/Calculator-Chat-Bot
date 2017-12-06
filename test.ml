@@ -670,7 +670,7 @@ let linear_arith_tests = [
   ("nullspace_a11", a11 ^ " nullspace",
    "[\n[ 0. ]\n]");
    ("nullspace_a21", a21 ^ " nullspace",
-   "[\n[ 1. ]\n[ 0. ]\n]");
+   "[\n[ 0. ]\n]");
    ("nullspace_a12", a12 ^ " nullspace",
    "[\n[ 1.5 ]\n[ 1. ]\n]");
    ("nullspace_a22", a22 ^ " nullspace",

@@ -5,29 +5,9 @@ open Yojson.Basic.Util
 open Types
 let _ = Curl.global_init Curl.CURLINIT_GLOBALALL
 let user_environments = Hashtbl.create 10
-  (* PMap.empty
-  |> PMap.add "`prime" (E "`prime has not be not bound")
-  |> PMap.add "`p" (E "`p has not be not bound")
-  |> PMap.add "`q" (E "`q has not be not bound")
-  |> PMap.add "`n" (E "`n has not be not bound")
-  |> PMap.add "`d" (E "`d has not be not bound")
-  |> PMap.add "`e" (E "`e has not be not bound")
-  |> PMap.add "`prime_prob" (E "`prime_prob has not be not bound") *)
-(* 
-let update_env sender_psid env' = 
-  match Hashtbl.mem user_environments sender_psid with
-  | true -> Hashtbl.replace user_environments sender_psid env'
-  | false -> Hashtbl.add user_environments sender_psid (
-    PMap.empty
-    |> PMap.add "`prime" (E "`prime has not be not bound")
-    |> PMap.add "`p" (E "`p has not be not bound")
-    |> PMap.add "`q" (E "`q has not be not bound")
-    |> PMap.add "`n" (E "`n has not be not bound")
-    |> PMap.add "`d" (E "`d has not be not bound")
-    |> PMap.add "`e" (E "`e has not be not bound")
-    |> PMap.add "`prime_prob" (E "`prime_prob has not be not bound")
-  ) *)
 
+(* [get_env sender_psid] gets the environment for user with id [sender_psid].
+ * The environment contains any defintions that the user has created *)
 let get_env sender_psid : Types.value Types.PMap.t = 
   match Hashtbl.find_opt user_environments sender_psid with
   | Some env -> env
@@ -157,36 +137,54 @@ let callSendAPI sender_psid response =
     print_endline "Sent api request";
     body)
 
+(* [webhook req] is called by Facebook 
+ * messenger when a message is sent to Calculator bot. *)
 let webhook req =
   let headers = Header.init_with "Content-Type" "application/json" in
   let j = Yojson.Basic.from_string req.req_body in
-  (
-    print_endline "here";
-    print_endline (j |> Yojson.Basic.pretty_to_string);
-    print_endline "next";
-    let entries =  j |> member "entry" |> to_list in
-    let status = `OK in
-    let handle_entry entry = (
-      let webhook_event = List.nth (entry |> member "messaging" |> to_list) 0 in
-      let sender_psid = webhook_event |> member "sender" |> member "id" |> to_string in
-      print_endline ("Message: " ^ (webhook_event |> member "message" |> Yojson.Basic.to_string));
-      let regex = Str.regexp "\n" in
-      let command = webhook_event |> member "message" |> member "text" |> to_string |> String.lowercase_ascii in
-      let (result, env') = (Eval.evaluate_line (get_env sender_psid) command) in
-      (Hashtbl.replace user_environments sender_psid env';
-      let message = ("{\"text\": \"" ^ (result  |> Str.global_replace regex "\\n") ^ "\"}") in
-      print_endline ("Result " ^ result);
-      callSendAPI sender_psid message)
-    ) in (
-      List.map handle_entry entries;
-      let res_body = "Processed request successfully" in
-        {headers; status; res_body}
-    );
+  let entries =  j |> member "entry" |> to_list in
+  let status = `OK in
+
+  (* [handle entry] handles and then responds to entry, a single message sent by user to chat bot *)
+  let handle_entry entry = (
+    let webhook_event = List.nth (entry |> member "messaging" |> to_list) 0 in
+    let sender_psid = webhook_event |> member "sender" |> member "id" |> to_string in
+
+    (* logs message sent by user for server debugging *)
+    print_endline ("Message: " ^ (webhook_event |> member "message" |> Yojson.Basic.to_string));
+
+    (* gets command from request body *)
+    let command = webhook_event |> member "message" |> member "text" |> to_string in
+    let lower_command = command |> String.lowercase_ascii
+
+    (* determines response to command and updates in hash table
+     * to environment produced by running said command *)
+    let (result, env') = (Eval.evaluate_line (get_env sender_psid) command) in
+    (Hashtbl.replace user_environments sender_psid env';
+
+
+    (* formats new line characters for post request body *)
+    let regex = Str.regexp "\n" in
+    let escaped = (result  |> Str.global_replace regex "\\n") in
+
+    (* builds json to match Facebook API schema*)
+    let message = ("{\"text\": \"" ^ escaped ^ "\"}") in
+
+    (* send calculator response to Facebook for printing in messenger*)
+    callSendAPI sender_psid message)
+  ) in 
     
-  )
+  (* uses to List.map to handle each message contained in [entries]*)
+  List.map handle_entry entries;
 
+  (* formulates reponse to api request made by Facebook *)
+  let res_body = "Processed request successfully" in
+    {headers; status; res_body}
+    
+    
+  
 
-
+(* endpoint used to verify webhook is running *)
 let webhook_verif req =
   let headers = Header.init_with "Content-Type" "text/plain" in
   let verify_token = "sdfkjsflkgjassodofiwpoeirhskxmcnbmdfsldjf" in

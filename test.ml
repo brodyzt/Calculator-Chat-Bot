@@ -383,6 +383,7 @@ let linear_arith_tests = [
    "1");
    ("equal_b12", b12 ^ " " ^ b12 ^ " =",
    "1");
+<<<<<<< HEAD
    ("equal_i22", i22 ^ " " ^ i22 ^ " =",
    "1");
    ("equal_i33", i33 ^ " " ^ i33 ^ " =",
@@ -431,6 +432,9 @@ let linear_arith_tests = [
    ("equal_not_a23", a23 ^ " " ^ a22 ^ " =",
    "0");
   
+=======
+
+>>>>>>> c89bf160e5462e2cb37874169aaefb2b83b210ce
 
   (*-------- row --------*)
   ("row_1x1", a11 ^ " " ^ "0" ^ " row",

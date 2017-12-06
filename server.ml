@@ -3,16 +3,45 @@ open Cohttp_lwt_unix
 open Cohttp
 open Yojson.Basic.Util
 open Types
-let init_enviro =
-  PMap.empty
+let _ = Curl.global_init Curl.CURLINIT_GLOBALALL
+let user_environments = Hashtbl.create 10
+  (* PMap.empty
   |> PMap.add "`prime" (E "`prime has not be not bound")
   |> PMap.add "`p" (E "`p has not be not bound")
   |> PMap.add "`q" (E "`q has not be not bound")
   |> PMap.add "`n" (E "`n has not be not bound")
   |> PMap.add "`d" (E "`d has not be not bound")
   |> PMap.add "`e" (E "`e has not be not bound")
-  |> PMap.add "`prime_prob" (E "`prime_prob has not be not bound")
+  |> PMap.add "`prime_prob" (E "`prime_prob has not be not bound") *)
+(*
+let update_env sender_psid env' =
+  match Hashtbl.mem user_environments sender_psid with
+  | true -> Hashtbl.replace user_environments sender_psid env'
+  | false -> Hashtbl.add user_environments sender_psid (
+    PMap.empty
+    |> PMap.add "`prime" (E "`prime has not be not bound")
+    |> PMap.add "`p" (E "`p has not be not bound")
+    |> PMap.add "`q" (E "`q has not be not bound")
+    |> PMap.add "`n" (E "`n has not be not bound")
+    |> PMap.add "`d" (E "`d has not be not bound")
+    |> PMap.add "`e" (E "`e has not be not bound")
+    |> PMap.add "`prime_prob" (E "`prime_prob has not be not bound")
+  ) *)
 
+let get_env sender_psid : Types.value Types.PMap.t =
+  match Hashtbl.find_opt user_environments sender_psid with
+  | Some env -> env
+  | None -> Hashtbl.add user_environments sender_psid (
+    PMap.empty
+    |> PMap.add "'prime" (E "'prime has not be not bound")
+    |> PMap.add "'p" (E "'p has not be not bound")
+    |> PMap.add "'q" (E "'q has not be not bound")
+    |> PMap.add "'n" (E "'n has not be not bound")
+    |> PMap.add "'d" (E "'d has not be not bound")
+    |> PMap.add "'e" (E "'e has not be not bound")
+    |> PMap.add "'prime_prob" (E "'prime_prob has not be not bound")
+  );
+  Hashtbl.find user_environments sender_psid
 
 type meth = Code.meth
 type uri = Uri.t
@@ -77,31 +106,57 @@ let test req =
   {headers; status; res_body}
 
 
+let writer_callback a d =
+	Buffer.add_string a d;
+	String.length d
 
+let init_conn url =
+	let r = Buffer.create 16384
+	and c = Curl.init () in
+	Curl.set_timeout c 1200;
+	Curl.set_sslverifypeer c false;
+	Curl.set_sslverifyhost c Curl.SSLVERIFYHOST_EXISTENCE;
+	Curl.set_writefunction c (writer_callback r);
+	Curl.set_tcpnodelay c true;
+	Curl.set_verbose c false;
+	Curl.set_post c false;
+	Curl.set_url c url; r,c
 
-let callSendAPI sender_psid response = 
+let post ?(content_type = "application/json") url data =
+  print_endline ("Request body: " ^ data);
+  let r,c = init_conn url in
+  Curl.set_post c true;
+  Curl.set_httpheader c [ "Content-Type: " ^ content_type ];
+  Curl.set_postfields c data;
+  Curl.set_postfieldsize c (String.length data);
+  Curl.perform c;
+  let rc = Curl.get_responsecode c in
+  Curl.cleanup c;
+  rc, (Buffer.contents r)
+
+let callSendAPI sender_psid response =
   let request_body = "{
     \"recipient\" : {
-      \"id\" : ^\"" ^ sender_psid ^
+      \"id\" : \"" ^ sender_psid ^
     "\"},
-    \"message\": { \"text\" : \"" ^ response ^
-  "\"}}" in
-  ( print_endline request_body;
-  Client.post 
+    \"message\":" ^ response ^
+  "}" in
+  ( (*print_endline ("Request body: " ^ request_body);*)
+    post "https://graph.facebook.com/v2.6/me/messages?access_token=EAAEZBhqyWObQBAED8CndCr1WRaFMTjCwdF1qfLb78CXt3G15ZC6POeaaSjPzUiY8ve9by9PJk2OmJs7P8daeqFQz6Bj05MKhWNgmiJJFyyr8fzuZAh3G8gIZBzkvOO6UFXBio1Yf4oLZAoCuOLC3ZBMsEXqo94LOyhB0kl2wtzmDyFUSyZAj7nv" request_body;
+   Cohttp_lwt_unix.Client.post
+    ~headers:(Cohttp.Header.init_with "Content-Type" "application/json")
     ~body:(Cohttp_lwt.Body.of_string request_body)
-    (Uri.of_string "https://graph.facebook.com/v2.6/me/messages?access_token=EAAEZBhqyWObQBAED8CndCr1WRaFMTjCwdF1qfLb78CXt3G15ZC6POeaaSjPzUiY8ve9by9PJk2OmJs7P8daeqFQz6Bj05MKhWNgmiJJFyyr8fzuZAh3G8gIZBzkvOO6UFXBio1Yf4oLZAoCuOLC3ZBMsEXqo94LOyhB0kl2wtzmDyFUSyZAj7nv")
+    (* (Uri.of_string "https://graph.facebook.com/v2.6/me/messages?access_token=EAAEZBhqyWObQBAED8CndCr1WRaFMTjCwdF1qfLb78CXt3G15ZC6POeaaSjPzUiY8ve9by9PJk2OmJs7P8daeqFQz6Bj05MKhWNgmiJJFyyr8fzuZAh3G8gIZBzkvOO6UFXBio1Yf4oLZAoCuOLC3ZBMsEXqo94LOyhB0kl2wtzmDyFUSyZAj7nv") *)
+       (Uri.of_string "google.com")
     >>= fun (resp, body) ->
     let code = resp |> Response.status |> Code.code_of_status in
     Printf.printf "Response code: %d\n" code;
     Printf.printf "Headers: %s\n" (resp |> Response.headers |> Header.to_string);
     body |> Cohttp_lwt.Body.to_string >|= fun body ->
-    Printf.printf "Body of length: %d\n" (String.length body); body)
-(* 
-let handleMessage sender_psid (received_message: Yojson.Basic.json) = 
-  let text = received_message |> member "text" |> to_string in
-  callSendAPI sender_psid ("\"text\": " ^ text) *)
+    Printf.printf "Body of length: %d\n" (String.length body);
+    print_endline "Sent api request";
+    body)
 
-let env = ref init_enviro
 let webhook req =
   let headers = Header.init_with "Content-Type" "application/json" in
   let j = Yojson.Basic.from_string req.req_body in
@@ -114,17 +169,20 @@ let webhook req =
     let handle_entry entry = (
       let webhook_event = List.nth (entry |> member "messaging" |> to_list) 0 in
       let sender_psid = webhook_event |> member "sender" |> member "id" |> to_string in
-      let command = webhook_event |> member "message" |> member "text" |> to_string in
-      let (result, env') = (Eval.evaluate_line !env command) in
-      (env := env';
-      let message = ("\"text\": " ^ result) in
-      print_endline ("Result" ^ result);
+      print_endline ("Message: " ^ (webhook_event |> member "message" |> Yojson.Basic.to_string));
+      let regex = Str.regexp "\n" in
+      let command = webhook_event |> member "message" |> member "text" |> to_string |> String.lowercase_ascii in
+      let (result, env') = (Eval.evaluate_line (get_env sender_psid) command) in
+      (Hashtbl.replace user_environments sender_psid env';
+      let message = ("{\"text\": \"" ^ (result  |> Str.global_replace regex "\\n") ^ "\"}") in
+      print_endline ("Result " ^ result);
       callSendAPI sender_psid message)
     ) in (
       List.map handle_entry entries;
       let res_body = "Processed request successfully" in
-        {headers; status; res_body};
-    )
+        {headers; status; res_body}
+    );
+
   )
 
 
@@ -165,7 +223,7 @@ let _ =
   add_route (`GET, "/test/get") test;
   add_route (`POST, "/webhook") webhook;
   add_route (`GET, "/webhook") webhook_verif;
-  run ~port:8000 ()
+  run ~port:1337 ()
 
 
 

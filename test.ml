@@ -295,6 +295,8 @@ let a22 = "[[2., -3.], [-4., 5.]]"
 let a23 = "[[6., 2., 3.], [-2., -5., 0.]]"
 let a231 = "[[1., 1., 1.], [1., 1., 1.]]"
 let a220 = "[[0., 0.], [0., 0.]]"
+let a210 = "[[0.], [0.]]"
+let a310 = "[[0.], [0.], [0.]]"
 let a221 = "[[1., 1.], [1., 1.]]"
 let b22 = "[[7., 34.], [56., -19.]]"
 let c22 = "[[4., 3.], [3., 2.]]"
@@ -465,6 +467,33 @@ let linear_arith_tests = [
   ("simple_solve",
    "[[2., -3.], [-4., 5.]] [[1.], [1.]] matrix_solve",
    "[\n[ -4. ]\n[ -3. ]\n]");
+  ("solve_2x2_valid", i22 ^ " " ^ a21 ^ " matrix_solve",
+  "[\n[ 2. ]\n[ 4. ]\n]");
+  ("solve_2x2_invalid_reverse", a21 ^ " " ^ i22 ^ " matrix_solve",
+  "matrix size issue");
+  ("solve_2x2_valid_zero", i22 ^ " " ^ a210 ^ " matrix_solve",
+  "[\n[ 0. ]\n[ 0. ]\n]");
+  ("solve_2x2_wrong_height", i22 ^ " " ^ a31 ^ " matrix_solve",
+  "matrix size issue");
+  ("solve_3x3_valid", i33 ^ " " ^ a31 ^ " matrix_solve",
+  "[\n[ 2. ]\n[ 4. ]\n[ 8. ]\n]");
+  ("solve_3x3_invalid_reverse", a31 ^ " " ^ i33 ^ " matrix_solve",
+  "matrix size issue");
+  ("solve_3x3_valid_zero", i33 ^ " " ^ a310 ^ " matrix_solve",
+  "[\n[ 0. ]\n[ 0. ]\n[ 0. ]\n]");
+  ("solve_3x3_wrong_height", i33 ^ " " ^ a21 ^ " matrix_solve",
+  "matrix size issue");
+  ("solve_2x3_wrong_size", a23 ^ " " ^ a12 ^ " matrix_solve",
+  "matrix size issue");
+  ("solve_1x1_valid", a11 ^ " " ^ b11 ^ " matrix_solve",
+  "[\n[ -7. ]\n]");
+  ("solve_1x1_valid_zero", a11 ^ " " ^ a110 ^ " matrix_solve",
+  "[\n[ 0. ]\n]");
+  ("solve_1x1_invalid_reverse", a110 ^ " " ^ a11 ^ " matrix_solve",
+  "[\n[ ]\n]");
+  ("solve_2x2_inconsistent", "[[2., -3.], [4., -6.]] [[1.], [1.]] matrix_solve",
+  "this system is not consistent");
+
 
   (*-------- inv --------*)
   ("inv_1x1", a11 ^ " inv",

@@ -331,26 +331,105 @@ let linear_arith_tests = [
   ("simpl_float_scale", "2. [[2., 3.], [5., 7.]] scale", "[\n[ 4. 6. ]\n[ 10. 14. ]\n]");
   (*scaling an int matrix*)
   ("simpl_int_scale", "2 [[2, 3], [5, 7]] scale", "[\n[ 4 6 ]\n[ 10 14 ]\n]");
+  ("simple_scale_1x10", "0." ^ " " ^ a110 ^ " scale",
+   "[\n[ 0. ]\n]");
+   ("simple_scale_1x1_0_scalebynonzero", "5." ^ " " ^ a110 ^ " scale",
+   "[\n[ 0. ]\n]");
+  ("simple_scale_2x31", "3." ^ " " ^ a231 ^ " scale",
+   "[\n[ 3. 3. 3. ]\n[ 3. 3. 3. ]\n[ 3. 3. 3. ]\n]");
 
   (*-------- . --------*)
   ("simple_dot_1x1", a11 ^ " " ^ b11 ^ " .",
    "-7.");
+  ("simple_dot_1x2", "[[1. 2.]] [[3., 4.]] .",
+   "11.");
+  ("simple_dot_1x3", a13 ^ " " ^ b13 ^ " .",
+  "32");
+  ("simple_dot_1x3_reverse", b13 ^ " " ^ a13 ^ " .",
+  "32");
   (*simple int dot product*)
   ("simple_int_dot_prod", "[[2], [5], [4]] [[5], [3], [1]] .", "29");
   (*simple float dot product*)
   ("simple_float_dot_prod", "[[2.], [7.], [4.]] [[3.], [3.], [1.5]] .", "33.");
 
   (*-------- # --------*)
+  ("simple_dot_3x1", "[[4., 5., 6.]] [[7., 2., 3.]] #",
+  "[\n[ 3. 30. -27. ]\n]");
+  ("simple_dot_3x1_reverse", "[[7., 2., 3.]] [[4., 5., 6.]] #",
+  "[\n[ 3. -30. 27. ]\n]");
   (*simple cross product ints*)
   ("simple_int_cross_prod", "[[1], [2], [4]] [[6], [2], [1]] #", "[\n[ -6 ]\n[ 23 ]\n[ -10 ]\n]");
   (*simple cross product floatss*)
   ("simple_float_cross_prod", "[[6.5], [3.5], [4.]] [[2.], [4.], [10.]] #", "[\n[ 19. ]\n[ -57. ]\n[ 19. ]\n]");
 
   (*-------- = --------*)
-  ("equal_1x1_0", a110 ^ " " ^ a110 ^ " =",
+  ("equal_a11", a11 ^ " " ^ a11 ^ " =",
    "1");
-  ("equal_1x3", a13 ^ " " ^ a13 ^ " =",
+   ("equal_a21", a21 ^ " " ^ a21 ^ " =",
    "1");
+   ("equal_a12", a12 ^ " " ^ a12 ^ " =",
+   "1");
+   ("equal_a22", a22 ^ " " ^ a22 ^ " =",
+   "1");
+   ("equal_b11", b11 ^ " " ^ b11 ^ " =",
+   "1");
+   ("equal_b22", b22 ^  " " ^ b22 ^ " =",
+   "1");
+   ("equal_c22", c22 ^  " " ^ c22 ^ " =",
+   "1");
+   ("equal_a13", a13 ^ " " ^ a13 ^ " =",
+   "1");
+   ("equal_b13", b13 ^ " " ^ b13 ^ " =",
+   "1");
+   ("equal_b12", b12 ^ " " ^ b12 ^ " =",
+   "1");
+   ("equal_i22", i22 ^ " " ^ i22 ^ " =",
+   "1");
+   ("equal_i33", i33 ^ " " ^ i33 ^ " =",
+   "1");
+   ("equal_a110", a110 ^ " " ^ a110 ^ " =",
+   "1");
+   ("equal_a220", a220 ^ " " ^ a220 ^ " =",
+   "1");
+   ("equal_a330", a330 ^ " " ^ a330 ^ " =",
+   "1");
+   ("equal_a231", a231 ^ " " ^ a231 ^ " =",
+   "1");
+   ("equal_a23", a23 ^ " " ^ a23 ^ " =",
+   "1");
+
+  ("equal_not_a11", a11 ^ " " ^ a22 ^ " =",
+   "0");
+   ("equal_not_a21", a21 ^ " " ^ a22 ^ " =",
+   "0");
+   ("equal_not_a12", a12 ^ " " ^ a22 ^ " =",
+   "0");
+   ("equal_not_b11", b11 ^ " " ^ a22 ^ " =",
+   "0");
+   ("equal_not_b22", b22 ^  " " ^ a22 ^ " =",
+   "0");
+   ("equal_not_c22", c22 ^  " " ^ a22 ^ " =",
+   "0");
+   ("equal_not_a13", a13 ^ " " ^ a22 ^ " =",
+   "0");
+   ("equal_not_b13", b13 ^ " " ^ a22 ^ " =",
+   "0");
+   ("equal_not_b12", b12 ^ " " ^ a22 ^ " =",
+   "0");
+   ("equal_not_i22", i22 ^ " " ^ a22 ^ " =",
+   "0");
+   ("equal_not_i33", i33 ^ " " ^ a22 ^ " =",
+   "0");
+   ("equal_not_a110", a110 ^ " " ^ a22 ^ " =",
+   "0");
+   ("equal_not_a220", a220 ^ " " ^ a22 ^ " =",
+   "0");
+   ("equal_not_a330", a330 ^ " " ^ a22 ^ " =",
+   "0");
+   ("equal_not_a231", a231 ^ " " ^ a22 ^ " =",
+   "0");
+   ("equal_not_a23", a23 ^ " " ^ a22 ^ " =",
+   "0");
   
 
   (*-------- row --------*)
@@ -386,7 +465,7 @@ let linear_arith_tests = [
   "index out of bounds");
 
   (*-------- matrix_solve --------*)
-  (*tests solving a siple system of eqn*)
+  (*tests solving a simple system of eqn*)
   ("simple_solve",
    "[[2., -3.], [-4., 5.]] [[1.], [1.]] matrix_solve",
    "[\n[ -4. ]\n[ -3. ]\n]");
@@ -624,6 +703,40 @@ let linear_arith_tests = [
    "[\n[ -0.576923076923 ]\n[ 0.230769230769 ]\n[ 1. ]\n]");
 
   (*-------- colspace --------*)
+  ("colspace_a11", a11 ^ " colspace",
+   "[\n[ 1. ]\n]");
+   ("colspace_a21", a21 ^ " colspace",
+   "[\n[ 2. ]\n[ 4. ]\n]");
+   ("colspace_a12", a12 ^ " colspace",
+   "[\n[ 2. ]\n]");
+   ("colspace_a22", a22 ^ " colspace",
+   "[\n[ 2. -3. ]\n[ -4. 5. ]\n]");
+   ("colspace_b11", b11 ^ " colspace",
+   "[\n[ -7. ]\n]");
+   ("colspace_b22", b22 ^ " colspace",
+   "[\n[ 7. 34. ]\n[ 56. -19. ]\n]");
+   ("colspace_c22", c22 ^ " colspace",
+   "[\n[ 4. 3. ]\n[ 3. 2. ]\n]");
+   ("colspace_a13", a13 ^ " colspace",
+   "[\n[ 1. ]\n]");
+   ("colspace_b13", b13 ^ " colspace",
+   "[\n[ 4. ]\n]");
+   ("colspace_b12", b12 ^ " colspace",
+   "[\n[ 7. ]\n]");
+   ("colspace_i22", i22 ^ " colspace",
+   "[\n[ 1. 0. ]\n[ 0. 1. ]\n]");
+   ("colspace_i33", i33 ^ " colspace",
+   "[\n[ 1. 0. 0. ]\n[ 0. 1. 0. ]\n[ 0. 0. 1. ]\n]");
+   ("colspace_a110", a110 ^ " colspace",
+   "[\n[ ]\n]");
+   ("colspace_a220", a220 ^ " colspace",
+   "[\n[ ]\n[ ]\n]");
+   ("colspace_a330", a330 ^ " colspace",
+   "[\n[ ]\n[ ]\n[ ]\n]");
+   ("colspace_a231", a231 ^ " colspace",
+   "[\n[ 1. ]\n[ 1. ]\n");
+   ("colspace_a23", a23 ^ " colspace",
+   "[\n[ 6 2 ]\n[ -2 -5 \n]");
 ]
 
 

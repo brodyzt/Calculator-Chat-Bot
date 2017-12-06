@@ -48,16 +48,19 @@ Instructions for set up
   1. The only the packages used with the terminal version are oUint, and nums
   so you should not need to install anything to run the command line version
   2. There is a make file to make running the code simpler
-    - `make compile` will compile the code
     - `make test` will run the test suite
     - `make repl` will compile and run the 
     - `make clean` will clean up the files built
 + Running the server
+    - `make compile` will compile the code
+    - ./sever.ml will run the server
 
 + Using the messanger bot
-  
+    - you can message "Ocaml Calculator" or CLICK THIS LINK to message the the bot
+
 Using the calculator
 ================
+
 Types
 ------
 + integers (of infinite size)
@@ -66,7 +69,7 @@ Types
   - ex. `34.564`
 + strings (must be contained in quotation marks)
   - ex.   `"Hello!!"`
-+ matricies (row major)
++ matricies (row major) and require spaces after commas and no spaces after ]
   - ex. `[[2., -3.], [-4., 5.]]`
 
 Built in Operators
@@ -79,7 +82,7 @@ Built in Operators
   must be of the same size
 + `a b *` will compute normal integer/ floating point multiplication of `a` and `b`
 + `a b /` will compute integer/floating point division of `a` `b` 
-  - note: integer division will be floored for numbers where the [b] does not divide the [a]. If [b] is 0 then this equation will evaluate to 0 and a warning will be given.
+  - note: integer division will be floored for numbers where the `b` does not divide the `a`. If `b` is 0 then this equation will evaluate to 0 and a warning will be given.
 + `a b ^` operator will raise `a` to the `b` power where `a` and `b` are normal integers or floating point numbers. This may cause floating point numbers to overflow, but integers will never overflow their value, though could cause aslow response.
 + `a b =` tests equality of `a` and `b` which are normal integer or floating point values
 + `a b c ?` will be used like an if statement. `a` will act as the guard, so if it evaluates to a non zero value then the stack will process `b` and if `a` is a zero value then `c` will be processed by the stack.
@@ -96,16 +99,16 @@ Built in Operators
 + `a b lcm` computes the least common multiple of `a` and `b`, where `a`, `b`, and `c` are integers
 + `a factor` computes the factors of `a`, where `a` is an integer
 + `a gen_prime` is an integer greater than `a`, which is prime with very high probability\
-  - `` `prime`` will give the most recently generated prime
+  - ` 'prime` will give the most recently generated prime
 + `n is_prime` is 1 if `n` is prime and 0 if `n` is not prime, can be slow for large `n`
 + `n is_prime_prob` is 1 if `n` is prime and 0 if `n` is not prime with high probability, much faster than is_prime, but not guaranteed to be correct.
-  - note: if the user types `` `prime_prob`` you will recieve the result of the last call to is_prime_prob
+  - note: if the user types `'prime_prob` you will recieve the result of the last call to is_prime_prob
 + `a totient` computes the Euler’s totient function of `a` where `a` is an integer > 0
 + `p q d public_key` will generate a public key based on the private key `(p, q, d)`
-  - `` `n`` and `` `e`` will give the public key most recently calculated
+  - `'n` and `'e` will give the public key most recently calculated
   - though generate_public_key takes 3 parameters, it can take the resulting tuple produced by generate_private_key
 + `generate_private_key` will generate, with very high probability, a triple (d,p,q) where p,q are two large prime numbers, and d is a unit modulo p*q
-   - `` `p``, `` `q``, and `` `d`` will give the private key most recently generated
+   - `'p`, `'q`, and `'d` will give the private key most recently generated
 + `a b c encrypt` will encrypt the string `a` using `b` `c` as the public key where `b` is a large number, and `d` is a unit modulo `b`.
   - though encrypt takes 3 parameters, it can take 2 the second being the resulting pair created by `public_key` 
 + `a b c d decrypt` will decrypt the number `a` using `b` `c` `d` as the private key where `b` is a large prime integer, `c` is a large prime integer, and `d` is a unit modulo the product of `b` and `c`.

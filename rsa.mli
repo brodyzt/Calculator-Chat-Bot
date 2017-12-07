@@ -19,6 +19,6 @@ val get_public_key: Types.private_key -> Types.value
   private key k*)
  val decrypt: Types.private_key -> Types.integer -> Types.value
 
-(*[crack k i] is the Some s, where i is the result of [encrypt k s]
+(*[crack k i] is some s, where i is the result of [encrypt k s]
   this could take a very long time if i can not be factored quickly*)
  val crack: Types.public_key -> Types.integer -> Types.value

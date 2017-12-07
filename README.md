@@ -184,15 +184,15 @@ integer > 0 otherwise error message "totient undefined for non_positive values"
   tuple produced by generate_private_key
 + `generate_private_key` will generate, with very high probability, a triple
 (d,p,q) where p,q are two large prime numbers, and d is a unit modulo p*q
-   - `'p`, `'q`, and `'d` will give the corresponding components private key most recently generated
+   - `'p`, `'q`, and `'d` will give the corresponding components of the private key most recently generated
 + `msg n e encrypt` will encrypt the string `msg` using `n` `e` as the public
 key where `n` is a large product of two distinct, and `e` is a unit modulo `n`.
-  - though encrypt takes 3 parameters, it can take 2 the second being the
+  - though encrypt takes 3 parameters, it can take 2 with the second being the
   resulting pair created by `public_key`
 + `c d p q decrypt` will decrypt the number `c` using `d` `p` `q` as the
 private key where `p` is a large prime integer, `q` is a large prime integer,
 and `d` is a unit modulo the product of `p` and `q`.
-  - though encrypt takes 4 parameters, it can take 2 the second being the
+  - though encrypt takes 4 parameters, it can take 2 with the second being the
   resulting tuple produced by generate_private_key
 + `c n e crack` will attempt to decrypt the integer `c` using `n` `e` as the
 public key where `n` is the product of 2 large primes, and `e` is a unit mod `n`.

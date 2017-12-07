@@ -26,7 +26,12 @@ let simple_lang_tests = [
   (*tests a simple if, if the value if the first one is a true (non 0) value*)
   ("simple_if_true", "1 2 3 ?", "2");
 
+]
 
+let lang_tests = [
+  ("var defn", ["{x :-> 5}"; "x"], "5");
+  ("simpl fun defn", ["{add2 : x -> x 2 +}"; "4 add2"], "6");
+  ("simpl 2 param fun defn", ["{add : x y -> x y +} "; "4. 7. add"], "11.");
 ]
 
 let simpl_arith_tests = [
@@ -794,10 +799,25 @@ let tests = [
   rsa_arith_tests;
 ]
 
+let rec cont_eval l (v,env) =
+  match l with
+  | [] -> v
+  | h :: t ->
+      cont_eval t (Eval.evaluate_line (env) h )
+
+
+let make_multi_line_tests =
+  List.rev_map
+    (fun (name, test, value) ->
+      name >:: (fun _ -> assert_equal value (cont_eval test ("",PMap.empty)))
+    )
+
 let make_tests =
   List.rev_map
     (fun (name, test, value) ->
-      name >:: (fun _ -> assert_equal value (fst (Eval.evaluate_line (PMap.empty) test)) )
+      name >:: (fun _ -> assert_equal value
+                        (fst (Eval.evaluate_line (PMap.empty) test)) )
     )
 
-let _ = run_test_tt_main ("suite" >::: (make_tests (List.flatten tests)))
+let _ = run_test_tt_main ("suite" >::: ((make_multi_line_tests lang_tests)
+                                        @(make_tests (List.flatten (tests)))))

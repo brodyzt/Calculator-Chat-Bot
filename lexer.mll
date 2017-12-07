@@ -14,7 +14,7 @@ let stack = Stack.create ()
  * of which takes precidence*)
 let no_op env op =
   match op with
-  | "generate_private_key" -> begin
+  | "gen_priv_key" -> begin
     let PrivKey(d, p, q) = Rsa.gen_private_key () in
       (PrivKey(d, p, q),
        env |> PMap.add "'p" (N (I p)) |> PMap.add "'q" (N (I q)) |> PMap.add "'d" (N (I  d)) )
@@ -290,7 +290,7 @@ let int_matrix = '[' int_vector (", "int_vector) * ']'
  * any excapsed charactures*)
 let string = '"' _ *  '"'
 let id = (letter ) (letter | digit | "_")*
-let nop = "generate_private_key"
+let nop = "gen_priv_key"
 let uop = "inv" | "transpose" | "echelon" | "reduce" | "det" | "indep" | "dep"
           | "nullspace" | "colspace" | "!" | "factor" | "gen_prime"
           | "is_prime" | "is_prime_prob" | "totient" | "'prime" | "'p"
@@ -363,7 +363,7 @@ rule read env = parse
   | _ {
     Stack.push
       (E("I do not understand the token: "^(Lexing.lexeme lexbuf)))
-      stack; env
+      stack; read env lexbuf
   }
   | eof {env }
 and baked_in env = parse

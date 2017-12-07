@@ -29,6 +29,8 @@ let simple_lang_tests = [
 ]
 
 let lang_tests = [
+  (*a majority of these tests were done interactivly, but here are some simple
+   * tests to avoid reversion*)
   ("var defn", ["{x :-> 5}"; "x"], "5");
   ("simpl fun defn", ["{add2 : x -> x 2 +}"; "4 add2"], "6");
   ("simpl 2 param fun defn", ["{add : x y -> x y +} "; "4. 7. add"], "11.");
@@ -129,7 +131,7 @@ let simpl_arith_tests = [
   ("simple_integer_mod3", "0 100 %", "0");
   ("simple_integer_mod4", "-5 -4 %", "-1");
   ("simple_integer_mod4", "-1 -1 %", "0");
-  
+
 
   (*-------- = --------*)
   (*tests the equality of two numbers*)
@@ -371,7 +373,7 @@ let comb_arith_tests = [
   ("small_choose", "13 5 choose", "1287");
   (*computes a large choose*)
   ("large_choose", "217 43 choose", "5601414076770489401221861478881318576914682800");
-  
+
   (*-------- perm --------*)
   ("first_negative_perm", "-13 5 perm", "Negative values are not allowed");
   ("second_negative_perm", "13 -5 perm", "Negative values are not allowed");

@@ -17,7 +17,8 @@ let string_of_number n =
 (*[string_of_matrix m] converts the matrix [m] to a string*)
 let string_of_matrix m =
   "[\n"^(Array.fold_right ( fun  e ac ->
-    "[ "^(Array.fold_right (fun  el acc -> (string_of_number el)^" "^acc) e ("]\n"^ac))  )
+    "[ "^(Array.fold_right (fun  el acc ->
+      (string_of_number el)^" "^acc) e ("]\n"^ac))  )
     m
     "]"
      )
@@ -72,12 +73,7 @@ let rec string_of_value v =
   | P (l, r) -> "("^string_of_value l^","^string_of_value r^")"
   | Func _ -> "op"
 
-(*[evaluate_line env s] evaluates [s] representing a program in the enviroment
- * [env] which binds all the previously defined user functions, the program can
- * define a new function contained in curly braces or evaluate a stack program
- * a new function definition will add a binging to the enviroment while
- * evlauating a program will not change the enviroment, but the top element on
- * the stack will be converte to a string and paired with the enviroment*)
+
 let evaluate_line env s =
   try
     let lexbuf = Lexing.from_string s in

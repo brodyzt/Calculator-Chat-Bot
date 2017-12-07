@@ -1,41 +1,46 @@
 MAKE :
+
  -> change make so that grader does not need to install everything to run
  -> install script
  -> make server sperate command?
 
+
 DESIGN_DOC
- _ add work break down section
- _ update testing plan
- _ update list of commands
- _ update the types section to give examples
+ _ put in what you did for the project
+ x add work break down section
+ x update testing plan
+ x update list of commands
+
 
 README:
- _ add how to install required packages
- _ add a dependencies section
- _ update the list of commands
+ x add how to install required packages
+ x add a dependencies section
+ x update the list of commands
  _ update how to use the bot
 
 TEST:
- _ add more solve tests
- _ add more simple arith tests
- _ add more comb tests
+
+ ✅ add more solve tests
+ ✅ add more simple arith tests
+ ✅ add more comb tests
+
 
 LIN_ALG:
  x fix nullspace and solve for matricies with less rows than cols
 
 EVAL:
- _ try catch so we dont see any errors
+ x try catch so we dont see any errors
 
 LEXER:
- _ make matrix non jagad arrays
+ x make matrix non jagad arrays
 
 REPL:
- _ make sure things are printing nicely
+ x make sure things are printing nicely
 
 
 BOT:
- _ have really long qyeries time out for the bot
+ _ have really long qeries time out for the bot/ maybe have them return when done
 
 ALL FILES:
- _ helper method documentation
- _ clean up code (make style good - no lines over 80 chars/Library functions/tail rec)
+ x helper method documentation
+ x clean up code (make style good - no lines over 80 chars/Library functions/tail rec)

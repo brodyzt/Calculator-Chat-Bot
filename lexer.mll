@@ -14,10 +14,11 @@ let stack = Stack.create ()
  * of which takes precidence*)
 let no_op env op =
   match op with
-  | "generate_private_key" -> begin
+  | "gen_priv_key" -> begin
     let PrivKey(d, p, q) = Rsa.gen_private_key () in
       (PrivKey(d, p, q),
-       env |> PMap.add "'p" (N (I p)) |> PMap.add "'q" (N (I q)) |> PMap.add "'d" (N (I  d)) )
+       env |> PMap.add "'p" (N (I p)) |> PMap.add "'q" (N (I q))
+           |> PMap.add "'d" (N (I  d)) )
   end
   | "'prime"
   | "'p"
@@ -66,7 +67,8 @@ let un_op env op =
        * take the results of corresponding methods*)
       | "public_key", PrivKey(d, p, q) -> begin
           let PubKey(n, e) = Rsa.get_public_key (d,p,q) in
-            (PubKey(n,e), env |> PMap.add "'n" (N (I n)) |> PMap.add "'e" (N(I e)) )
+            (PubKey(n,e), env |> PMap.add "'n" (N (I n))
+              |> PMap.add "'e" (N(I e)))
         end
       | _, E(e) -> E(e), env
       | _ -> E("not a defined operator"), env
@@ -232,7 +234,8 @@ let rec row_to_list s f =
   let len = String.length s in
   match c with
     | None -> (f s)::[]
-    | Some x -> (f (String.sub s 0 x))::(row_to_list (String.sub s (x+2) (len-x-2) ) f)
+    | Some x ->
+      (f (String.sub s 0 x))::(row_to_list (String.sub s (x+2) (len-x-2) ) f)
 
 (*[make_rows s f] makes a list of lists wich are the rows of the matrix which
  * is represented as the string [s] using the function f to convert from a
@@ -290,7 +293,7 @@ let int_matrix = '[' int_vector (", "int_vector) * ']'
  * any excapsed charactures*)
 let string = '"' _ *  '"'
 let id = (letter ) (letter | digit | "_")*
-let nop = "generate_private_key"
+let nop = "gen_priv_key"
 let uop = "inv" | "transpose" | "echelon" | "reduce" | "det" | "indep" | "dep"
           | "nullspace" | "colspace" | "!" | "factor" | "gen_prime"
           | "is_prime" | "is_prime_prob" | "totient" | "'prime" | "'p"
@@ -363,7 +366,7 @@ rule read env = parse
   | _ {
     Stack.push
       (E("I do not understand the token: "^(Lexing.lexeme lexbuf)))
-      stack; env
+      stack; read env lexbuf
   }
   | eof {env }
 and baked_in env = parse

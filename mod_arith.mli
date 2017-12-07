@@ -27,16 +27,16 @@ val subtract: Types.integer -> Types.integer -> Types.integer -> Types.value
 val eq: Types.integer -> Types.integer -> Types.integer -> Types.value
 
 (*[multiply a b n] is the unique 0 <= r < n such that (a*b - r) divides n
-  or if n <= 0 then the result will be an exception valu*)
+  or if n <= 0 then the result will be an exception value*)
 val multiply: Types.integer -> Types.integer -> Types.integer -> Types.value
 
 (*[divide a b n] is the unique 0 <= r < n such that (a*b' - r) divides n, where
-  if [multiply b b' n] is 1, or -1 if no such b' exists or
+  if [multiply b b' n] is 1, if no such b' exists or
   if n <= 0 then the result will be an exception value*)
 val divide: Types.integer -> Types.integer -> Types.integer -> Types.value
 
 (*[power a b n] is the unique 0 <= r < n such that (a^b -r) divides n if b >=0,
-  instead the unique 0 <= r < n such that (a'^-b -r) divides n, where
+  instead the unique 0 <= r < n such that (a'^-b -r) divides n if b < 0, or
   if n <= 0 then the result will be an exception value*)
 val power: Types.integer -> Types.integer -> Types.integer -> Types.value
 
@@ -66,7 +66,7 @@ val factor: Types.integer -> Types.value
 val is_prime: Types.integer -> Types.value
 
 (*[is_prime_prob n] This is a faster version of is_prime, but without
-   absolute certainty of result*)
+   absolute certainty of correctness of result*)
 val is_prime_likely: Types.integer -> Types.value
 
 (*[totient n] is the number of units in Z mod n. In other words it is the

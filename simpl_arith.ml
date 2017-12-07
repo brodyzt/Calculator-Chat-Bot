@@ -55,14 +55,19 @@ let divide a b =
     | _ -> E("Incorrect Types")
   with Division_by_zero -> E("division by 0")
 
-let modulus a b = N(I(mod_big_int a b))
+let modulus a b = N(I((int_of_big_int a) mod (int_of_big_int b) |> big_int_of_int))
 
 let power a b =
-  match a, b with
-  | I(a), I(b) -> N(I(power_big_int_positive_big_int a b))
-  | F(a), F(b) -> N(F(a**b))
-  | Q(a,b), Q(c,d) -> E("not supported")
-  | _ -> E("Incorrect Types")
+    match a, b with
+    | I(a), I(b) ->
+      if eq_big_int a zero_big_int = true && eq_big_int b zero_big_int
+      then E "undefined"
+      else N(I(power_big_int_positive_big_int a b))
+    | F(a), F(b) ->
+      if a = 0. && b = 0. then E("undefined")
+      else N(F(a**b))
+    | Q(a,b), Q(c,d) -> E("not supported")
+    | _ -> E("Incorrect Types")
 
 let eq a b =
   match a, b with

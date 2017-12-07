@@ -26,38 +26,126 @@ let simple_lang_tests = [
   (*tests a simple if, if the value if the first one is a true (non 0) value*)
   ("simple_if_true", "1 2 3 ?", "2");
 
+]
 
+let lang_tests = [
+  (*a majority of these tests were done interactivly, but here are some simple
+   * tests to avoid reversion*)
+  ("var defn", ["{x :-> 5}"; "x"], "5");
+  ("simpl fun defn", ["{add2 : x -> x 2 +}"; "4 add2"], "6");
+  ("simpl 2 param fun defn", ["{add : x y -> x y +} "; "4. 7. add"], "11.");
 ]
 
 let simpl_arith_tests = [
+  (*-------- + --------*)
   (*tests a simple addition of integers*)
   ("simple_integer_add", "2 3 +", "5");
+  ("simple_integer_commutative_add", "3 2 +", "5");
+  ("simple_integer_zero_add", "0 0 +", "0");
+  ("simple_integer_zero_and_other1_add", "0 1 +", "1");
+  ("simple_integer_zero_and_other2_add", "1 0 +", "1");
+  ("simple_integer_zero_and_other3_add", "0 -1 +", "-1");
+  ("simple_integer_zero_and_other4_add", "0 -5 +", "-5");
+  ("simple_integer_zero_and_other5_add", "0 5 +", "5");
+
   (*tests addition of simple floating point numbers*)
   ("simple_float_add", "2. 3. +", "5.");
+  ("simple_float_communtative_add", "3. 2. +", "5.");
+  ("simple_float_zero_add", "0. 0. +", "0.");
+  ("simple_float_zero_and_other1_add", "0. 1. +", "1.");
+  ("simple_float_zero_and_other2_add", "1. 0. +", "1.");
+  ("simple_float_zero_and_other3_add", "0. -1. +", "-1.");
+  ("simple_float_zero_and_other4_add", "0. -5. +", "-5.");
+  ("simple_float_zero_and_other5_add", "0. 5. +", "5.");
+
+  (*-------- - --------*)
   (*tests simple subtraction of integers which results in a negative integer*)
   ("simple_integer_subt", "2 3 -", "-1");
   (*tests simple subtraction of floating point numbers*)
   ("simple_float_subt", "10. 3. -", "7.");
+  ("simple_float_zero_sub", "0. 0. +", "0.");
+  ("simple_float_zero_and_other1_sub", "0. 1. -", "-1.");
+  ("simple_float_zero_and_other2_sub", "1. 0. -", "1.");
+  ("simple_float_zero_and_other3_sub", "0. -1. -", "1.");
+  ("simple_float_zero_and_other4_sub", "0. -5. -", "5.");
+  ("simple_float_zero_and_other5_sub", "0. 5. -", "-5.");
+
+  (*-------- * --------*)
   (*tests simple multiplication of integer values*)
   ("simple_integer_mult", "9 5 *", "45");
+  ("simple_integer_zero_and_other1_mult", "0 1 *", "0");
+  ("simple_integer_zero_and_other2_mult", "1 0 *", "0");
+  ("simple_integer_zero_and_other3_mult", "0 -1 *", "0");
+  ("simple_integer_zero_and_other4_mult", "0 -5 *", "0");
+  ("simple_integer_zero_and_other5_mult", "0 5 *", "0");
   (*tests multiplication of floating point numbers*)
   ("simple_float_mult", "2.5 7. *", "17.5");
+  ("simple_float_zero_and_other1_mult", "0. 1. *", "0.");
+  ("simple_float_zero_and_other2_mult", "1. 0. *", "0.");
+  ("simple_float_zero_and_other3_mult", "0. -1. *", "0.");
+  ("simple_float_zero_and_other4_mult", "0. -5. *", "0.");
+  ("simple_float_zero_and_other5_mult", "0. 5. *", "0.");
+
+  (*-------- / --------*)
   (*tests simple integer division*)
   ("simple_integer_div", "8 2 /", "4");
+  ("simple_integer_zero_and_other1_div", "0 1 /", "0");
+  ("simple_integer_zero_and_other2_div", "1 0 /", "division by 0");
+  ("simple_integer_zero_and_other3_div", "0 -1 /", "0");
+  ("simple_integer_zero_and_other4_div", "0 -5 /", "0");
+  ("simple_integer_zero_and_other5_div", "0 5 /", "0");
   (*tests simple floating point division*)
   ("simple_float_div", "27. 5. /", "5.4");
-  (*tests modulus for integers*)
-  ("simple_integer_mod", "100 3 %", "1");
-  (*tests taking powers of two relativly small integers*)
-  ("simple_integer_pow", "2 10 ^", "1024");
+  ("simple_float_zero_and_other1_div", "0. 1. /", "0.");
+  ("simple_float_zero_and_other2_div", "1. 0. /", "division by 0");
+  ("simple_float_zero_and_other3_div", "0. -1. /", "0.");
+  ("simple_float_zero_and_other4_div", "0. -5. /", "0.");
+  ("simple_float_zero_and_other5_div", "0. 5. /", "0.");
+
+  (*-------- ^ --------*)
   (*tests powers of the small floating point numbers*)
   ("simple_float_pow", "10. 3. ^", "1000.");
+  ("simple_float_pow_0._0.", "0. 0. ^", "Undefined");
+  ("simple_float_pow_sqrt", "25. 0.5 ^", "5.");
+  ("simple_float_pow_inverse", "10. -1. ^", "0.1");
+  (*tests powers of the large floating point numbers*)
+  ("big_simple_float_pow", "1000. 3. ^", "1000000000.");
+  ("big_simple_float_pow_sqrt", "25000. 0.5 ^", "158.113883008");
+  ("big_simple_float_pow_inverse", "10000000. -1. ^", "1e-07");
+
+  (*tests powers of the small integer numbers*)
+  ("simple_integer_pow", "10 3 ^", "1000");
+  ("simple_integer_pow_0._0.", "0 0 ^", "Undefined");
+  ("simple_integer_pow_inverse", "10 -1 ^", "I do not understand");
+  (*tests powers of the large integer numbers*)
+  ("big_simple_float_pow", "1000 3 ^", "1000000000");
+  ("big_simple_float_pow_sqrt", "25000 0.5 ^", "Incorrect Types");
+  ("big_simple_float_pow_inverse", "10000000 -1 ^", "I do not understand");
+
+
+  (*-------- % --------*)
+  (*tests modulus for integers*)
+  ("simple_integer_mod", "100 3 %", "1");
+  ("simple_integer_mod1", "100 0 %", "I do not understand");
+  ("simple_integer_mod2", "0 0 %", "I do not understand");
+  ("simple_integer_mod3", "0 100 %", "0");
+  ("simple_integer_mod4", "-5 -4 %", "-1");
+  ("simple_integer_mod4", "-1 -1 %", "0");
+
+
+  (*-------- = --------*)
   (*tests the equality of two numbers*)
   ("simple_integer_=", "18 17 =", "0");
+  ("simple_integer_reverse_=", "17 18 =", "0");
+  ("simple_integer_=_1", "0 0 =", "1");
+  ("simple_integer_=_2", "0 1 =", "0");
+  ("simple_integer_=_3", "4 0 =", "0");
   (*tests the equality of floating point numbers*)
   ("simple_float_=", "15.2 15.3 =", "0");
-
-
+  ("simple_integer_reverse_=", "15.3 15.2 =", "0");
+  ("simple_integer_=_1.", "0. 0. =", "1");
+  ("simple_integer_=_2", "0. 1. =", "0");
+  ("simple_integer_=_3", "4. 0. =", "0");
 ]
 
 let mod_arith_tests = [
@@ -261,7 +349,8 @@ let mod_arith_tests = [
 ]
 
 let comb_arith_tests = [
-  (*black box*)
+  (*-------- ! --------*)
+  ("negative_fact", "-3 !", "Negative values are not allowed");
   (*tests that zero factorial is 1*)
   ("zero_fact", "0 !", "1");
   (*tests that a 1 factorial is 1*)
@@ -270,16 +359,46 @@ let comb_arith_tests = [
   ("small_fact", "6 !", "720");
   (*tests a larger factorial*)
   ("large_fact", "30 !", "265252859812191058636308480000000");
+  ("inception_fact", "3 ! !", "720");
+
+  (*-------- choose --------*)
+  ("first_negative_choose", "-13 5 choose", "Negative values are not allowed");
+  ("second_negative_choose", "13 -5 choose", "Negative values are not allowed");
+  ("both_negative_choose", "-13 -5 choose", "Negative values are not allowed");
+  ("0_0_choose", "0 0 choose", "1");
+  ("1_1_choose", "1 1 choose", "1");
+  ("1_5_choose", "1 5 choose", "Invalid inputs");
+  ("5_1_choose", "5 1 choose", "5");
   (*computes a small combination*)
   ("small_choose", "13 5 choose", "1287");
   (*computes a large choose*)
   ("large_choose", "217 43 choose", "5601414076770489401221861478881318576914682800");
+
+  (*-------- perm --------*)
+  ("first_negative_perm", "-13 5 perm", "Negative values are not allowed");
+  ("second_negative_perm", "13 -5 perm", "Negative values are not allowed");
+  ("both_negative_perm", "-13 -5 perm", "Negative values are not allowed");
+  ("0_0_perm", "0 0 perm", "1");
+  ("1_1_perm", "1 1 perm", "1");
+  ("1_5_perm", "1 5 perm", "Invalid inputs");
+  ("5_1_perm", "5 1 perm", "5");
   (*computes a small permutation*)
   ("small_perm", "10 4 perm", "5040");
   (*computes a large perm*)
   ("large_perm", "49 25 perm", "980390734080409707851586040233984000000");
-  (*need partition tests*)
 
+  (*-------- part --------*)
+  ("first_negative_part", "-18 6 part", "Negative values are not allowed");
+  ("second_negative_part", "18 -4 part", "Negative values are not allowed");
+  ("both_negative_part", "-8 -4 part", "Negative values are not allowed");
+  ("0_0_part", "0 1 part", "1");
+  ("1_1_part", "0 2 part", "1");
+  ("1_5_part", "-4 6 part", "Invalid inputs");
+  ("5_1_part", "4 2 part", "5");
+  (*computes a small partutation*)
+  ("small_part", "10 4 part", "286");
+  (*computes a large part*)
+  ("large_part", "49 25 part", "11844267374132633700");
 ]
 
 let xempty = "[]"
@@ -339,12 +458,22 @@ let linear_arith_tests = [
   (*-------- . --------*)
   ("simple_dot_1x1", a11 ^ " " ^ b11 ^ " .",
    "-7.");
+  ("simple_dot_1x1_reverse", b11 ^ " " ^ a11 ^ " .",
+   "-7.");
+  ("simple_dot_1x1_size_error", a11 ^ " " ^ a21 ^ " .",
+   "matrix size issue");
+  ("simple_dot_1x1_size_reverse_error", a21 ^ " " ^ a11 ^ " .",
+   "matrix size issue");
   ("simple_dot_1x2", "[[1.], [2.]] [[3.], [4.]] .",
+   "11.");
+   ("simple_dot_1x2_reverse", "[[3.], [4.]] [[1.], [2.]] .",
    "11.");
   ("simple_dot_1x3", a13 ^ " transpose " ^ b13 ^ " transpose .",
   "32.");
   ("simple_dot_1x3_reverse", b13 ^ " transpose " ^ a13 ^ " transpose .",
   "32.");
+  ("simple_dot_3x3_size_error", a33 ^ " " ^ i33 ^ " .",
+   "matrix size issue");
   (*simple int dot product*)
   ("simple_int_dot_prod", "[[2], [5], [4]] [[5], [3], [1]] .", "29");
   (*simple float dot product*)
@@ -794,10 +923,25 @@ let tests = [
   rsa_arith_tests;
 ]
 
+let rec cont_eval l (v,env) =
+  match l with
+  | [] -> v
+  | h :: t ->
+      cont_eval t (Eval.evaluate_line (env) h )
+
+
+let make_multi_line_tests =
+  List.rev_map
+    (fun (name, test, value) ->
+      name >:: (fun _ -> assert_equal value (cont_eval test ("",PMap.empty)))
+    )
+
 let make_tests =
   List.rev_map
     (fun (name, test, value) ->
-      name >:: (fun _ -> assert_equal value (fst (Eval.evaluate_line (PMap.empty) test)) )
+      name >:: (fun _ -> assert_equal value
+                        (fst (Eval.evaluate_line (PMap.empty) test)) )
     )
 
-let _ = run_test_tt_main ("suite" >::: (make_tests (List.flatten tests)))
+let _ = run_test_tt_main ("suite" >::: ((make_multi_line_tests lang_tests)
+                                        @(make_tests (List.flatten (tests)))))

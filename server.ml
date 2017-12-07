@@ -31,7 +31,6 @@ let user_environments = Hashtbl.create 10
  * to the chat bot
 ***************************************************************************)
 
-
 type meth = Code.meth
 type uri = Uri.t
 
@@ -120,7 +119,6 @@ let post ?(content_type = "application/json") url data =
   let rc = Curl.get_responsecode c in
   Curl.cleanup c;
   rc, (Buffer.contents r)
-
 (**************************************************************************)
 
 
@@ -134,13 +132,12 @@ let formulate_body sender_psid response =
   "}"
 
 let callSendAPI sender_psid response =
-
-
   let request_body = formulate_body sender_psid response in
   let post_url = "https://graph.facebook.com/v2.6/me/messages?access_token=EAAEZBhqyWObQBAED8CndCr1WRaFMTjCwdF1qfLb78CXt3G15ZC6POeaaSjPzUiY8ve9by9PJk2OmJs7P8daeqFQz6Bj05MKhWNgmiJJFyyr8fzuZAh3G8gIZBzkvOO6UFXBio1Yf4oLZAoCuOLC3ZBMsEXqo94LOyhB0kl2wtzmDyFUSyZAj7nv" in
 
   (* calls post request helper function with formatted data *)
   post post_url request_body
+
 
 (* [webhook req] is called by Facebook 
  * messenger when a message is sent to Calculator bot. *)
@@ -169,7 +166,6 @@ let webhook req =
     let (result, env') = (Eval.evaluate_line (get_env sender_psid) command) in
     (Hashtbl.replace user_environments sender_psid env';
 
-
     (* formats new line characters for post request body *)
     let regex = Str.regexp "\n" in
     let escaped = (result  |> Str.global_replace regex "\\n") in
@@ -189,8 +185,6 @@ let webhook req =
     {headers; status; res_body}
     
     
-  
-
 (* endpoint used to verify webhook is running *)
 let webhook_verif req =
   let headers = Header.init_with "Content-Type" "text/plain" in

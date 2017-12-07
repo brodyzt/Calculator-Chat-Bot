@@ -70,7 +70,7 @@ Instructions for set up
     - this server is partially adapted from [ohttp](https://github.com/RamV13/ohttp/blob/master/README.md)
     - This will require installing some extra packages:
        * oUnit, str, nums, yojson, cohttp, lwt, ocurl
-    - to install dependencies run:
+    - to install these dependencies, run:
         `make install`
     - `make server` will compile and run the server
 

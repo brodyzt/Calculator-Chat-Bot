@@ -1,9 +1,10 @@
 System Description
 ==================
 We have implemented a programable calculator that has capabilities in multiple
-computer science related concepts a first or second year Cornell student my need help with.
-These topics include modular arithmetic, linear algebra, combinatorics, as well as basic
-calculator functionality such as multiplication and addition.
+computer science related concepts a first or second year Cornell student my need
+help with. These topics include modular arithmetic, linear algebra,
+combinatorics, as well as basic calculator functionality such as multiplication
+and addition.
 
 Discrete Help
 -------------
@@ -18,8 +19,9 @@ Functionality inculding :
   + decryption given a private key
   + small prime generation
   + probabilistic large prime generation
-- Solving systems of linear congruences modulo a number (and other easy diophantine equations,
-in addition to indicating if simple quadratic equations have a solution)
+- Solving systems of linear congruences modulo a number (and other easy
+diophantine equations, in addition to indicating if simple quadratic
+equations have a solution)
 - Basic Combinatorics including factorials, permutations, and combinations
 
 Linear Algebra Help
@@ -40,7 +42,8 @@ Programmability
 ---------------
 Our programming language is a small mathematical stack based language written
 in postfix (RPN) notation. The calculator comes with many built in operators
-for all of the above outlined topics, and allow the user to write their own operators
+for all of the above outlined topics, and allow the user to write their own
+operators
 
 Dependencies
 ============
@@ -61,7 +64,8 @@ Instructions for set up
   1. The only the packages used with the command line version are oUint, and nums
   so you should not need to install anything to run the command line version
   2. There is a make file to make running the code simpler
-    - required packages are oUnit(see #1 for install command) and Nums(does not require install)
+    - required packages are oUnit(see #1 for install command)
+    and Nums(does not require install)
     - `make test` will run the test suite
     - `make repl` will compile and run the repl, (control-c will quit)
     - `make clean` will clean up the files built
@@ -81,15 +85,16 @@ Instructions for set up
     - ./sever.ml will run the server
 
 + Using the messanger bot
-    - you can message "Ocaml Calculator" or CLICK THIS LINK to message the the bot
+    - you can message "Ocaml Calculator" or CLICK THIS LINK to message the the
+    bot
     - these commands will be case insensitive
 
 Using the calculator
 ================
-* note: if an error is raised and you do not interact with the resulting error that error
-may be burried on the stack, for example `2 0 / 3 5 *` will return `15` and will not
-display the divide by zero error, when the following says .... displays the error this is
-suceptible to happen
+* note: if an error is raised and you do not interact with the resulting error
+that error may be burried on the stack, for example `2 0 / 3 5 *` will return
+`15` and will not display the divide by zero error, when the following says
+.... displays the error this is suceptible to happen
 
 Types
 ------
@@ -100,15 +105,16 @@ Types
 + strings (must be contained in quotation marks)
   - ex.   `"Hello!!"`
 + matricies (row major) and require spaces after commas and no spaces after ]
-  - ex. `[[2., -3.], [-4., 5.]]` is the matrix   
-  | 2. -3. |  
+  - ex. `[[2., -3.], [-4., 5.]]` is the matrix
+  | 2. -3. |
   | -4  5. |
 
 Built in Operators
 ------------------
 simple arithmatic
 *****************
-+ `a b +` will compute the normal integer/floating point/matrix addition of `a` and `b`
++ `a b +` will compute the normal integer/floating point/matrix addition of
+`a` and `b`
   where `a` and `b` are of the same types, if they are both matricies then they
   must be of the same size
 + `a b -` will compute normal integer/floating point subtraction `a` and `b`
@@ -116,16 +122,18 @@ simple arithmatic
   must be of the same size
 + `a b *` will compute normal integer/floating point multiplication of `a` and `b`
 + `a b /` will compute integer/floating point division of `a` `b`
-  - note: integer division will be floored for numbers where the `b` does not divide
-  the `a`. If `b` is 0 then this equation will evaluate to an error, `"division by zero"`.
-+ `a b ^` operator will raise `a` to the `b` power where `a` and `b` are normal integers
-or floating point numbers. This may cause floating point numbers to overflow, but integers
+  - note: integer division will be floored for numbers where the `b` does not
+  divide the `a`. If `b` is 0 then this equation will evaluate to an error,
+  `"division by zero"`.
++ `a b ^` operator will raise `a` to the `b` power where `a` and `b` are normal
+integers or floating point numbers. This may cause floating point numbers to
+overflow, but integers
 will never overflow their value, though could cause a slow response.
-+ `a b =` tests equality of `a` and `b` which are normal integer, floating point, or
-matrix values
-+ `a b c ?` will be used like an if statement. `a` will act as the guard, so if it
-evaluates to a non zero value then the stack will process `b` and if `a` is a zero value
-then `c` will be processed by the stack.
++ `a b =` tests equality of `a` and `b` which are normal integer, floating
+point, or matrix values
++ `a b c ?` will be used like an if statement. `a` will act as the guard, so if
+it evaluates to a non zero value then the stack will process `b` and if `a` is
+a zero value then `c` will be processed by the stack.
 
 
 modular arithmetic
@@ -149,11 +157,14 @@ and `c` are integers, and `c` is positive
 otherwise the error message "cannot take the remainder mod a non-positive number"
 will be displayed
   - note: if the `b` is not relatively prime to `c` then division cannot proceed
-  and the error `"second arguement is not relatively prime to divisor"` will be displayed.
-+ `a b c ^~` operator will raise `a` to the `b` power then take the remainder mod `c`, where
-`a`, `b`, and `c` are integers, and `c` is positive otherwise the error message "cannot
+  and the error `"second arguement is not relatively prime to divisor"` will be
+  displayed.
++ `a b c ^~` operator will raise `a` to the `b` power then take the remainder
+mod `c`, where `a`, `b`, and `c` are integers, and `c` is positive otherwise
+the error message "cannot
 take the remainder mod a non-positive number" will be displayed
-+ `a b c =~` tests the equality of `a` and `b` mod `c`, where `a`, `b`, and `c` are integers
++ `a b c =~` tests the equality of `a` and `b` mod `c`, where `a`, `b`,
+and `c` are integers
 
 other modular operators
 ***********************
@@ -163,13 +174,13 @@ and `c` are integers
 and `c` are integers
 + `a factor` computes the factors of `a`, where `a` is an integer dispaying them
 as a list with their multiplicities
-+ `l gen_prime` is an integer representable with `l` bits, which is prime with very
-high probability and gives the error message "no primes this small" if the `l`
++ `l gen_prime` is an integer representable with `l` bits, which is prime with
+very high probability and gives the error message "no primes this small" if the `l`
 is to small
   - ` 'prime` will give the most recently generated prime
 + `n is_prime` is 1 if `n` is prime and 0 if `n` is not prime, can be slow
-for large `n` (for large n it could take lifetimes to finish, control-c will get you
-out of this sticky situation)
+for large `n` (for large n it could take lifetimes to finish, control-c will
+get you out of this sticky situation)
 + `n is_prime_prob` is 1 if `n` is prime and 0 if `n` is not prime with high
 probability, much faster than is_prime, but not guaranteed to be correct,
 roughly probability 1/2^100 of n being composite.
@@ -177,14 +188,17 @@ roughly probability 1/2^100 of n being composite.
   last call to is_prime_prob
 + `a totient` computes the Euler’s totient function of `a` where `a` is an
 integer > 0 otherwise error message "totient undefined for non_positive values"
-+ `p q d public_key` will generate a public key based on the private key `(p, q, d)`
-  - `'n` and `'e` will give the corresponding components of the public key most recently calculated
++ `p q d public_key` will generate a public key based on the private key
+`(p, q, d)`
+  - `'n` and `'e` will give the corresponding components of the public key most
+  recently calculated
 
   - though generate_public_key takes 3 parameters, it can take the resulting
   tuple produced by generate_private_key
 + `generate_private_key` will generate, with very high probability, a triple
 (d,p,q) where p,q are two large prime numbers, and d is a unit modulo p*q
-   - `'p`, `'q`, and `'d` will give the corresponding components of the private key most recently generated
+   - `'p`, `'q`, and `'d` will give the corresponding components of the
+   private key most recently generated
 + `msg n e encrypt` will encrypt the string `msg` using `n` `e` as the public
 key where `n` is a large product of two distinct, and `e` is a unit modulo `n`.
   - though encrypt takes 3 parameters, it can take 2 with the second being the
@@ -204,18 +218,22 @@ will be displayed if no such value exists
 where the as and bs are integers, there are `n` of those equations (otherwise
 a parsing error is enountered), the b's are relative prime (otherwise the method
 may fail, or give a false result), and each b is positive (otherwise the
-error message `"cannot take the remainder mod a non-positive number"` will be displayed)
-+ `a p square` indicates if a is a square mod p where p is a positive prime, and a is an integer. Gives the exception value "cannot take the remainder mod a non-positive number", if p <= 0.
+error message `"cannot take the remainder mod a non-positive number"` will be
+displayed)
++ `a p square` indicates if a is a square mod p where p is a positive prime,
+and a is an integer. Gives the exception value "cannot take the remainder mod
+a non-positive number", if p <= 0.
 
 combinatroics
 *************
 + `n !` is the calculation of a factorial where `a` is a positive integer
-+ `n k choose` is the calculation of `n` choose `k` where `n` and `k` are positive integer
++ `n k choose` is the calculation of `n` choose `k` where `n` and `k` are
+positive integer
 + `n k perm` is the calculation of the number of choices of `n` items
 from `k` where order matters, `n` and `k` are positive integers
 + `a b part` is the calculation of the number of ways `n` items
-can be partitioned into `k` categories where all `n` items would be indistinguishable,
-`n` and `k` are positive integers
+can be partitioned into `k` categories where all `n` items would be
+indistinguishable, `n` and `k` are positive integers
 
 linear alg
 **********
@@ -223,26 +241,32 @@ linear alg
 will proceed in the rational numbers, to avoid errors from tructation in integer
 division any time the improper sizes of imput matricies an erroe message
 "matrix size issue" will be diplayed
-+ `v1 v2 .` computes the dot product of `v1` and `v2` where `v1` and `v2` are column vectors
-+ `v1 v2 #` computes the cross product of `v1` and `v2` where `v1` and `v2` are column
++ `v1 v2 .` computes the dot product of `v1` and `v2` where `v1` and `v2` are
+column vectors
++ `v1 v2 #` computes the cross product of `v1` and `v2` where `v1` and `v2` are
+column
 vectors of height 3
 + `m s *` computes `m` scaled by `s` where `s` is a number and `m` is a matrix
-+ `m n col` gives the `n`th column of the matrix `m` where `n` is a 64 bit integer with
++ `m n col` gives the `n`th column of the matrix `m` where `n` is a 64 bit
+integer with
 within the matrix `m`
-+ `m n row` gives the `n`th row of the matrix `m` where `n` is a 64 bit integer with
++ `m n row` gives the `n`th row of the matrix `m` where `n` is a 64 bit integer
 within the matrix `m`
 + `m inv` computes the inverse of the matrix `m` if `m` is invertable
 + `m transpose` computes the transpose of the matrix `m`
 + `m echelon` reduces `m` to echelon form where `m` is a matrix
 + `m reduce` reduces `m` to reduced echelon form where `m` is a matrix
-+ `m b matrix_solve` solves the linear systems of equations `m`x=`b` where `m` and
-`b` have the same number of columns. if the system is inconsitent then the
++ `m b matrix_solve` solves the linear systems of equations `m`x=`b` where `m`
+and `b` have the same number of columns. if the system is inconsitent then the
 error message "inconsistant system" is displayed
 + `m det` computes the determinant of `m`, where `m` is a square matrix
-+ `a indep` computes if the columns of `a` are linearly independent where `a` is a matrix
++ `a indep` computes if the columns of `a` are linearly independent where `a`
+is a matrix
 + `m rank` computes the rank of the matrix `m`
-+ `m dep` computes if the columns of `m` are linearly dependent where `m` is a matrix
-+ `m indep` computes if the columns of `m` are linearly independent where `m` is a matrix
++ `m dep` computes if the columns of `m` are linearly dependent where `m`
+is a matrix
++ `m indep` computes if the columns of `m` are linearly independent where `m`
+is a matrix
 + `m nullspace` computes a matrix with the columns of the matrix being the null
 space of `m` where `m` is a matrix
 + `a colspace` computes a matrix with the columns of the matrix being the column
@@ -253,12 +277,12 @@ Defining a New Operator
 
 A function defintion must be entered in its own message to the calculator and be
 in the following form
-`{<name of function>: <param₁> … <paramn> -> <stack program for method>}`   
+`{<name of function>: <param₁> … <paramn> -> <stack program for method>}`
 Then to execute the function the user can list the arguments and then place the
 function name after the arguments listed in order
 * ex. ```
-      { add1 : x -> x 1 + }  
-      ```   
+      { add1 : x -> x 1 + }
+      ```
       ```
        3 add1
        ```
@@ -267,7 +291,7 @@ to define a variable they could create a constant function that will always
 evaluate to some value.
     * ex. ```
           {x :-> 5}
-          ```   
+          ```
           ```
            x
            ```

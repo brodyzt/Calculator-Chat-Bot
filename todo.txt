@@ -1,7 +1,9 @@
 MAKE :
- _ change make so that grader does not need to install everything to run
- _ install script
- x make server sperate command?
+
+ -> change make so that grader does not need to install everything to run
+ -> install script
+ -> make server sperate command?
+
 
 DESIGN_DOC
  _ put in what you did for the project
@@ -17,9 +19,11 @@ README:
  _ update how to use the bot
 
 TEST:
- x add more solve tests
- _ add more simple arith tests
- _ add more comb tests
+
+ ✅ add more solve tests
+ ✅ add more simple arith tests
+ ✅ add more comb tests
+
 
 LIN_ALG:
  x fix nullspace and solve for matricies with less rows than cols

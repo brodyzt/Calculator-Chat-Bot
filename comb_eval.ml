@@ -33,7 +33,7 @@ let combination n k =
     | Some numerator, Some ldenom, Some rdenom ->
       let denom = mult_big_int ldenom rdenom in
       N(I(div_big_int numerator denom))
-    | _ -> E("Inputs are not integers")
+    | _ -> E("Invalid inputs")
 
 let partition_identical n k =
   combination
@@ -48,4 +48,4 @@ let permutation n k =
     let denom_big_int_option = sub_big_int n k |> factorial |> big_int_of_value in
     match numerator_big_int_option, denom_big_int_option with
     | Some numerator, Some denom -> N(I(div_big_int numerator denom))
-    | _ -> E("Inputs are not integers")
+    | _ -> E("Invalid inputs")

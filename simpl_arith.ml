@@ -1,5 +1,6 @@
 open Types
 open Big_int
+exception Undefined
 
 let reduce (a,b) =
   let N(I g) = Mod_arith.gcd a b in
@@ -48,21 +49,31 @@ let divide a b =
   try
     match a, b with
     | I(a), I(b) -> N(I(div_big_int a b))
-    | F(a), F(b) -> N(F(a/.b))
+    | F(a), F(b) ->
+      begin
+        if b = 0. then raise Division_by_zero
+        else N(F(a/.b))
+      end
     | Q(a, b), I(c) -> N(reduce (a,(mult_big_int b c)))
     | I(a), Q(b, c) -> N(reduce ((mult_big_int a c),b))
     | a, Q(c, d) ->  multiply a (Q (d, c))
     | _ -> E("Incorrect Types")
   with Division_by_zero -> E("division by 0")
 
-let modulus a b = N(I(mod_big_int a b))
+let modulus a b = N(I((int_of_big_int a) mod (int_of_big_int b) |> big_int_of_int))
 
 let power a b =
-  match a, b with
-  | I(a), I(b) -> N(I(power_big_int_positive_big_int a b))
-  | F(a), F(b) -> N(F(a**b))
-  | Q(a,b), Q(c,d) -> E("not supported")
-  | _ -> E("Incorrect Types")
+  try
+    match a, b with
+    | I(a), I(b) ->
+      if eq_big_int a zero_big_int = true && eq_big_int b zero_big_int then raise Undefined
+      else N(I(power_big_int_positive_big_int a b))
+    | F(a), F(b) ->
+      if a = 0. && b = 0. then raise Undefined
+      else N(F(a**b))
+    | Q(a,b), Q(c,d) -> E("not supported")
+    | _ -> E("Incorrect Types")
+  with Undefined -> E("Undefined")
 
 let eq a b =
   match a, b with

@@ -249,8 +249,8 @@ Defining a New Operator
 -----------------------
 
 A function defintion must be entered in its own message to the calculator and be
-in the following form
-`{<name of function>: <param₁> … <paramn> -> <stack program for method>}`   
+in the following form:
+- `{<name of function>: <param₁> … <paramn> -> <stack program for method>}`   
 Then to execute the function the user can list the arguments and then place the
 function name after the arguments listed in order
 * ex. ```

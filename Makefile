@@ -22,6 +22,6 @@ compile:
 server:
 	make compile
 	ocamlbuild \
-	-pkgs lwt,cohttp,cohttp-lwt-unix,yojson,curl,str\
-		server.byte & \
+	-pkgs lwt,cohttp,cohttp-lwt-unix,yojson,curl,str \
+		server.byte 
 	./server.byte

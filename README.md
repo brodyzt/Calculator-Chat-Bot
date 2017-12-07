@@ -168,7 +168,7 @@ high probability and gives the error message "no primes this small" if the `l`
 is to small
   - ` 'prime` will give the most recently generated prime
 + `n is_prime` is 1 if `n` is prime and 0 if `n` is not prime, can be slow
-for large `n` (infact will possibly never terminate, control-c will get you
+for large `n` (for large n it could take lifetimes to finish, control-c will get you
 out of this sticky situation)
 + `n is_prime_prob` is 1 if `n` is prime and 0 if `n` is not prime with high
 probability, much faster than is_prime, but not guaranteed to be correct,

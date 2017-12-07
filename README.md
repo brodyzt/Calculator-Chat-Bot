@@ -61,33 +61,32 @@ Instructions for set up
 ========================
 + Running the Calculator in the terminal
   - commands will be case sensitive
-  1. The only the packages used with the command line version are oUint, and nums
+  1. The only the packages used with the command line version are oUint, nums, and str
   so you should not need to install anything to run the command line version
   2. There is a make file to make running the code simpler
     - required packages are oUnit(see #1 for install command)
     and Nums(does not require install)
     - `make test` will run the test suite
     - `make repl` will compile and run the repl, (control-c will quit)
+    - `make compile` will compile all the non server source code
     - `make clean` will clean up the files built
 + Running the server
     - this server is partially adapted from [ohttp](https://github.com/RamV13/ohttp/blob/master/README.md)
-    - This will require installing some extra packages the required packages are
+    - This will require installing some extra packages:
        * oUnit, str, nums, yojson, cohttp, lwt, ocurl
-       steps for installation on a mac are:
-         1. `opam install ounit`
-         2. `opam install yojson`
-         3. `opam install cohttp cohttp cohttp-lwt-unix`
-         4. `opan update`
-         5. `opam upgrade` (this will delete and reinstall everything)
-         6. `opam install ocurl`
-    - `make compile` will compile all the code including the server
+    - to install these dependencies, run:
+        `make install`
     - `make server` will compile and run the server
-    - ./sever.ml will run the server
 
 + Using the messanger bot
-    - you can message "Ocaml Calculator" or CLICK THIS LINK to message the the
-    bot
+  * The instance we set up is in testing mode, since facebook does not allow
+  them to be public, access must be explicitly given, ztb5 can give you access
+  * To set up your own instance:
+    - to connect bot to facebook, visit https://developers.facebook.com/docs/messenger-platform/getting-started/quick-start
+    and follow the tutorial
+    - once bot is connected to facebook, you can start a conversation by messaging the page the bot is linked to
     - these commands will be case insensitive
+    - multiple users are suported, and their enviroments will be strored seperately
 
 Using the calculator
 ================
@@ -277,7 +276,8 @@ Defining a New Operator
 
 A function defintion must be entered in its own message to the calculator and be
 in the following form
-`{<name of function>: <param₁> … <paramn> -> <stack program for method>}`
+  `{<name of function>: <param₁> … <paramn> -> <stack program for method>}`
+
 Then to execute the function the user can list the arguments and then place the
 function name after the arguments listed in order
 * ex. ```

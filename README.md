@@ -58,31 +58,31 @@ Instructions for set up
 ========================
 + Running the Calculator in the terminal
   - commands will be case sensitive
-  1. The only the packages used with the command line version are oUint, and nums
+  1. The only the packages used with the command line version are oUint, nums, and str
   so you should not need to install anything to run the command line version
   2. There is a make file to make running the code simpler
     - required packages are oUnit(see #1 for install command) and Nums(does not require install)
     - `make test` will run the test suite
     - `make repl` will compile and run the repl, (control-c will quit)
+    - `make compile` will compile all the non server source code
     - `make clean` will clean up the files built
 + Running the server
     - this server is partially adapted from [ohttp](https://github.com/RamV13/ohttp/blob/master/README.md)
     - This will require installing some extra packages the required packages are
        * oUnit, str, nums, yojson, cohttp, lwt, ocurl
-       steps for installation on a mac are:
+       possible steps for installation on a mac are:
          1. `opam install ounit`
          2. `opam install yojson`
          3. `opam install cohttp cohttp cohttp-lwt-unix`
          4. `opan update`
          5. `opam upgrade` (this will delete and reinstall everything)
          6. `opam install ocurl`
-    - `make compile` will compile all the code including the server
     - `make server` will compile and run the server
-    - ./sever.ml will run the server
 
 + Using the messanger bot
     - you can message "Ocaml Calculator" or CLICK THIS LINK to message the the bot
     - these commands will be case insensitive
+    - multiple users are suported, and there enviroments will be strored seperately
 
 Using the calculator
 ================

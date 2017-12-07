@@ -86,8 +86,8 @@ Instructions for set up
 
 Using the calculator
 ================
-* note: if an error is raised and you do not interact with the resulting error that error 
-may be burried on the stack, for example `2 0 / 3 5 *` will return `15` and will not 
+* note: if an error is raised and you do not interact with the resulting error that error
+may be burried on the stack, for example `2 0 / 3 5 *` will return `15` and will not
 display the divide by zero error, when the following says .... displays the error this is
 suceptible to happen
 
@@ -102,7 +102,7 @@ Types
 + matricies (row major) and require spaces after commas and no spaces after ]
   - ex. `[[2., -3.], [-4., 5.]]` is the matrix   
   | 2. -3. |  
-  | -4  5. | 
+  | -4  5. |
 
 Built in Operators
 ------------------
@@ -116,93 +116,93 @@ simple arithmatic
   must be of the same size
 + `a b *` will compute normal integer/floating point multiplication of `a` and `b`
 + `a b /` will compute integer/floating point division of `a` `b`
-  - note: integer division will be floored for numbers where the `b` does not divide 
+  - note: integer division will be floored for numbers where the `b` does not divide
   the `a`. If `b` is 0 then this equation will evaluate to an error, `"division by zero"`.
-+ `a b ^` operator will raise `a` to the `b` power where `a` and `b` are normal integers 
-or floating point numbers. This may cause floating point numbers to overflow, but integers 
++ `a b ^` operator will raise `a` to the `b` power where `a` and `b` are normal integers
+or floating point numbers. This may cause floating point numbers to overflow, but integers
 will never overflow their value, though could cause a slow response.
 + `a b =` tests equality of `a` and `b` which are normal integer, floating point, or
 matrix values
-+ `a b c ?` will be used like an if statement. `a` will act as the guard, so if it 
-evaluates to a non zero value then the stack will process `b` and if `a` is a zero value 
++ `a b c ?` will be used like an if statement. `a` will act as the guard, so if it
+evaluates to a non zero value then the stack will process `b` and if `a` is a zero value
 then `c` will be processed by the stack.
 
 
 modular arithmetic
 ******************
-+ `a b %` will compute the remainder of `a` when divided by `b` where `a` and 
-`b` are integers, and `b` is positive if b is 0 then the error message "division 
++ `a b %` will compute the remainder of `a` when divided by `b` where `a` and
+`b` are integers, and `b` is positive if b is 0 then the error message "division
 by 0" will be displayed
-+ `a b c +~` will compute the sum of `a` and `b` taken mod `c` where `a`, `b`, 
++ `a b c +~` will compute the sum of `a` and `b` taken mod `c` where `a`, `b`,
 and `c` are integers, and `c` is positive
-otherwise the error message "cannot take the remainder mod a non-positive number" 
+otherwise the error message "cannot take the remainder mod a non-positive number"
 will be displayed
-+ `a b c -~`  will compute the difference of `a` and `b` taken mod `c` where 
++ `a b c -~`  will compute the difference of `a` and `b` taken mod `c` where
 `a`, `b`, and `c` are integers, and `c` is positive otherwise the error message
 "cannot take the remainder mod a non-positive number" will be displayed
-+ `a b c *~` will compute the product of `a` and `b` taken mod `c` where `a`, 
++ `a b c *~` will compute the product of `a` and `b` taken mod `c` where `a`,
 `b`, and `c` are integers, and `c` is positive
 otherwise the error message "cannot take the remainder mod a non-positive number"
 will be displayed
 + `a b c /~` will compute the division of `a` and `b` taken mod `c` where `a`, `b`,
 and `c` are integers, and `c` is positive
-otherwise the error message "cannot take the remainder mod a non-positive number" 
+otherwise the error message "cannot take the remainder mod a non-positive number"
 will be displayed
-  - note: if the `b` is not relatively prime to `c` then division cannot proceed 
+  - note: if the `b` is not relatively prime to `c` then division cannot proceed
   and the error `"second arguement is not relatively prime to divisor"` will be displayed.
 + `a b c ^~` operator will raise `a` to the `b` power then take the remainder mod `c`, where
-`a`, `b`, and `c` are integers, and `c` is positive otherwise the error message "cannot 
+`a`, `b`, and `c` are integers, and `c` is positive otherwise the error message "cannot
 take the remainder mod a non-positive number" will be displayed
 + `a b c =~` tests the equality of `a` and `b` mod `c`, where `a`, `b`, and `c` are integers
 
 other modular operators
 ***********************
-+ `a b gcd` computes the greatest common divisor of `a` and `b`, where `a`, `b`, 
++ `a b gcd` computes the greatest common divisor of `a` and `b`, where `a`, `b`,
 and `c` are integers
-+ `a b lcm` computes the least common multiple of `a` and `b`, where `a`, `b`, 
++ `a b lcm` computes the least common multiple of `a` and `b`, where `a`, `b`,
 and `c` are integers
-+ `a factor` computes the factors of `a`, where `a` is an integer dispaying them 
++ `a factor` computes the factors of `a`, where `a` is an integer dispaying them
 as a list with their multiplicities
-+ `l gen_prime` is an integer greater than `l` bits long, which is prime with very 
-high probability and gives the error message "no primes this small" if the length 
++ `l gen_prime` is an integer representable with `l` bits, which is prime with very
+high probability and gives the error message "no primes this small" if the `l`
 is to small
   - ` 'prime` will give the most recently generated prime
-+ `n is_prime` is 1 if `n` is prime and 0 if `n` is not prime, can be slow 
-for large `n` (infact will possibly never terminate, control-c will get you 
++ `n is_prime` is 1 if `n` is prime and 0 if `n` is not prime, can be slow
+for large `n` (infact will possibly never terminate, control-c will get you
 out of this sticky situation)
-+ `n is_prime_prob` is 1 if `n` is prime and 0 if `n` is not prime with high 
-probability, much faster than is_prime, but not guaranteed to be correct, 
++ `n is_prime_prob` is 1 if `n` is prime and 0 if `n` is not prime with high
+probability, much faster than is_prime, but not guaranteed to be correct,
 roughly probability 1/2^100 of n being composite.
-  - note: if the user types `'prime_prob` you will recieve the result of the 
+  - note: if the user types `'prime_prob` you will receive the result of the
   last call to is_prime_prob
-+ `a totient` computes the Euler’s totient function of `a` where `a` is an 
++ `a totient` computes the Euler’s totient function of `a` where `a` is an
 integer > 0 otherwise error message "totient undefined for non_positive values"
 + `p q d public_key` will generate a public key based on the private key `(p, q, d)`
   - `'n` and `'e` will give the public key most recently calculated
-  - though generate_public_key takes 3 parameters, it can take the resulting 
+  - though generate_public_key takes 3 parameters, it can take the resulting
   tuple produced by generate_private_key
-+ `generate_private_key` will generate, with very high probability, a triple 
++ `generate_private_key` will generate, with very high probability, a triple
 (d,p,q) where p,q are two large prime numbers, and d is a unit modulo p*q
    - `'p`, `'q`, and `'d` will give the private key most recently generated
-+ `msg n e encrypt` will encrypt the string `msg` using `n` `e` as the public 
++ `msg n e encrypt` will encrypt the string `msg` using `n` `e` as the public
 key where `n` is a large number, and `e` is a unit modulo `n`.
-  - though encrypt takes 3 parameters, it can take 2 the second being the 
+  - though encrypt takes 3 parameters, it can take 2 the second being the
   resulting pair created by `public_key`
-+ `c d p q decrypt` will decrypt the number `c` using `d` `p` `q` as the 
-private key where `p` is a large prime integer, `q` is a large prime integer, 
++ `c d p q decrypt` will decrypt the number `c` using `d` `p` `q` as the
+private key where `p` is a large prime integer, `q` is a large prime integer,
 and `d` is a unit modulo the product of `p` and `q`.
-  - though encrypt takes 4 parameters, it can take 2 the second being the 
+  - though encrypt takes 4 parameters, it can take 2 the second being the
   resulting tuple produced by generate_private_key
-+ `c n e crack` will attempt to decrypt the integer `c` using `n` `e` as the 
++ `c n e crack` will attempt to decrypt the integer `c` using `n` `e` as the
 public key where `n` is the product of 2 large primes, and `e` is a unit mod `n`.
-  - though crack takes 3 parameters, it can take 2 the second being the resulting 
+  - though crack takes 3 parameters, it can take 2 the second being the resulting
   pair created by `public_key`
-+ `a b c bezout` is a pair (x, y) where x*a + y*b = c, or an exception message 
++ `a b c bezout` is a pair (x, y) where x*a + y*b = c, or an exception message
 will be displayed if no such value exists
 + `a0b0 … anbn n solve` solves the system of equations x=a₀ (mod b₀) … x=an(mod bn)
 where the as and bs are integers, there are `n` of those equations (otherwise
-a parsing error is enountered), they do not contradict (otherwise the method 
-may fail, or give a false result), and each b is positive (otherwise the 
+a parsing error is enountered), they do not contradict (otherwise the method
+may fail, or give a false result), and each b is positive (otherwise the
 error message `"cannot take the remainder mod a non-positive number"` will be displayed)
 + `a n square` indicates if `a` is a square mod `n` where `n` is a positive
 integer, and `a` is positive integer. Can take a very long time for large `n`
@@ -211,26 +211,26 @@ combinatroics
 *************
 + `n !` is the calculation of a factorial where `a` is a positive integer
 + `n k choose` is the calculation of `n` choose `k` where `n` and `k` are positive integer
-+ `n k perm` is the calculation of the number of choices of `n` items 
++ `n k perm` is the calculation of the number of choices of `n` items
 from `k` where order matters, `n` and `k` are positive integers
-+ `a b part` is the calculation of the number of ways `n` items 
++ `a b part` is the calculation of the number of ways `n` items
 can be partitioned into `k` categories where all `n` items would be indistinguishable,
 `n` and `k` are positive integers
 
 linear alg
 **********
-* note: in these calculations if integer values are given then computation 
-will proceed in the rational numbers, to avoid errors from tructation in integer 
+* note: in these calculations if integer values are given then computation
+will proceed in the rational numbers, to avoid errors from tructation in integer
 division any time the improper sizes of imput matricies an erroe message
 "matrix size issue" will be diplayed
 + `v1 v2 .` computes the dot product of `v1` and `v2` where `v1` and `v2` are column vectors
-+ `v1 v2 #` computes the cross product of `v1` and `v2` where `v1` and `v2` are column 
++ `v1 v2 #` computes the cross product of `v1` and `v2` where `v1` and `v2` are column
 vectors of height 3
 + `m s *` computes `m` scaled by `s` where `s` is a number and `m` is a matrix
-+ `m n col` gives the `n`th column of the matrix `m` where `n` is a 64 bit integer with 
-within the matrix `m` 
-+ `m n row` gives the `n`th row of the matrix `m` where `n` is a 64 bit integer with 
-within the matrix `m` 
++ `m n col` gives the `n`th column of the matrix `m` where `n` is a 64 bit integer with
+within the matrix `m`
++ `m n row` gives the `n`th row of the matrix `m` where `n` is a 64 bit integer with
+within the matrix `m`
 + `m inv` computes the inverse of the matrix `m` if `m` is invertable
 + `m transpose` computes the transpose of the matrix `m`
 + `m echelon` reduces `m` to echelon form where `m` is a matrix
@@ -243,15 +243,15 @@ error message "inconsistant system" is displayed
 + `m rank` computes the rank of the matrix `m`
 + `m dep` computes if the columns of `m` are linearly dependent where `m` is a matrix
 + `m indep` computes if the columns of `m` are linearly independent where `m` is a matrix
-+ `m nullspace` computes a matrix with the columns of the matrix being the null 
++ `m nullspace` computes a matrix with the columns of the matrix being the null
 space of `m` where `m` is a matrix
-+ `a colspace` computes a matrix with the columns of the matrix being the column 
++ `a colspace` computes a matrix with the columns of the matrix being the column
 space of `m` where `m` is a matrix
 
 Defining a New Operator
 -----------------------
 
-A function defintion must be entered in its own message to the calculator and be 
+A function defintion must be entered in its own message to the calculator and be
 in the following form
 `{<name of function>: <param₁> … <paramn> -> <stack program for method>}`   
 Then to execute the function the user can list the arguments and then place the

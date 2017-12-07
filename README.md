@@ -70,13 +70,8 @@ Instructions for set up
     - this server is partially adapted from [ohttp](https://github.com/RamV13/ohttp/blob/master/README.md)
     - This will require installing some extra packages the required packages are
        * oUnit, str, nums, yojson, cohttp, lwt, ocurl
-       possible steps for installation on a mac are:
-         1. `opam install ounit`
-         2. `opam install yojson`
-         3. `opam install cohttp cohttp cohttp-lwt-unix`
-         4. `opan update`
-         5. `opam upgrade` (this will delete and reinstall everything)
-         6. `opam install ocurl`
+       to install dependencies run:
+        `make install`
     - `make server` will compile and run the server
 
 + Using the messanger bot

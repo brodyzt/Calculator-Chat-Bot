@@ -42,5 +42,5 @@ BOT:
  _ have really long qeries time out for the bot/ maybe have them return when done
 
 ALL FILES:
- _ helper method documentation
- _ clean up code (make style good - no lines over 80 chars/Library functions/tail rec)
+ x helper method documentation
+ x clean up code (make style good - no lines over 80 chars/Library functions/tail rec)

@@ -115,19 +115,6 @@ let add =
 let subtract =
   simple_bin (fun a b -> let N(num) = Simpl_arith.subtract a b in num)
 
-let string_of_number n =
-  match n with
-  | I i -> string_of_big_int i
-  | F f -> string_of_float f
-  | Q (a, b) -> (string_of_big_int a )^ "/" ^ (string_of_big_int b)
-
-let string_of_matrix m =
-  "[\n"^(Array.fold_right ( fun  e ac ->
-    "[ "^(Array.fold_right (fun  el acc -> (string_of_number el)^" "^acc) e ("]\n"^ac))  )
-    m
-    "]"
-     )
-
 (*[clear_col j i1 i2] substracts a multiple of i1 from i2 such that the
  * leading entry of i2 will become 0(the leading entry is in the [j]
  * col)*)
@@ -160,7 +147,8 @@ let swap m i1 i2 =
  * a rational matrix*)
 let convert_to_rat m =
   match m.(0).(0) with
-  | I _ -> (init_matrix (Array.length m) (Array.length m.(0)) (fun i j -> let I(n) = m.(i).(j) in Q(n, big_int_of_int 1) ) )
+  | I _ -> (init_matrix (Array.length m) (Array.length m.(0))
+    (fun i j -> let I(n) = m.(i).(j) in Q(n, big_int_of_int 1) ) )
   | F _ -> m
   | Q _ -> m
 
@@ -220,7 +208,9 @@ let rec red_row_up m i=
             let N(n) = Simpl_arith.divide v (piv_val) in
               m.(i).(j') <- n
           ) m.(i);
-          Array.iteri (fun ind row -> if ind < i then m.(ind) <- (clear_col j ( m.(i) ) row ) else () ) m;
+          Array.iteri (fun ind row ->
+            if ind < i then m.(ind) <- (clear_col j ( m.(i) ) row ) else ()
+          ) m;
           red_row_up m (i-1))
   else
     M(m)
@@ -255,7 +245,7 @@ let inverse m =
     else
       E "matrix size error"
 
-(*[prod_diag m i j acc] takes the product of the entries along the primary
+(*[prod_diag m i acc] takes the product of the entries along the primary
  * diagonal of [m] where the entries to the left and above [i] have already been
  * taken into account
  * requires: m has been reduced to row eschelon form *)
@@ -291,12 +281,10 @@ let determinant m =
         else reg_unit m.(0).(0)))
   else E("matrix size issue")
 
-
-
-
-
-(*[piv_col m f init] applys the function f to the col number of the pivot col
- * in the row eschelon matrix [m]
+(*[piv_col m f g pinit ninit] essential traverses the pivots in a matrix
+ * applys the function f to the row and col number of
+ * the pivot col in the row eschelon matrix [m] using pinit for the initial
+ * value, and applys g to every pivot row and col with nacc as its initial value
  * requires: m has been reduced to row echelon form*)
 let piv_col m f g pinit ninit=
   let rows = Array.length m in
@@ -304,12 +292,12 @@ let piv_col m f g pinit ninit=
   let rr = row_echelon m in
     let rec trav_diag i j pacc nacc =
       if i < rows && j < cols then
+        (*this is a pivot position*)
         if non_zero (m.(i).(j)) then
           trav_diag (i+1) (j+1) (f i j pacc) (g i j nacc)
         else trav_diag (i) (j+1) pacc nacc
       else (pacc, nacc)
     in trav_diag 0 0 pinit ninit
-
 
 (*[negate v] negates the value [v]*)
 let negate v =
@@ -328,12 +316,10 @@ let rec rem v l =
 let rec from n acc =
   if n < 0 then acc else (from (n-1) (n::acc))
 
-
 let rec exists_non_zero n m =
   if n < 0 then false
   else if non_zero (m.(n)) then true
   else exists_non_zero (n-1) m
-
 
 (*[check_consistent m i] chacks that the matrix m is consistent in the
  * row i and all those above*)
@@ -348,8 +334,6 @@ let rec check_consistent m i =
         else false
       else
         check_consistent m (i-1)
-
-
 
 (*[read_off_sol m] for a matrix that is in augmented form and has one singular
  * solution this reads off the solution*)
@@ -386,9 +370,11 @@ let solve m1 m2 =
   let cols2 = Array.length m2.(0) in
     if rows1 <> 0 && cols1 <> 0 && cols2 = 1 &&  rows1 = rows2 then
         let aug = Array.make_matrix rows1 (cols1+1) (F 0.) in
+          (*adds m to the augmented matrix*)
           Array.iteri (fun i row -> Array.iteri (fun j v ->
             aug.(i).(j) <- v
           ) row) m1;
+          (*adds vector to the augmented matrix*)
           Array.iteri (fun i row -> aug.(i).(cols1) <- row.(0)) m2;
             let M(sol) = red_row_echelon aug in
               if check_consistent sol (rows1 -1)

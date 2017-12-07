@@ -31,19 +31,22 @@ let truthy b =
 (*[add a b n] is a + b (mod n) expressed as N(I(r)) with 0 <= r < n or
   E("cannot take the remainder mod a non-positive number") is n <= 0*)
 let add a b n =
-  if (le_big_int n zero_big_int) then E("cannot take the remainder mod a non-positive number")
+  if (le_big_int n zero_big_int)
+  then E("cannot take the remainder mod a non-positive number")
   else N(I(mod_big_int (add_big_int a b) n))
 
 (*[subtract a b n] is a - b (mod n) expressed as N(I(r) with 0 <= r < n or
   E("cannot take the remainder mod a non-positive number") is n <= 0*)
 let subtract a b n =
-  if (le_big_int n zero_big_int) then E("cannot take the remainder mod a non-positive number")
+  if (le_big_int n zero_big_int)
+  then E("cannot take the remainder mod a non-positive number")
   else N(I(mod_big_int (sub_big_int a b) n))
 
 (*[multiply a b n] is a*b (mod n) expressed as N(I(r) with 0 <= r < n or
   E("cannot take the remainder mod a non-positive number") is n <= 0*)
 let multiply a b n =
-  if (le_big_int n zero_big_int) then (E "cannot take the remainder mod a non-positive number")
+  if (le_big_int n zero_big_int)
+  then (E "cannot take the remainder mod a non-positive number")
   else N(I(mod_big_int (mult_big_int a b) n))
 
 (*[as_bin_list a accum] is a list of a's bits staring with accum and in reverse order
@@ -87,7 +90,8 @@ let rec condense n pows bin accum=
 let power a b n =
   let b = abs_big_int b in
   if (eq_big_int b zero_big_int) then N(I(unit_big_int))
-  else if (le_big_int n zero_big_int) then E("cannot take the remainder mod a non-positive number")
+  else if (le_big_int n zero_big_int)
+  then E("cannot take the remainder mod a non-positive number")
   else let a_red = mod_big_int a n in
   if eq_big_int a_red zero_big_int then N(I(zero_big_int))
   else let bin = as_bin_list b [] in
@@ -443,7 +447,8 @@ let is_square a p =
   if n <= 0, if n > 0, and there exists some b such that a*b = 1 (mod n), then
   N(I(b)), otherwise, E("has no inerse mod this number") *)
 let inv a n =
-  if (le_big_int n zero_big_int) then E("cannot take the remainder mod a non-positive number")
+  if (le_big_int n zero_big_int)
+  then E("cannot take the remainder mod a non-positive number")
   else let result = bezout a n (big_int_of_int 1) in
       match result with
         | E _ -> E("has no inverse mod this number")
@@ -455,7 +460,8 @@ let inv a n =
   r = a*b^-1 (mod n) for 0 <= r < n, it is N(I(r)), otherwise
   E("second arguement is not relatively prime to divisor")*)
 let divide a b n =
-  if (le_big_int n zero_big_int) then E("cannot take the remainder mod a non-positive number")
+  if (le_big_int n zero_big_int)
+  then E("cannot take the remainder mod a non-positive number")
   else let result = inv b n in
   match result with
     | E _ -> E("second arguement is not relatively prime to divisor")

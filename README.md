@@ -178,14 +178,15 @@ roughly probability 1/2^100 of n being composite.
 + `a totient` computes the Euler’s totient function of `a` where `a` is an
 integer > 0 otherwise error message "totient undefined for non_positive values"
 + `p q d public_key` will generate a public key based on the private key `(p, q, d)`
-  - `'n` and `'e` will give the public key most recently calculated
+  - `'n` and `'e` will give the corresponding components of the public key most recently calculated
+
   - though generate_public_key takes 3 parameters, it can take the resulting
   tuple produced by generate_private_key
 + `generate_private_key` will generate, with very high probability, a triple
 (d,p,q) where p,q are two large prime numbers, and d is a unit modulo p*q
-   - `'p`, `'q`, and `'d` will give the private key most recently generated
+   - `'p`, `'q`, and `'d` will give the corresponding components private key most recently generated
 + `msg n e encrypt` will encrypt the string `msg` using `n` `e` as the public
-key where `n` is a large number, and `e` is a unit modulo `n`.
+key where `n` is a large product of two distinct, and `e` is a unit modulo `n`.
   - though encrypt takes 3 parameters, it can take 2 the second being the
   resulting pair created by `public_key`
 + `c d p q decrypt` will decrypt the number `c` using `d` `p` `q` as the
@@ -204,8 +205,7 @@ where the as and bs are integers, there are `n` of those equations (otherwise
 a parsing error is enountered), the b's are relative prime (otherwise the method
 may fail, or give a false result), and each b is positive (otherwise the
 error message `"cannot take the remainder mod a non-positive number"` will be displayed)
-+ `a n square` indicates if `a` is a square mod `n` where `n` is a positive
-integer, and `a` is positive integer. Can take a very long time for large `n`
++ `a p square` indicates if a is a square mod p where p is a positive prime, and a is an integer. Gives the exception value "cannot take the remainder mod a non-positive number", if p <= 0.
 
 combinatroics
 *************

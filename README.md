@@ -68,16 +68,18 @@ Instructions for set up
     - `make clean` will clean up the files built
 + Running the server
     - this server is partially adapted from [ohttp](https://github.com/RamV13/ohttp/blob/master/README.md)
-    - This will require installing some extra packages the required packages are
+    - This will require installing some extra packages:
        * oUnit, str, nums, yojson, cohttp, lwt, ocurl
-       to install dependencies run:
+    - to install dependencies run:
         `make install`
     - `make server` will compile and run the server
 
 + Using the messanger bot
-    - you can message "Ocaml Calculator" or CLICK THIS LINK to message the the bot
+    - to connect bot to facebook, visit https://developers.facebook.com/docs/messenger-platform/getting-started/quick-start
+    and follow the tutorial 
+    - once bot is connected to facebook, you can start a conversation by messaging the page the bot is linked to
     - these commands will be case insensitive
-    - multiple users are suported, and there enviroments will be strored seperately
+    - multiple users are suported, and their enviroments will be strored seperately
 
 Using the calculator
 ================

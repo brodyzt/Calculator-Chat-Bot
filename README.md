@@ -199,9 +199,9 @@ public key where `n` is the product of 2 large primes, and `e` is a unit mod `n`
   pair created by `public_key`
 + `a b c bezout` is a pair (x, y) where x*a + y*b = c, or an exception message
 will be displayed if no such value exists
-+ `a0b0 … anbn n solve` solves the system of equations x=a₀ (mod b₀) … x=an(mod bn)
++ `b0a0 … bnan n solve` solves the system of equations x=a₀ (mod b₀) … x=an(mod bn)
 where the as and bs are integers, there are `n` of those equations (otherwise
-a parsing error is enountered), they do not contradict (otherwise the method
+a parsing error is enountered), the b's are relative prime (otherwise the method
 may fail, or give a false result), and each b is positive (otherwise the
 error message `"cannot take the remainder mod a non-positive number"` will be displayed)
 + `a n square` indicates if `a` is a square mod `n` where `n` is a positive

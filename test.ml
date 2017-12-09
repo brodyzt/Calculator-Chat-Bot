@@ -97,7 +97,7 @@ let simpl_arith_tests = [
   (*tests simple floating point division*)
   ("simple_float_div", "27. 5. /", "5.4");
   ("simple_float_zero_and_other1_div", "0. 1. /", "0.");
-  ("simple_float_zero_and_other2_div", "1. 0. /", "division by 0");
+  ("simple_float_zero_and_other2_div", "1. 0. /", "inf");
   ("simple_float_zero_and_other3_div", "0. -1. /", "0.");
   ("simple_float_zero_and_other4_div", "0. -5. /", "0.");
   ("simple_float_zero_and_other5_div", "0. 5. /", "0.");
@@ -105,7 +105,7 @@ let simpl_arith_tests = [
   (*-------- ^ --------*)
   (*tests powers of the small floating point numbers*)
   ("simple_float_pow", "10. 3. ^", "1000.");
-  ("simple_float_pow_0._0.", "0. 0. ^", "Undefined");
+  ("simple_float_pow_0._0.", "0. 0. ^", "undefined");
   ("simple_float_pow_sqrt", "25. 0.5 ^", "5.");
   ("simple_float_pow_inverse", "10. -1. ^", "0.1");
   (*tests powers of the large floating point numbers*)
@@ -115,7 +115,7 @@ let simpl_arith_tests = [
 
   (*tests powers of the small integer numbers*)
   ("simple_integer_pow", "10 3 ^", "1000");
-  ("simple_integer_pow_0._0.", "0 0 ^", "Undefined");
+  ("simple_integer_pow_0._0.", "0 0 ^", "undefined");
   ("simple_integer_pow_inverse", "10 -1 ^", "I do not understand");
   (*tests powers of the large integer numbers*)
   ("big_simple_float_pow", "1000 3 ^", "1000000000");

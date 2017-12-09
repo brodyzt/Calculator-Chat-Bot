@@ -192,7 +192,7 @@ integer > 0 otherwise error message "totient undefined for non_positive values"
   - `'n` and `'e` will give the corresponding components of the public key most
   recently calculated
 
-  - though gen_public_key takes 3 parameters, it can take the resulting
+  - though public_key takes 3 parameters, it can take the resulting
   tuple produced by gen_private_key
 + `gen_private_key` will generate, with very high probability, a triple
 (d,p,q) where p,q are two large prime numbers, and d is a unit modulo p*q
